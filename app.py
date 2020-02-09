@@ -1,6 +1,6 @@
 import logging
 from os import urandom
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, request, session
 from libs.authentication import Authentication
 from libs.secrets import Secrets
 
@@ -13,10 +13,50 @@ secrets = Secrets('secrets.json')
 auth = Authentication(secrets)
 
 
+def is_user_logged_in():
+    """
+    Check if the requester is logged in
+    :return: Boolean: True or False
+    """
+    try:
+        return session['loggedin']
+    except Exception as e:
+        logging.debug(f'Session not yet created, creating empty. {e}')
+        session['loggedin'] = False
+        return 0
+
+
 @app.route('/')
 def home():
-    auth.attempt_login('admin', 'hihi')
-    return render_template('home.html')
+    """
+    Serve the homepage or redirect to the login page
+    """
+    if is_user_logged_in():
+        return render_template('home.html')
+    return redirect('/login')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """
+    Serve the login page or redirect to home
+    """
+    if request.method == 'POST':
+        if 'password' in request.form and 'username' in request.form:
+            if auth.attempt_login(request.form['username'], request.form['password']):
+                session['loggedin'] = True
+                return redirect('/')
+    return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    """
+    Log a user out and redirect to login
+    """
+    if is_user_logged_in():
+        session['loggedin'] = False
+    return redirect('/')
 
 
 if __name__ == '__main__':
