@@ -7,9 +7,10 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'flask',
-        'keras',
-        'pandas',
-        'numpy'
+        'flask==1.1.1',
+        'numpy==1.16.3',
+        'pandas==0.24.2',
+        'passlib==1.7.1',
+        'bcrypt==3.1.7'
     ],
 )
