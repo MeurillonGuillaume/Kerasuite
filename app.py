@@ -4,11 +4,14 @@ from flask import Flask, render_template, redirect, request, session
 from libs.authentication import Authentication
 from libs.secrets import Secrets
 
+# Enable logging
 logging.basicConfig(level=logging.INFO)
 
+# Create Flask app
 app = Flask(__name__)
 app.secret_key = urandom(80)
 
+# Load suite secrets
 secrets = Secrets('secrets.json')
 auth = Authentication(secrets)
 

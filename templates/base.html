@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Kerasuite</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css">
 </head>
 <body>
-{% block Body %}
-{% endblock %}
+
+<div class="container">
+    <div class="section">
+        {% block Navbar %}
+        {% endblock %}
+        {% block Body %}
+        {% endblock %}</div>
+</div>
 </body>
 </html>

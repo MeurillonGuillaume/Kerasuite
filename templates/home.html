@@ -1,5 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'navbar.html' %}
 {% block Body %}
     <h1>Hello, World!</h1>
-    <p><a href="/logout">Logout</a></p>
+    <a href="/logout">
+        <button class="btn tooltip tooltip-bottom" data-tooltip="Come back soon!">Logout</button>
+    </a>
 {% endblock %}

@@ -1,9 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'navbar.html' %}
 {% block Body %}
     <h1>Login</h1>
     <form method="post" action="/login">
-        <input type="text" name="username" value="admin" required>
-        <input type="password" name="password" value="Kerasuite" required>
-        <input type="submit" value="Login">
+        <div class="form-group">
+            <label class="form-label" for="username">Username:</label>
+            <input type="text" name="username" value="admin" class="form-input" id="username" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="password">Password:</label>
+            <input type="password" name="password" value="Kerasuite" class="form-input" id="password" required>
+        </div>
+
+        <button class="btn btn-success btn-lg tooltip tooltip-bottom" data-tooltip="Let's go!">Login</button>
     </form>
 {% endblock %}
