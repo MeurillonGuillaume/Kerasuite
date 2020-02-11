@@ -35,7 +35,13 @@ def home():
     Serve the homepage or redirect to the login page
     """
     if is_user_logged_in():
-        return render_template('home.html', LoggedIn=True)
+        return render_template('home.html', LoggedIn=True,
+                               Projects=[{"name": "Hello, World!", "description": "Some text about this project"},
+                                         {"name": "Project 2", "description": "Some text about this project"},
+                                         {"name": "Project Kerasuite", "description": "Some text about this project"},
+                                         {"name": "Yet another great project",
+                                          "description": "Some text about this project"},
+                                         {"name": "This is fine", "description": "Some text about this project"}])
     return redirect('/login')
 
 
