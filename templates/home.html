@@ -4,23 +4,64 @@
     <div class="columns">
         {% if Projects %}
             {% for project in Projects %}
-                <div class="column col-lg-12 col-3" style="margin-bottom: 1rem">
+                <div class="column col-lg-12 col-4" style="margin-bottom: 1rem">
                     <div class="card">
-                        <div class="card-header bg-dark">
+                        <div class="card-header bg-secondary">
                             <div class="card-title text-center">
                                 <h2>{{ project.name }}</h2>
                             </div>
                         </div>
                         <div class="card-body">
                             <p><span class="text-bold">Project description: </span>{{ project.description }}</p>
-                            <button class="btn btn-success">Launch</button>
-                            <button class="btn btn-error text-right tooltip tooltip-bottom"
-                                    data-tooltip="Delete this project"><i class="icon icon-delete"></i></button>
+                            <a href="#">
+                                <button class="btn btn-success">Launch</button>
+                            </a>
+                            <a href="#">
+                                <button class="btn btn-error tooltip tooltip-bottom" data-tooltip="Delete this project">
+                                    <i class="icon icon-delete"></i></button>
+                            </a>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         {% endif %}
+        <div class="modal" id="modal-id">
+            <a href="#close" class="modal-overlay" id="modalCloseArea" aria-label="Close"></a>
+            <div class="modal-container">
+                <div class="modal-header">
+                    <a href="#close" class="btn btn-clear float-right" id="modalCloseBtn" aria-label="Close"></a>
+                    <div class="modal-title h5">New project</div>
+                </div>
+                <div class="modal-body">
+                    <div class="content">
+                        <!-- content here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    ...
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-primary btn-action btn-lg" id="modalBtn"><i class="icon icon-plus"></i></button>
+        <script>
+            document.addEventListener("DOMContentLoaded", function (event) {
+                let button = document.getElementById('modalBtn');
+                let modal = document.getElementById('modal-id');
+                let modalCloseBtn = document.getElementById('modalCloseBtn');
+                let modalCloseArea = document.getElementById('modalCloseArea');
 
+                button.onclick = function () {
+                    modal.classList.add('active');
+                };
+
+                modalCloseBtn.onclick = function () {
+                    modal.classList.remove('active');
+                };
+
+                modalCloseArea.onclick = function () {
+                    modal.classList.remove('active');
+                };
+            })
+        </script>
     </div>
 {% endblock %}
