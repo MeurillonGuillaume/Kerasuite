@@ -13,11 +13,14 @@
                         </div>
                         <div class="card-body">
                             <p><span class="text-bold">Project description: </span>{{ project.description }}</p>
-                            <button class="btn btn-primary">Launch project</button>
+                            <button class="btn btn-success">Launch</button>
+                            <button class="btn btn-error text-right tooltip tooltip-bottom"
+                                    data-tooltip="Delete this project"><i class="icon icon-delete"></i></button>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         {% endif %}
+
     </div>
 {% endblock %}
