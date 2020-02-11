@@ -3,8 +3,8 @@ import logging
 
 
 class Authentication:
-    def __init__(self, secrets):
-        self.__secrets = secrets
+    def __init__(self, database):
+        self.__db = database
 
     def attempt_login(self, username, password):
         """
@@ -15,7 +15,7 @@ class Authentication:
         """
         try:
             logging.info(f'Attempting to login with username "{username}" and password "{password}"')
-            userdata = self.__secrets.get_user(username)
+            userdata = self.__db.get('users')[username]['password']
             if userdata is not None:
                 # Will return True if the submitted password matches the hashed password
                 return bcrypt.verify(password, userdata)

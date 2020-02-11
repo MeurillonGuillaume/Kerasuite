@@ -1,8 +1,11 @@
 import logging
-from os import urandom
+from os import urandom, listdir
 from flask import Flask, render_template, redirect, request, session
 from libs.authentication import Authentication
-from libs.secrets import Secrets
+import pickledb
+
+# Global variables
+DATABASE_NAME = 'Kerasuite.db'
 
 # Enable logging
 logging.basicConfig(level=logging.INFO)
@@ -11,9 +14,17 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 app.secret_key = urandom(80)
 
-# Load suite secrets
-secrets = Secrets('secrets.json')
-auth = Authentication(secrets)
+# Check if the database exists
+if DATABASE_NAME not in listdir('.'):
+    # Initialise the database with a default user & password (admin - Kerasuite)
+    logging.warning('The database does not exist, initialising now ...')
+    database = pickledb.load('Kerasuite.db', True)
+    database.set('users', {"admin": {"password": "$2b$12$F5t/lNpjbvGMh0m56t1xbe/saHiK.dHKIKif1Q.xOyxcbrr/vKAw."}})
+
+# Load database
+logging.info('Loading database into memory ...')
+database = pickledb.load(DATABASE_NAME, True)
+auth = Authentication(database)
 
 
 def is_user_logged_in():
@@ -54,6 +65,7 @@ def login():
         if 'password' in request.form and 'username' in request.form:
             if auth.attempt_login(request.form['username'], request.form['password']):
                 session['loggedin'] = True
+                session['username'] = request.form['username']
                 return redirect('/')
     return render_template('login.html')
 
@@ -69,4 +81,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=False, port=4444, host='0.0.0.0')
+    app.run(port=4444)
