@@ -1,17 +1,26 @@
 {% extends 'navbar.html' %}
 {% block Body %}
-    <h1>Login</h1>
-    <form method="post" action="/login">
-        <div class="form-group">
-            <label class="form-label" for="username">Username:</label>
-            <input type="text" name="username" value="admin" class="form-input" id="username" required>
-        </div>
+    <div class="columns">
+        <div class="column col-md-12 col-6 col-mx-auto">
+            <h1 class="text-center">Sign In</h1>
+            <div class="form-group">
+                <form method="post" action="/login">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username</label>
+                        <input type="text" name="username" class="form-input" id="username" placeholder="John Doe"
+                               required>
+                    </div>
 
-        <div class="form-group">
-            <label class="form-label" for="password">Password:</label>
-            <input type="password" name="password" value="Kerasuite" class="form-input" id="password" required>
-        </div>
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" name="password" class="form-input" id="password" placeholder="P@$$w0rd"
+                               required>
+                    </div>
 
-        <button class="btn btn-success btn-lg tooltip tooltip-bottom" data-tooltip="Let's go!">Login</button>
-    </form>
+                    <button class="btn btn-success btn-lg tooltip tooltip-bottom" data-tooltip="Let's go!">Sign In
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
 {% block Navbar %}
-    <header class="navbar">
-        <section class="navbar-section">
-            <a href="https://github.com/MeurillonGuillaume/Kerasuite" class="btn">GitHub</a>
-        </section>
+    <header class="navbar" style="padding: 1rem;">
+        <div class="navbar-primary">
+            <a href="/" class="navbar-brand"><span class="text-large">Kerasuite</span></a>
+        </div>
+        <div class="navbar-section">
+            <a href="https://github.com/MeurillonGuillaume/Kerasuite" class="btn" target="_blank">Github repo</a>
+            {% if LoggedIn %}
+                <a href="/logout" class="btn btn-error tooltip tooltip-bottom" data-tooltip="Come back soon :)">
+                    Sign Out
+                </a>
+            {% endif %}
+        </div>
     </header>
 {% endblock %}

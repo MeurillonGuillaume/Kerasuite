@@ -35,7 +35,7 @@ def home():
     Serve the homepage or redirect to the login page
     """
     if is_user_logged_in():
-        return render_template('home.html')
+        return render_template('home.html', LoggedIn=True)
     return redirect('/login')
 
 
