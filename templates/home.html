@@ -1,7 +1,24 @@
 {% extends 'navbar.html' %}
+{% include 'modal_newproject.html' %}
+
 {% block Body %}
     <h1 class="text-center">Your projects</h1>
     <div class="columns">
+        <div class="column col-lg-12 col-4" style="margin-bottom: 1rem">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <div class="card-title text-center">
+                        <h2>New project</h2>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <p>Click the button below to create a new project</p>
+                    <button class="btn btn-primary btn-action btn-lg tooltip tooltip-bottom"
+                            data-tooltip="Create a new project"
+                            id="modalBtn"><i class="icon icon-plus"></i></button>
+                </div>
+            </div>
+        </div>
         {% if Projects %}
             {% for project in Projects %}
                 <div class="column col-lg-12 col-4" style="margin-bottom: 1rem">
@@ -25,43 +42,8 @@
                 </div>
             {% endfor %}
         {% endif %}
-        <div class="modal" id="modal-id">
-            <a href="#close" class="modal-overlay" id="modalCloseArea" aria-label="Close"></a>
-            <div class="modal-container">
-                <div class="modal-header">
-                    <a href="#close" class="btn btn-clear float-right" id="modalCloseBtn" aria-label="Close"></a>
-                    <div class="modal-title h5">New project</div>
-                </div>
-                <div class="modal-body">
-                    <div class="content">
-                        <!-- content here -->
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    ...
-                </div>
-            </div>
-        </div>
-        <button class="btn btn-primary btn-action btn-lg" id="modalBtn"><i class="icon icon-plus"></i></button>
-        <script>
-            document.addEventListener("DOMContentLoaded", function (event) {
-                let button = document.getElementById('modalBtn');
-                let modal = document.getElementById('modal-id');
-                let modalCloseBtn = document.getElementById('modalCloseBtn');
-                let modalCloseArea = document.getElementById('modalCloseArea');
 
-                button.onclick = function () {
-                    modal.classList.add('active');
-                };
-
-                modalCloseBtn.onclick = function () {
-                    modal.classList.remove('active');
-                };
-
-                modalCloseArea.onclick = function () {
-                    modal.classList.remove('active');
-                };
-            })
-        </script>
+        {% block NewProjectModal %}
+        {% endblock %}
     </div>
 {% endblock %}
