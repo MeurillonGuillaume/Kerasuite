@@ -48,7 +48,7 @@ def home():
     Serve the homepage or redirect to the login page
     """
     if is_user_logged_in():
-        return render_template('home.html', LoggedIn=True,
+        return render_template('home.html', LoggedIn=session['loggedin'],
                                Projects=dbclient.get_user_projects(session['username']))
     return redirect('/login')
 
@@ -85,7 +85,7 @@ def settings():
     Return a settings page or redirect to login.
     """
     if is_user_logged_in():
-        return render_template('settings.html')
+        return render_template('settings.html', LoggedIn=session['loggedin'])
     return redirect('/login')
 
 
