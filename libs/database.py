@@ -49,3 +49,13 @@ class Database:
         project_to_trash = self.get_project(name, username)
         projects[username].remove(project_to_trash)
         self.__dbclient.set('projects', projects)
+
+    def does_project_exist(self, projectname, username):
+        """
+        Check if a project exists or not
+        """
+        projects = self.get_user_projects(username)
+        for p in projects:
+            if projectname == p['name']:
+                return 1
+        return 0

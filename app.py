@@ -115,5 +115,14 @@ def drop_project():
     return redirect('/login')
 
 
+@app.route('/run')
+def run():
+    if is_user_logged_in():
+        project = request.args.get('project')
+        if dbclient.does_project_exist(project, session['username']):
+            return render_template('project.html', Projectname=project, LoggedIn=session['loggedin'])
+    return redirect('/login')
+
+
 if __name__ == '__main__':
     app.run(port=4444)

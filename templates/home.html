@@ -30,7 +30,7 @@
                         </div>
                         <div class="card-body">
                             <p><span class="text-bold">Project description: </span>{{ project.description }}</p>
-                            <a href="#">
+                            <a href="/run?project={{ project.name }}">
                                 <button class="btn btn-success">Launch</button>
                             </a>
                             <a href="/drop/project?project={{ project.name }}"

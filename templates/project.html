@@ -1,0 +1,33 @@
+{% extends 'navbar.html' %}
+{% block Body %}
+    <h1>Project: {{ Projectname }}</h1>
+    <div class="accordion">
+        <input id="accordion-1" type="radio" name="accordion-radio" hidden="" checked="">
+        <label class="accordion-header c-hand" for="accordion-1"><i
+                class="icon icon-arrow-right mr-1"></i>1. Data uploading</label>
+        <div class="accordion-body">
+            <ul class="menu menu-nav">
+                <li class="menu-item">
+                    <form action="#">
+                        <div class="form-group">
+                            <label class="form-label" for="username">Load a dataset</label>
+                            <input type="file" class="form-input" id="datasetInput" required>
+                        </div>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="accordion">
+        <input id="accordion-2" type="radio" name="accordion-radio" hidden="">
+        <label class="accordion-header c-hand" for="accordion-2"><i
+                class="icon icon-arrow-right mr-1"></i>2. To be continued ...</label>
+        <div class="accordion-body">
+            <ul class="menu menu-nav">
+                <li class="menu-item"><a href="#accordions">Item 1</a></li>
+                <li class="menu-item"><a href="#accordions">Item 2</a></li>
+            </ul>
+        </div>
+    </div>
+    </div>
+{% endblock %}
