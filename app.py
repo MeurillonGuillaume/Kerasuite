@@ -2,6 +2,7 @@ import logging
 from os import urandom, listdir
 from flask import Flask, render_template, redirect, request, session
 from libs.authentication import Authentication
+from libs.database import Database
 import pickledb
 
 # Global variables
@@ -25,6 +26,7 @@ if DATABASE_NAME not in listdir('.'):
 logging.info('Loading database into memory ...')
 database = pickledb.load(DATABASE_NAME, True)
 auth = Authentication(database)
+dbclient = Database(database)
 
 
 def is_user_logged_in():
@@ -47,12 +49,7 @@ def home():
     """
     if is_user_logged_in():
         return render_template('home.html', LoggedIn=True,
-                               Projects=[{"name": "Hello, World!", "description": "Some text about this project"},
-                                         {"name": "Project 2", "description": "Some text about this project"},
-                                         {"name": "Project Kerasuite", "description": "Some text about this project"},
-                                         {"name": "Yet another great project",
-                                          "description": "Some text about this project"},
-                                         {"name": "This is fine", "description": "Some text about this project"}])
+                               Projects=dbclient.get_user_projects(session['username']))
     return redirect('/login')
 
 
@@ -61,13 +58,15 @@ def login():
     """
     Serve the login page or redirect to home
     """
-    if request.method == 'POST':
-        if 'password' in request.form and 'username' in request.form:
-            if auth.attempt_login(request.form['username'], request.form['password']):
-                session['loggedin'] = True
-                session['username'] = request.form['username']
-                return redirect('/')
-    return render_template('login.html')
+    if not is_user_logged_in():
+        if request.method == 'POST':
+            if 'password' in request.form and 'username' in request.form:
+                if auth.attempt_login(request.form['username'], request.form['password']):
+                    session['loggedin'] = True
+                    session['username'] = request.form['username']
+                    return redirect('/')
+        return render_template('login.html')
+    return redirect('/')
 
 
 @app.route('/logout')
@@ -78,6 +77,42 @@ def logout():
     if is_user_logged_in():
         session['loggedin'] = False
     return redirect('/')
+
+
+@app.route('/settings')
+def settings():
+    """
+    Return a settings page or redirect to login.
+    """
+    if is_user_logged_in():
+        return render_template('settings.html')
+    return redirect('/login')
+
+
+@app.route('/create/project', methods=['GET', 'POST'])
+def create_project():
+    """
+    Create a new project for a certain user
+    """
+    if request.method == 'POST':
+        if is_user_logged_in():
+            if 'projectdescription' in request.form and 'projectname' in request.form:
+                dbclient.create_project(request.form['projectname'], request.form['projectdescription'],
+                                        session['username'])
+    return redirect('/login')
+
+
+@app.route('/drop/project')
+def drop_project():
+    """
+    Drop a project for a certain user
+    """
+    if is_user_logged_in():
+        project = request.args.get('project')
+        if project is not None:
+            dbclient.drop_project(project, session['username'])
+        return redirect('/')
+    return redirect('/login')
 
 
 if __name__ == '__main__':

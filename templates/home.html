@@ -33,7 +33,8 @@
                             <a href="#">
                                 <button class="btn btn-success">Launch</button>
                             </a>
-                            <a href="#">
+                            <a href="/drop/project?project={{ project.name }}"
+                               onclick="return confirm('Are you sure to delete {{ project.name }}?')">
                                 <button class="btn btn-error tooltip tooltip-bottom" data-tooltip="Delete this project">
                                     <i class="icon icon-delete"></i></button>
                             </a>
