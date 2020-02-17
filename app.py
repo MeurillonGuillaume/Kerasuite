@@ -2,7 +2,7 @@ import logging
 from os import urandom, listdir
 from flask import Flask, render_template, redirect, request, session
 from libs.authentication import Authentication
-from libs.database import Database
+from libs.projects import Projects
 import pickledb
 
 # Global variables
@@ -26,7 +26,7 @@ if DATABASE_NAME not in listdir('.'):
 logging.info('Loading database into memory ...')
 database = pickledb.load(DATABASE_NAME, True)
 auth = Authentication(database)
-dbclient = Database(database)
+project_client = Projects(database)
 
 
 def is_user_logged_in():
@@ -49,7 +49,7 @@ def home():
     """
     if is_user_logged_in():
         return render_template('home.html', LoggedIn=session['loggedin'],
-                               Projects=dbclient.get_user_projects(session['username']))
+                               Projects=project_client.get_user_projects(session['username']))
     return redirect('/login')
 
 
@@ -97,8 +97,8 @@ def create_project():
     if request.method == 'POST':
         if is_user_logged_in():
             if 'projectdescription' in request.form and 'projectname' in request.form:
-                dbclient.create_project(request.form['projectname'], request.form['projectdescription'],
-                                        session['username'])
+                project_client.create_project(request.form['projectname'], request.form['projectdescription'],
+                                              session['username'])
     return redirect('/login')
 
 
@@ -110,7 +110,7 @@ def drop_project():
     if is_user_logged_in():
         project = request.args.get('project')
         if project is not None:
-            dbclient.drop_project(project, session['username'])
+            project_client.drop_project(project, session['username'])
         return redirect('/')
     return redirect('/login')
 
@@ -119,7 +119,7 @@ def drop_project():
 def run():
     if is_user_logged_in():
         project = request.args.get('project')
-        if dbclient.does_project_exist(project, session['username']):
+        if project_client.does_project_exist(project, session['username']):
             return render_template('project.html', Projectname=project, LoggedIn=session['loggedin'])
     return redirect('/login')
 

@@ -1,7 +1,7 @@
 import logging
 
 
-class Database:
+class Projects:
     def __init__(self, db_instance):
         self.__dbclient = db_instance
 
@@ -23,13 +23,17 @@ class Database:
         if not projects:
             projects = {username: []}
 
-        if username in projects.keys():
-            projects[username].append({'name': name, 'description': description})
-        else:
-            projects[username] = [{'name': name, 'description': description}]
-        self.__dbclient.set('projects', projects)
+        if not self.does_project_exist(name, username):
+            if username in projects.keys():
+                projects[username].append({'name': name, 'description': description})
+            else:
+                projects[username] = [{'name': name, 'description': description}]
+            self.__dbclient.set('projects', projects)
 
     def get_all_projects(self):
+        """
+        Request all projects of every user
+        """
         return self.__dbclient.get('projects')
 
     def get_project(self, name, username):
@@ -37,9 +41,10 @@ class Database:
         Request data for a single project
         """
         projects = self.get_all_projects()[username]
-        for p in projects:
-            if p['name'] == name:
-                return p
+        for project in projects:
+            if project['name'] == name:
+                return project
+        return 0
 
     def drop_project(self, name, username):
         """
@@ -54,8 +59,7 @@ class Database:
         """
         Check if a project exists or not
         """
-        projects = self.get_user_projects(username)
-        for p in projects:
-            if projectname == p['name']:
-                return 1
+        p = self.get_project(projectname, username)
+        if p is not 0:
+            return 1
         return 0
