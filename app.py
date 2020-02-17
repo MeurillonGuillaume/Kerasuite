@@ -28,6 +28,9 @@ database = pickledb.load(DATABASE_NAME, True)
 auth = Authentication(database)
 project_client = Projects(database)
 
+# Global variables
+ALLOWED_FILETYPES = ['.csv', '.json']
+
 
 def is_user_logged_in():
     """
@@ -121,6 +124,13 @@ def run():
         project = request.args.get('project')
         if project_client.does_project_exist(project, session['username']):
             return render_template('project.html', Projectname=project, LoggedIn=session['loggedin'])
+    return redirect('/login')
+
+
+@app.route('/set/project/dataset', methods=['GET', 'POST'])
+def set_dataset():
+    if is_user_logged_in():
+        print(request.form['dataset'])
     return redirect('/login')
 
 

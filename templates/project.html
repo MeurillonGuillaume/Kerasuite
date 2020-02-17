@@ -8,11 +8,13 @@
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
-                    <form action="#">
+                    <form action="/set/project/dataset" method="post">
                         <div class="form-group">
-                            <label class="form-label" for="username">Load a dataset</label>
-                            <input type="file" class="form-input" id="datasetInput" required>
+                            <input type="hidden" name="project" value="{{ Projectname }}">
+                            <label class="form-label" for="dataset">Load a dataset</label>
+                            <input type="file" class="form-input" id="dataset" name="dataset" accept=".csv,.json" required>
                         </div>
+                        <input type="submit">
                     </form>
                 </li>
             </ul>
