@@ -1,10 +1,9 @@
 {% extends 'navbar.html' %}
-{% include 'modal_newproject.html' %}
 
 {% block Body %}
     <h1 class="text-center">Your projects</h1>
     <div class="columns">
-        <div class="column col-md-12 col-4" style="margin-bottom: 1rem">
+        <div class="column col-md-12 col-4 mb-1">
             <div class="card">
                 <div class="card-header bg-primary">
                     <div class="card-title text-center">
@@ -31,12 +30,16 @@
                         <div class="card-body">
                             <p><span class="text-bold">Project description: </span>{{ project.description }}</p>
                             <a href="/run?project={{ project.name }}">
-                                <button class="btn btn-success tooltip tooltip-bottom" data-tooltip="Open {{ project.name }}">Launch</button>
+                                <button class="btn btn-success tooltip tooltip-bottom"
+                                        data-tooltip="Open {{ project.name }}">Launch
+                                </button>
                             </a>
                             <a href="/drop/project?project={{ project.name }}"
                                onclick="return confirm('Are you sure to delete {{ project.name }}?')">
-                                <button class="btn btn-error tooltip tooltip-bottom" data-tooltip="Delete this project">
-                                    <i class="icon icon-delete"></i></button>
+                                <button class="btn btn-error tooltip tooltip-bottom"
+                                        data-tooltip="Delete {{ project.name }}">
+                                    <i class="icon icon-delete"></i>
+                                </button>
                             </a>
                         </div>
                     </div>
@@ -44,7 +47,6 @@
             {% endfor %}
         {% endif %}
 
-        {% block NewProjectModal %}
-        {% endblock %}
+        {% include 'modal_newproject.html' %}
     </div>
 {% endblock %}
