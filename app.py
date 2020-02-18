@@ -173,6 +173,7 @@ def set_dataset():
                 if is_file_allowed(dataset.filename):
                     filename = secure_filename(dataset.filename)
                     dataset.save(path.join(app.config['UPLOAD_FOLDER'], filename))
+
     return redirect('/login')
 
 

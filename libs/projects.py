@@ -60,6 +60,8 @@ class Projects:
         Change the name and/or description of a project if possible
         """
         user_projects = self.get_user_projects(username)
+        if self.does_project_exist(newname, username):
+            return oldname
         for project in user_projects:
             if project['name'] == oldname:
                 user_projects[user_projects.index(project)] = {'name': newname, 'description': description}
@@ -76,3 +78,6 @@ class Projects:
         if p is not 0:
             return 1
         return 0
+
+    def assign_dataset(self, name, projectname, username):
+        ...
