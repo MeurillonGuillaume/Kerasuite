@@ -55,6 +55,19 @@ class Projects:
         projects[username].remove(project_to_trash)
         self.__dbclient.set('projects', projects)
 
+    def update_project(self, oldname, newname, description, username):
+        """
+        Change the name and/or description of a project if possible
+        """
+        user_projects = self.get_user_projects(username)
+        for project in user_projects:
+            if project['name'] == oldname:
+                user_projects[user_projects.index(project)] = {'name': newname, 'description': description}
+        projects = self.get_all_projects()
+        projects[username] = user_projects
+        self.__dbclient.set('projects', projects)
+        return newname
+
     def does_project_exist(self, projectname, username):
         """
         Check if a project exists or not

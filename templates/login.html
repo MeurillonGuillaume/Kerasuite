@@ -4,11 +4,11 @@
         <div class="column col-md-12 col-6 col-mx-auto">
             <h1 class="text-center">Sign In</h1>
             <div class="form-group">
-                <form method="post" action="/login">
+                <form method="post" action="/login" enctype="multipart/form-data">
                     <div class="form-group">
                         <label class="form-label" for="username">Username</label>
                         <input type="text" name="username" class="form-input" id="username" placeholder="John Doe"
-                               required>
+                               autofocus required>
                     </div>
 
                     <div class="form-group">

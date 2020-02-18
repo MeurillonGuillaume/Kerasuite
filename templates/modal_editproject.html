@@ -1,27 +1,28 @@
 <div class="modal" id="modal-id">
     <a href="#close" class="modal-overlay" id="modalCloseArea" aria-label="Close"></a>
     <div class="modal-container">
-        <form action="/create/project" method="post" enctype="multipart/form-data">
+        <form action="/edit/project" method="post" enctype="multipart/form-data">
             <div class="modal-header">
                 <a href="#close" class="btn btn-clear float-right" id="modalCloseBtn" aria-label="Close"></a>
-                <div class="modal-title h5">New project</div>
+                <div class="modal-title h5">Edit project</div>
             </div>
             <div class="modal-body">
                 <div class="content">
                     <div class="form-group">
                         <label class="form-label" for="projectname">Name</label>
+                        <input type="hidden" name="old_projectname" value="{{ Projectname }}">
                         <input type="text" name="projectname" class="form-input" id="projectname"
-                               placeholder="The amazing Hello, World!" autofocus required>
+                               placeholder="The amazing Hello, World!" value="{{ Projectname }}" autofocus required>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="projectdescription">Description <i>(optional)</i></label>
                         <textarea class="form-input" name="projectdescription" id="projectdescription"
-                                  rows="3"></textarea>
+                                  rows="3">{{ Projectdescription }}</textarea>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <input type="submit" value="Create project!" class="btn btn-success">
+                <input type="submit" value="Update project!" class="btn btn-success">
             </div>
         </form>
     </div>

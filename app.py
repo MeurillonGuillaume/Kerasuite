@@ -1,9 +1,10 @@
 import logging
-from os import urandom, listdir
+from os import urandom, listdir, path
+import pickledb
 from flask import Flask, render_template, redirect, request, session
+from werkzeug.utils import secure_filename
 from libs.authentication import Authentication
 from libs.projects import Projects
-import pickledb
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'
@@ -14,6 +15,7 @@ logging.basicConfig(level=logging.INFO)
 # Create Flask app
 app = Flask(__name__)
 app.secret_key = urandom(80)
+app.config['UPLOAD_FOLDER'] = path.join(path.dirname(path.realpath(__file__)), 'data')
 
 # Check if the database exists
 if DATABASE_NAME not in listdir('.'):
@@ -29,7 +31,7 @@ auth = Authentication(database)
 project_client = Projects(database)
 
 # Global variables
-ALLOWED_FILETYPES = ['.csv', '.json']
+ALLOWED_FILETYPES = ['csv', 'json']
 
 
 def is_user_logged_in():
@@ -42,6 +44,16 @@ def is_user_logged_in():
     except Exception as e:
         logging.debug(f'Session not yet created, creating empty. {e}')
         session['loggedin'] = False
+        return 0
+
+
+def is_file_allowed(filename):
+    """
+    Check if a filetype is allowed
+    """
+    try:
+        return '.' in filename and str(filename).rsplit('.', 1)[1].lower() in ALLOWED_FILETYPES
+    except Exception as e:
         return 0
 
 
@@ -97,11 +109,11 @@ def create_project():
     """
     Create a new project for a certain user
     """
-    if request.method == 'POST':
-        if is_user_logged_in():
-            if 'projectdescription' in request.form and 'projectname' in request.form:
-                project_client.create_project(request.form['projectname'], request.form['projectdescription'],
-                                              session['username'])
+    if request.method == 'POST' and is_user_logged_in():
+        if 'projectdescription' in request.form and 'projectname' in request.form:
+            project_client.create_project(request.form['projectname'],
+                                          request.form['projectdescription'],
+                                          session['username'])
     return redirect('/login')
 
 
@@ -118,19 +130,49 @@ def drop_project():
     return redirect('/login')
 
 
+@app.route('/edit/project', methods=['GET', 'POST'])
+def edit_project():
+    """
+    Edit the fields of a project
+    """
+    if is_user_logged_in() and request.method == 'POST':
+        if 'projectdescription' in request.form and 'projectname' in request.form and 'old_projectname' in request.form:
+            newname = project_client.update_project(request.form['old_projectname'],
+                                                    request.form['projectname'],
+                                                    request.form['projectdescription'],
+                                                    session['username'])
+            return redirect(f'/run?project={newname}')
+    return redirect('/login')
+
+
 @app.route('/run')
 def run():
+    """
+    Launch a project or redirect to login
+    """
     if is_user_logged_in():
         project = request.args.get('project')
         if project_client.does_project_exist(project, session['username']):
-            return render_template('project.html', Projectname=project, LoggedIn=session['loggedin'])
+            return render_template('project.html', Projectname=project,
+                                   Projectdescription=project_client.get_project(project,
+                                                                                 session['username'])[
+                                       'description'],
+                                   LoggedIn=session['loggedin'])
     return redirect('/login')
 
 
 @app.route('/set/project/dataset', methods=['GET', 'POST'])
 def set_dataset():
-    if is_user_logged_in():
-        print(request.form['dataset'])
+    """
+    Set a dataset for a certain project
+    """
+    if is_user_logged_in() and request.method == 'POST':
+        if 'dataset' in request.files:
+            dataset = request.files['dataset']
+            if len(dataset.filename) > 1:
+                if is_file_allowed(dataset.filename):
+                    filename = secure_filename(dataset.filename)
+                    dataset.save(path.join(app.config['UPLOAD_FOLDER'], filename))
     return redirect('/login')
 
 
