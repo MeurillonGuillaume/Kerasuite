@@ -79,5 +79,49 @@ class Projects:
             return 1
         return 0
 
-    def assign_dataset(self, name, projectname, username):
-        ...
+    def get_all_datasets(self):
+        return self.__dbclient.get('datasets')
+
+    def assign_dataset(self, name, type, projectname, username):
+        """
+        Assign a dataset to a users project
+        """
+        data = self.get_all_datasets()
+        if not data:
+            data = {username: []}
+
+        i = 0
+        for project in data[username]:
+            if project['projectname'] == projectname:
+                data[username][i]['dataset'] = name
+                data[username][i]['datatype'] = type
+                self.__dbclient.set('datasets', data)
+                return 1
+            i += 1
+        data[username].append({'projectname': projectname, 'datatype': type, 'dataset': name})
+        self.__dbclient.set('datasets', data)
+
+    def does_project_have_dataset(self, projectname, username):
+        """
+        Check if a project does have a dataset assigned
+        """
+        data = self.get_all_datasets()
+        if data:
+            if username in data.keys():
+                for project in data[username]:
+                    if project['projectname'] == projectname:
+                        if project['dataset'] is not None and project['datatype'] is not None:
+                            return 1
+        return 0
+
+    def get_project_dataset(self, projectname, username):
+        """
+        Get the name of the dataset
+        """
+        data = self.get_all_datasets()
+        if data:
+            if username in data.keys():
+                for project in data[username]:
+                    if project['projectname'] == projectname:
+                        return f'{project["dataset"]}.{project["datatype"]}'
+        return None

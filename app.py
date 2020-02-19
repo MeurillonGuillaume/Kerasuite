@@ -3,6 +3,7 @@ from os import urandom, listdir, path
 import pickledb
 from flask import Flask, render_template, redirect, request, session
 from werkzeug.utils import secure_filename
+from uuid import uuid4
 from libs.authentication import Authentication
 from libs.projects import Projects
 
@@ -153,11 +154,15 @@ def run():
     if is_user_logged_in():
         project = request.args.get('project')
         if project_client.does_project_exist(project, session['username']):
-            return render_template('project.html', Projectname=project,
-                                   Projectdescription=project_client.get_project(project,
-                                                                                 session['username'])[
-                                       'description'],
-                                   LoggedIn=session['loggedin'])
+            if project_client.does_project_have_dataset(project, session['username']):
+                # TODO: load dataset in memory
+                ...
+            return render_template('project.html',
+                                   Projectname=project,
+                                   Projectdescription=project_client.get_project(
+                                       project, session['username'])['description'],
+                                   LoggedIn=session['loggedin'],
+                                   HasDataset=project_client.does_project_have_dataset(project, session['username']))
     return redirect('/login')
 
 
@@ -167,15 +172,19 @@ def set_dataset():
     Set a dataset for a certain project
     """
     if is_user_logged_in() and request.method == 'POST':
-        if 'dataset' in request.files:
+        if 'dataset' in request.files and 'projectname' in request.form:
             dataset = request.files['dataset']
             if len(dataset.filename) > 1:
                 if is_file_allowed(dataset.filename):
-                    filename = secure_filename(dataset.filename)
-                    dataset.save(path.join(app.config['UPLOAD_FOLDER'], filename))
-
+                    file_ext = str(secure_filename(dataset.filename)).rsplit('.', 1)[1]
+                    new_filename = str(uuid4())
+                    dataset.save(f'{app.config["UPLOAD_FOLDER"]}/{new_filename}.{file_ext}')
+                    project_client.assign_dataset(new_filename, file_ext,
+                                                  request.form['projectname'],
+                                                  session['username'])
+                    return redirect(f'/run?project={request.form["projectname"]}')
     return redirect('/login')
 
 
 if __name__ == '__main__':
-    app.run(port=4444)
+    app.run(port=4444, host='0.0.0.0')
