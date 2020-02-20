@@ -4,8 +4,8 @@ import pickledb
 from flask import Flask, render_template, redirect, request, session
 from werkzeug.utils import secure_filename
 from uuid import uuid4
-from libs.authentication import Authentication
-from libs.projects import Projects
+from libs.projectmanager import ProjectManager
+from libs.usermanager import UserManager
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'
@@ -23,13 +23,14 @@ if DATABASE_NAME not in listdir('.'):
     # Initialise the database with a default user & password (admin - Kerasuite)
     logging.warning('The database does not exist, initialising now ...')
     database = pickledb.load('Kerasuite.db', True)
-    database.set('users', {"admin": {"password": "$2b$12$F5t/lNpjbvGMh0m56t1xbe/saHiK.dHKIKif1Q.xOyxcbrr/vKAw."}})
+    database.set('users',
+                 {"admin": {"password": "$2b$12$F5t/lNpjbvGMh0m56t1xbe/saHiK.dHKIKif1Q.xOyxcbrr/vKAw.", "admin": True}})
 
 # Load database
 logging.info('Loading database into memory ...')
 database = pickledb.load(DATABASE_NAME, True)
-auth = Authentication(database)
-project_client = Projects(database)
+project_manager = ProjectManager(database)
+user_manager = UserManager(database)
 
 # Global variables
 ALLOWED_FILETYPES = ['csv', 'json']
@@ -65,7 +66,7 @@ def home():
     """
     if is_user_logged_in():
         return render_template('home.html', LoggedIn=session['loggedin'],
-                               Projects=project_client.get_user_projects(session['username']))
+                               Projects=project_manager.get_user_projects(session['username']))
     return redirect('/login')
 
 
@@ -77,7 +78,7 @@ def login():
     if not is_user_logged_in():
         if request.method == 'POST':
             if 'password' in request.form and 'username' in request.form:
-                if auth.attempt_login(request.form['username'], request.form['password']):
+                if user_manager.attempt_login(request.form['username'], request.form['password']):
                     session['loggedin'] = True
                     session['username'] = request.form['username']
                     return redirect('/')
@@ -101,7 +102,7 @@ def settings():
     Return a settings page or redirect to login.
     """
     if is_user_logged_in():
-        return render_template('settings.html', LoggedIn=session['loggedin'])
+        return render_template('settings.html', LoggedIn=session['loggedin'], IsAdmin=...)
     return redirect('/login')
 
 
@@ -112,9 +113,9 @@ def create_project():
     """
     if request.method == 'POST' and is_user_logged_in():
         if 'projectdescription' in request.form and 'projectname' in request.form:
-            project_client.create_project(request.form['projectname'],
-                                          request.form['projectdescription'],
-                                          session['username'])
+            project_manager.create_project(request.form['projectname'],
+                                           request.form['projectdescription'],
+                                           session['username'])
     return redirect('/login')
 
 
@@ -126,7 +127,7 @@ def drop_project():
     if is_user_logged_in():
         project = request.args.get('project')
         if project is not None:
-            project_client.drop_project(project, session['username'])
+            project_manager.drop_project(project, session['username'])
         return redirect('/')
     return redirect('/login')
 
@@ -138,10 +139,10 @@ def edit_project():
     """
     if is_user_logged_in() and request.method == 'POST':
         if 'projectdescription' in request.form and 'projectname' in request.form and 'old_projectname' in request.form:
-            newname = project_client.update_project(request.form['old_projectname'],
-                                                    request.form['projectname'],
-                                                    request.form['projectdescription'],
-                                                    session['username'])
+            newname = project_manager.update_project(request.form['old_projectname'],
+                                                     request.form['projectname'],
+                                                     request.form['projectdescription'],
+                                                     session['username'])
             return redirect(f'/run?project={newname}')
     return redirect('/login')
 
@@ -153,16 +154,16 @@ def run():
     """
     if is_user_logged_in():
         project = request.args.get('project')
-        if project_client.does_project_exist(project, session['username']):
-            if project_client.does_project_have_dataset(project, session['username']):
+        if project_manager.does_project_exist(project, session['username']):
+            if project_manager.does_project_have_dataset(project, session['username']):
                 # TODO: load dataset in memory
                 ...
             return render_template('project.html',
                                    Projectname=project,
-                                   Projectdescription=project_client.get_project(
+                                   Projectdescription=project_manager.get_project(
                                        project, session['username'])['description'],
                                    LoggedIn=session['loggedin'],
-                                   HasDataset=project_client.does_project_have_dataset(project, session['username']))
+                                   HasDataset=project_manager.does_project_have_dataset(project, session['username']))
     return redirect('/login')
 
 
@@ -179,9 +180,9 @@ def set_dataset():
                     file_ext = str(secure_filename(dataset.filename)).rsplit('.', 1)[1]
                     new_filename = str(uuid4())
                     dataset.save(f'{app.config["UPLOAD_FOLDER"]}/{new_filename}.{file_ext}')
-                    project_client.assign_dataset(new_filename, file_ext,
-                                                  request.form['projectname'],
-                                                  session['username'])
+                    project_manager.assign_dataset(new_filename, file_ext,
+                                                   request.form['projectname'],
+                                                   session['username'])
                     return redirect(f'/run?project={request.form["projectname"]}')
     return redirect('/login')
 
@@ -190,9 +191,9 @@ def set_dataset():
 def clear_dataset():
     if is_user_logged_in():
         project = request.args.get('project')
-        if project_client.does_project_exist(project, session['username']):
-            if project_client.does_project_have_dataset(project, session['username']):
-                project_client.clear_project_dataset(project, session['username'])
+        if project_manager.does_project_exist(project, session['username']):
+            if project_manager.does_project_have_dataset(project, session['username']):
+                project_manager.clear_project_dataset(project, session['username'])
             return redirect(f'/run?project={project}')
     return redirect('/login')
 

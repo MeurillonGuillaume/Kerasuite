@@ -3,7 +3,7 @@ from os import remove
 import pathlib
 
 
-class Projects:
+class ProjectManager:
     def __init__(self, db_instance):
         self.__dbclient = db_instance
 

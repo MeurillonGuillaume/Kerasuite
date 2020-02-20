@@ -2,9 +2,9 @@ from passlib.hash import bcrypt
 import logging
 
 
-class Authentication:
-    def __init__(self, database):
-        self.__db = database
+class UserManager:
+    def __init__(self, db):
+        self.__dbclient = db
 
     def attempt_login(self, username, password):
         """
@@ -15,7 +15,7 @@ class Authentication:
         """
         try:
             logging.info(f'Attempting to login with username "{username}" and password "{password}"')
-            userdata = self.__db.get('users')[username]['password']
+            userdata = self.__dbclient.get('users')[username]['password']
             if userdata is not None:
                 # Will return True if the submitted password matches the hashed password
                 return bcrypt.verify(password, userdata)
