@@ -4,11 +4,49 @@
     <div class="accordion">
         <input id="accordion-1" type="radio" name="accordion-radio" hidden="" checked="">
         <label class="accordion-header c-hand text-large" for="accordion-1"><i
-                class="icon icon-arrow-right mr-1"></i>Manage users</label>
+                class="icon icon-arrow-right mr-1"></i>Manage existing users</label>
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
-                    <p>Hello, World!</p>
+                    {% if IsAdmin %}
+                        {% if UserList %}
+                            <table class="table table-striped table-hover table-scroll">
+                                <thead class="bg-primary">
+                                <tr class="text-center">
+                                    <th>Username</th>
+                                    <th>User role</th>
+                                    <th>Remove user</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for user in UserList %}
+                                    <tr class="text-center">
+                                        <td>{{ user }}{% if user == Username %} <i>(you)</i>{% endif %}</td>
+                                        {% if UserList[user].admin %}
+                                            <td>Administrator</td>
+                                        {% else %}
+                                            <td>Normal user</td>
+                                        {% endif %}
+                                        <td>
+                                            {% if user != Username %}
+                                                <a class="btn btn-error btn-action tooltip"
+                                                   data-tooltip="Delete user {{ user }}"
+                                                   onclick="return confirm('Are you sure that you want to delete {{ user }}? This action can\'t be undone!')"
+                                                   href="/remove/user?username={{ user }}"
+                                                   id="modalBtn"><i class="icon icon-delete"></i>
+                                                </a>
+                                            {% else %}
+                                                You can't delete yourself, can you?
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    {% else %}
+                        <p><b>You need elevated rights to access this tab!</b></p>
+                    {% endif %}
                 </li>
             </ul>
         </div>

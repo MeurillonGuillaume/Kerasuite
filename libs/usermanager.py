@@ -23,3 +23,38 @@ class UserManager:
         except Exception as e:
             logging.error(f'Failed attempt at logging in with username "{username}" and password "{password}": {e}')
             return 0
+
+    def has_elevated_rights(self, username):
+        """
+        Check if a user has elevated rights or not
+        """
+        try:
+            return self.__dbclient.get('users')[username]["admin"]
+        except Exception as e:
+            logging.error(f'Error retrieving user rights: {e}')
+            return 0
+
+    def get_users(self, username):
+        """
+        Get all users
+        """
+        if self.has_elevated_rights(username):
+            return self.__dbclient.get('users')
+        return None
+
+    def does_user_exist(self, username):
+        """
+        Check if a user actually exists
+        """
+        users = self.__dbclient.get('users')
+        if username in users.keys():
+            return 1
+        return 0
+
+    def delete_user(self, username):
+        """
+        Delete a user from the database
+        """
+        users = self.__dbclient.get('users')
+        del users[username]
+        self.__dbclient.set('users', users)

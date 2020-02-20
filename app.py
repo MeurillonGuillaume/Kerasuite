@@ -102,7 +102,11 @@ def settings():
     Return a settings page or redirect to login.
     """
     if is_user_logged_in():
-        return render_template('settings.html', LoggedIn=session['loggedin'], IsAdmin=...)
+        print(user_manager.get_users(session['username']))
+        return render_template('settings.html', LoggedIn=session['loggedin'],
+                               IsAdmin=user_manager.has_elevated_rights(session['username']),
+                               UserList=user_manager.get_users(session['username']),
+                               Username=session['username'])
     return redirect('/login')
 
 
@@ -189,12 +193,29 @@ def set_dataset():
 
 @app.route('/clear/dataset')
 def clear_dataset():
+    """
+    Clear the dataset of a project
+    """
     if is_user_logged_in():
         project = request.args.get('project')
         if project_manager.does_project_exist(project, session['username']):
             if project_manager.does_project_have_dataset(project, session['username']):
                 project_manager.clear_project_dataset(project, session['username'])
             return redirect(f'/run?project={project}')
+    return redirect('/login')
+
+
+@app.route('/remove/user')
+def remove_user():
+    """
+    Remove a user from the system
+    """
+    if is_user_logged_in():
+        username = request.args.get('username')
+        if user_manager.has_elevated_rights(session['username']) and username is not None and len(username) > 1:
+            if user_manager.does_user_exist(username):
+                user_manager.delete_user(username)
+        return redirect('/settings')
     return redirect('/login')
 
 
