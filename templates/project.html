@@ -23,9 +23,16 @@
                             <input type="submit">
                         </form>
                     {% else %}
-                        <button class="btn btn-error tooltip tooltip-right" data-tooltip="Delete the dataset">
-                            <i class="icon icon-delete"></i> Delete dataset
-                        </button>
+                        <div class="columns">
+                            <div class="col-1">
+                                <a href="/clear/dataset?project={{ Projectname }}"
+                                   onclick="return confirm('Are you sure to delete this dataset? It will be deleted from disk!')"
+                                   class="btn btn-error tooltip tooltip-right"
+                                   data-tooltip="Delete the current dataset">
+                                    <i class="icon icon-delete"></i> Delete dataset
+                                </a>
+                            </div>
+                        </div>
                     {% endif %}
                 </li>
             </ul>

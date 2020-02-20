@@ -186,5 +186,16 @@ def set_dataset():
     return redirect('/login')
 
 
+@app.route('/clear/dataset')
+def clear_dataset():
+    if is_user_logged_in():
+        project = request.args.get('project')
+        if project_client.does_project_exist(project, session['username']):
+            if project_client.does_project_have_dataset(project, session['username']):
+                project_client.clear_project_dataset(project, session['username'])
+            return redirect(f'/run?project={project}')
+    return redirect('/login')
+
+
 if __name__ == '__main__':
     app.run(port=4444, host='0.0.0.0')

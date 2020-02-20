@@ -1,4 +1,6 @@
 import logging
+from os import remove
+import pathlib
 
 
 class Projects:
@@ -125,3 +127,21 @@ class Projects:
                     if project['projectname'] == projectname:
                         return f'{project["dataset"]}.{project["datatype"]}'
         return None
+
+    def clear_project_dataset(self, projectname, username):
+        """
+        Delete the dataset from a project
+        """
+        data = self.get_all_datasets()
+        if data:
+            if username in data.keys():
+                i = 0
+                for project in data[username]:
+                    if project['projectname'] == projectname:
+                        dataset = self.get_project_dataset(projectname, username)
+                        remove(f'{pathlib.Path(__file__).parent.parent.absolute()}/data/{dataset}')
+                        data[username].remove(data[username][i])
+                        self.__dbclient.set('datasets', data)
+                        return 1
+                    i += 1
+        return 0
