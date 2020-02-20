@@ -1,0 +1,52 @@
+{% extends 'navbar.html' %}
+
+{% block Body %}
+    <h1 class="text-center">Your projects</h1>
+    <div class="columns">
+        <div class="column col-md-12 col-4 mb-1">
+            <div class="card">
+                <div class="card-header bg-primary">
+                    <div class="card-title text-center">
+                        <h2>New project</h2>
+                    </div>
+                </div>
+                <div class="card-body text-center">
+                    <p>Click the button below to create a new project</p>
+                    <button class="btn btn-primary btn-action btn-lg tooltip tooltip-bottom"
+                            data-tooltip="Create a new project"
+                            id="modalBtn"><i class="icon icon-plus"></i></button>
+                </div>
+            </div>
+        </div>
+        {% if Projects %}
+            {% for project in Projects %}
+                <div class="column col-md-12 col-4" style="margin-bottom: 1rem">
+                    <div class="card">
+                        <div class="card-header bg-secondary">
+                            <div class="card-title text-center">
+                                <h2>{{ project.name }}</h2>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p><span class="text-bold">Project description: </span>{{ project.description }}</p>
+                            <a href="/run?project={{ project.name }}">
+                                <button class="btn btn-success tooltip tooltip-bottom"
+                                        data-tooltip="Open {{ project.name }}">Launch
+                                </button>
+                            </a>
+                            <a href="/drop/project?project={{ project.name }}"
+                               onclick="return confirm('Are you sure to delete {{ project.name }}?')">
+                                <button class="btn btn-error tooltip tooltip-bottom"
+                                        data-tooltip="Delete {{ project.name }}">
+                                    <i class="icon icon-delete"></i>
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% include 'modal_newproject.html' %}
+    </div>
+{% endblock %}
