@@ -104,6 +104,7 @@ def change_password():
                 old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
                     'new_password_repeat']
                 user_manager.change_password(old, new, new_repeat, session['username'])
+                return redirect('/logout')
     return redirect('/login')
 
 
