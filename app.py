@@ -24,7 +24,7 @@ if DATABASE_NAME not in listdir('.'):
     logging.warning('The database does not exist, initialising now ...')
     database = pickledb.load('Kerasuite.db', True)
     database.set('users',
-                 {"admin": {"password": "$2b$12$F5t/lNpjbvGMh0m56t1xbe/saHiK.dHKIKif1Q.xOyxcbrr/vKAw.", "admin": True}})
+                 {"admin": {"password": "$2b$12$9PlFNhsAFENiKcsOsqjzAOPwUJyAF6FXCUxxbBHYJAhHai9q8eeCa", "admin": True}})
 
 # Load database
 logging.info('Loading database into memory ...')
@@ -81,9 +81,30 @@ def login():
                 if user_manager.attempt_login(request.form['username'], request.form['password']):
                     session['loggedin'] = True
                     session['username'] = request.form['username']
+                    if session['username'] == 'admin' and user_manager.admin_has_default_pass():
+                        # Todo: prompt to change password!
+                        return redirect('/change/password?user=admin')
                     return redirect('/')
         return render_template('login.html')
     return redirect('/')
+
+
+@app.route('/change/password', methods=['GET', 'POST'])
+def change_password():
+    """
+    Change a users password
+    """
+    if is_user_logged_in():
+        if request.method == 'GET':
+            user = request.args.get('user')
+            if len(user) > 1 and user == session['username']:
+                return render_template('change_password.html', Username=user)
+        elif request.method == 'POST':
+            if 'old_password' in request.form and 'new_password' in request.form and 'new_password_repeat' in request.form:
+                old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
+                    'new_password_repeat']
+                user_manager.change_password(old, new, new_repeat, session['username'])
+    return redirect('/login')
 
 
 @app.route('/logout')

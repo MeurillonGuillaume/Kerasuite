@@ -85,3 +85,19 @@ class UserManager:
         users = self.__dbclient.get('users')
         users[username]['admin'] = not users[username]['admin']
         self.__dbclient.set('users', users)
+
+    def admin_has_default_pass(self):
+        """
+        Check if the admin has changed his password
+        """
+        return bcrypt.verify('Kerasuite', self.__dbclient.get('users')['admin']['password'])
+
+    def change_password(self, old, new, new_repeat, username):
+        """
+        Change the current users password
+        """
+        if new == new_repeat:
+            if self.attempt_login(username, old):
+                users = self.__dbclient.get('users')
+                users[username]['password'] = bcrypt.hash(new)
+                self.__dbclient.set('users', users)
