@@ -62,13 +62,15 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="password">Password</label>
-                            <input type="password" name="password" class="form-input" id="password"
-                                   placeholder="Sup3erS3cr3tP@ssw0rd" required>
+                            <input type="password" name="password" class="form-input"
+                                   id="password" placeholder="Sup3erS3cr3tP@ssw0rd"
+                                   pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="password_repeat">Repeat password</label>
                             <input type="password" name="password_repeat" class="form-input" id="password_repeat"
-                                   placeholder="Sup3erS3cr3tP@ssw0rd" required>
+                                   placeholder="Sup3erS3cr3tP@ssw0rd"
+                                   pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" required>
                         </div>
                         <button class="btn btn-success tooltip tooltip" data-tooltip="Create user">
                             <i class="icon icon-people"></i> Create

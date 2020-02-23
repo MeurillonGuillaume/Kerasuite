@@ -25,6 +25,9 @@ class ProjectManager:
         if not projects:
             projects = {username: []}
 
+        if username not in projects:
+            projects[username] = []
+
         if not self.does_project_exist(name, username):
             if username in projects.keys():
                 projects[username].append({'name': name, 'description': description})
