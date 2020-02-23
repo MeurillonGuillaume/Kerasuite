@@ -1,14 +1,14 @@
 {% extends 'navbar.html' %}
 {% block Body %}
     <h1 class="text-center">Settings</h1>
-    <div class="accordion">
-        <input id="accordion-1" type="radio" name="accordion-radio" hidden="" checked="">
-        <label class="accordion-header c-hand text-large" for="accordion-1"><i
-                class="icon icon-arrow-right mr-1"></i>Manage existing users</label>
-        <div class="accordion-body">
-            <ul class="menu menu-nav">
-                <li class="menu-item">
-                    {% if IsAdmin %}
+    {% if IsAdmin %}
+        <div class="accordion">
+            <input id="accordion-1" type="radio" name="accordion-radio" hidden="" checked="">
+            <label class="accordion-header c-hand text-large" for="accordion-1"><i
+                    class="icon icon-arrow-right mr-1"></i>Manage existing users</label>
+            <div class="accordion-body">
+                <ul class="menu menu-nav">
+                    <li class="menu-item">
                         {% if UserList %}
                             <table class="table table-striped table-hover table-scroll">
                                 <thead class="bg-primary">
@@ -44,22 +44,40 @@
                                 </tbody>
                             </table>
                         {% endif %}
-                    {% else %}
-                        <p><b>You need elevated rights to access this tab!</b></p>
-                    {% endif %}
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
-    </div>
-    <div class="accordion">
-        <input id="accordion-2" type="radio" name="accordion-radio" hidden="">
-        <label class="accordion-header c-hand text-large" for="accordion-2"><i
-                class="icon icon-arrow-right mr-1"></i>To be continued ...</label>
-        <div class="accordion-body">
-            <ul class="menu menu-nav">
-                <li class="menu-item"><a href="#accordions">Item 1</a></li>
-                <li class="menu-item"><a href="#accordions">Item 2</a></li>
-            </ul>
+        <div class="accordion">
+            <input id="accordion-2" type="radio" name="accordion-radio" hidden="">
+            <label class="accordion-header c-hand text-large" for="accordion-2"><i
+                    class="icon icon-arrow-right mr-1"></i>Create new users</label>
+            <div class="accordion-body">
+                <ul class="menu menu-nav">
+                    <form action="/create/user" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label class="form-label" for="username">Username</label>
+                            <input type="text" name="username" class="form-input" id="username"
+                                   placeholder="TheLegend27" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" name="password" class="form-input" id="password"
+                                   placeholder="Sup3erS3cr3tP@ssw0rd" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="password_repeat">Repeat password</label>
+                            <input type="password" name="password_repeat" class="form-input" id="password_repeat"
+                                   placeholder="Sup3erS3cr3tP@ssw0rd" required>
+                        </div>
+                        <button class="btn btn-success tooltip tooltip" data-tooltip="Create user">
+                            <i class="icon icon-people"></i> Create
+                        </button>
+                    </form>
+                </ul>
+            </div>
         </div>
-    </div>
+    {% else %}
+        <p><b>You need elevated rights to access this tab!</b></p>
+    {% endif %}
 {% endblock %}

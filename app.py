@@ -102,7 +102,6 @@ def settings():
     Return a settings page or redirect to login.
     """
     if is_user_logged_in():
-        print(user_manager.get_users(session['username']))
         return render_template('settings.html', LoggedIn=session['loggedin'],
                                IsAdmin=user_manager.has_elevated_rights(session['username']),
                                UserList=user_manager.get_users(session['username']),
@@ -215,6 +214,23 @@ def remove_user():
         if user_manager.has_elevated_rights(session['username']) and username is not None and len(username) > 1:
             if user_manager.does_user_exist(username):
                 user_manager.delete_user(username)
+        return redirect('/settings')
+    return redirect('/login')
+
+
+@app.route('/create/user', methods=['GET', 'POST'])
+def create_user():
+    """
+    Create a new user
+    """
+    if is_user_logged_in():
+        if user_manager.has_elevated_rights(session['username']):
+            if 'username' in request.form and 'password' in request.form and 'password_repeat' in request.form:
+                username, password, pass_repeat = request.form['username'], request.form['password'], request.form[
+                    'password_repeat']
+                if len('username') > 1 and password == pass_repeat:
+                    if not user_manager.does_user_exist(username):
+                        user_manager.register_user(username, password, False)
         return redirect('/settings')
     return redirect('/login')
 

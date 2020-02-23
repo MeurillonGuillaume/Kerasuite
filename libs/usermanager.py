@@ -58,3 +58,11 @@ class UserManager:
         users = self.__dbclient.get('users')
         del users[username]
         self.__dbclient.set('users', users)
+
+    def register_user(self, username, password, elevated_rights):
+        """
+        Create a new user
+        """
+        users = self.__dbclient.get('users')
+        users[username] = {"password": bcrypt.hash(password), "admin": elevated_rights}
+        self.__dbclient.set('users', users)
