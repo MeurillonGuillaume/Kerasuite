@@ -230,7 +230,8 @@ def create_user():
                     'password_repeat']
                 if len('username') > 1 and password == pass_repeat:
                     if not user_manager.does_user_exist(username):
-                        user_manager.register_user(username, password, False)
+                        if user_manager.is_password_strong(password):
+                            user_manager.register_user(username, password, False)
         return redirect('/settings')
     return redirect('/login')
 

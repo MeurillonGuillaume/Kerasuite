@@ -1,8 +1,18 @@
 from passlib.hash import bcrypt
 import logging
+from re import match
 
 
 class UserManager:
+    @staticmethod
+    def is_password_strong(password):
+        """
+        Check if a password matches the front-end validation
+        """
+        if match('(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$', password):
+            return 1
+        return 0
+
     def __init__(self, db):
         self.__dbclient = db
 
