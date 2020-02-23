@@ -23,7 +23,7 @@ class ProjectManager:
         """
         projects = self.get_all_projects()
         if not projects:
-            projects = {username: []}
+            projects = {}
 
         if username not in projects:
             projects[username] = []
@@ -45,10 +45,12 @@ class ProjectManager:
         """
         Request data for a single project
         """
-        projects = self.get_all_projects()[username]
-        for project in projects:
-            if project['name'] == name:
-                return project
+        projects = self.get_all_projects()
+        if not isinstance(projects, bool):
+            projects = projects[username]
+            for project in projects:
+                if project['name'] == name:
+                    return project
         return 0
 
     def drop_project(self, name, username):

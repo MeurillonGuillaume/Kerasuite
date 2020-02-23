@@ -236,5 +236,17 @@ def create_user():
     return redirect('/login')
 
 
+@app.route('/op/user')
+def op_user():
+    if is_user_logged_in():
+        username = request.args.get('user')
+        if username is not None and len(username) > 1:
+            if user_manager.has_elevated_rights(
+                    session['username']) and username is not None and user_manager.does_user_exist(username):
+                user_manager.change_permissions(username)
+        return redirect('/settings')
+    return redirect('/login')
+
+
 if __name__ == '__main__':
     app.run(port=4444, host='0.0.0.0')

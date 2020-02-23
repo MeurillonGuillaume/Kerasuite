@@ -14,7 +14,7 @@
                                 <thead class="bg-primary">
                                 <tr class="text-center">
                                     <th>Username</th>
-                                    <th>User role</th>
+                                    <th>Elevated rights</th>
                                     <th>Remove user</th>
                                 </tr>
                                 </thead>
@@ -22,11 +22,27 @@
                                 {% for user in UserList %}
                                     <tr class="text-center">
                                         <td>{{ user }}{% if user == Username %} <i>(you)</i>{% endif %}</td>
-                                        {% if UserList[user].admin %}
-                                            <td>Administrator</td>
-                                        {% else %}
-                                            <td>Normal user</td>
-                                        {% endif %}
+                                        <td>
+                                            <div class="form-group text-center">
+                                                {% if user == Username or user == 'admin' %}
+                                                    <label class="form-checkbox form-inline tooltip tooltip-bottom"
+                                                           data-tooltip="Well, who else would do this job?">
+                                                        <input type="checkbox" checked="" disabled><i
+                                                            class="form-icon"></i>
+                                                    </label>
+                                                {% else %}
+
+                                                    <label class="form-checkbox form-inline">
+                                                        <a href="/op/user?user={{ user }}"
+                                                           onclick="return confirm('Are you sure to modify the role of {{ user }}?')">
+                                                            <input type="checkbox"
+                                                                   {% if UserList[user].admin %}checked=""{% endif %}>
+                                                            <i class="form-icon"></i></a>
+                                                    </label>
+
+                                                {% endif %}
+                                            </div>
+                                        </td>
                                         <td>
                                             {% if user != Username %}
                                                 <a class="btn btn-error btn-action tooltip"

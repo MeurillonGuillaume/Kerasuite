@@ -77,3 +77,11 @@ class UserManager:
         users = self.__dbclient.get('users')
         users[username] = {"password": bcrypt.hash(password), "admin": elevated_rights}
         self.__dbclient.set('users', users)
+
+    def change_permissions(self, username):
+        """
+        Swap the permissions assigned to a user
+        """
+        users = self.__dbclient.get('users')
+        users[username]['admin'] = not users[username]['admin']
+        self.__dbclient.set('users', users)
