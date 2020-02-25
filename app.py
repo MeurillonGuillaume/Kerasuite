@@ -82,7 +82,6 @@ def login():
                     session['loggedin'] = True
                     session['username'] = request.form['username']
                     if session['username'] == 'admin' and user_manager.admin_has_default_pass():
-                        # Todo: prompt to change password!
                         return redirect('/change/password?user=admin')
                     return redirect('/')
         return render_template('login.html')
