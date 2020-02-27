@@ -24,7 +24,7 @@ if DATABASE_NAME not in listdir('.'):
     logging.warning('The database does not exist, initialising now ...')
     database = pickledb.load('Kerasuite.db', True)
     database.set('users',
-                 {"admin": {"password": "$2b$12$F5t/lNpjbvGMh0m56t1xbe/saHiK.dHKIKif1Q.xOyxcbrr/vKAw.", "admin": True}})
+                 {"admin": {"password": "$2b$12$9PlFNhsAFENiKcsOsqjzAOPwUJyAF6FXCUxxbBHYJAhHai9q8eeCa", "admin": True}})
 
 # Load database
 logging.info('Loading database into memory ...')
@@ -81,9 +81,30 @@ def login():
                 if user_manager.attempt_login(request.form['username'], request.form['password']):
                     session['loggedin'] = True
                     session['username'] = request.form['username']
+                    if session['username'] == 'admin' and user_manager.admin_has_default_pass():
+                        return redirect('/change/password?user=admin')
                     return redirect('/')
         return render_template('login.html')
     return redirect('/')
+
+
+@app.route('/change/password', methods=['GET', 'POST'])
+def change_password():
+    """
+    Change a users password
+    """
+    if is_user_logged_in():
+        if request.method == 'GET':
+            user = request.args.get('user')
+            if len(user) > 1 and user == session['username']:
+                return render_template('change_password.html', Username=user)
+        elif request.method == 'POST':
+            if 'old_password' in request.form and 'new_password' in request.form and 'new_password_repeat' in request.form:
+                old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
+                    'new_password_repeat']
+                user_manager.change_password(old, new, new_repeat, session['username'])
+                return redirect('/logout')
+    return redirect('/login')
 
 
 @app.route('/logout')
@@ -102,7 +123,10 @@ def settings():
     Return a settings page or redirect to login.
     """
     if is_user_logged_in():
-        return render_template('settings.html', LoggedIn=session['loggedin'], IsAdmin=...)
+        return render_template('settings.html', LoggedIn=session['loggedin'],
+                               IsAdmin=user_manager.has_elevated_rights(session['username']),
+                               UserList=user_manager.get_users(session['username']),
+                               Username=session['username'])
     return redirect('/login')
 
 
@@ -189,12 +213,59 @@ def set_dataset():
 
 @app.route('/clear/dataset')
 def clear_dataset():
+    """
+    Clear the dataset of a project
+    """
     if is_user_logged_in():
         project = request.args.get('project')
         if project_manager.does_project_exist(project, session['username']):
             if project_manager.does_project_have_dataset(project, session['username']):
                 project_manager.clear_project_dataset(project, session['username'])
             return redirect(f'/run?project={project}')
+    return redirect('/login')
+
+
+@app.route('/remove/user')
+def remove_user():
+    """
+    Remove a user from the system
+    """
+    if is_user_logged_in():
+        username = request.args.get('username')
+        if user_manager.has_elevated_rights(session['username']) and username is not None and len(username) > 1:
+            if user_manager.does_user_exist(username):
+                user_manager.delete_user(username)
+        return redirect('/settings')
+    return redirect('/login')
+
+
+@app.route('/create/user', methods=['GET', 'POST'])
+def create_user():
+    """
+    Create a new user
+    """
+    if is_user_logged_in():
+        if user_manager.has_elevated_rights(session['username']):
+            if 'username' in request.form and 'password' in request.form and 'password_repeat' in request.form:
+                username, password, pass_repeat = request.form['username'], request.form['password'], request.form[
+                    'password_repeat']
+                if len('username') > 1 and password == pass_repeat:
+                    if not user_manager.does_user_exist(username):
+                        if user_manager.is_password_strong(password):
+                            user_manager.register_user(username, password, False)
+        return redirect('/settings')
+    return redirect('/login')
+
+
+@app.route('/op/user')
+def op_user():
+    if is_user_logged_in():
+        username = request.args.get('user')
+        if username is not None and len(username) > 1:
+            if user_manager.has_elevated_rights(
+                    session['username']) and username is not None and user_manager.does_user_exist(username):
+                user_manager.change_permissions(username)
+        return redirect('/settings')
     return redirect('/login')
 
 
