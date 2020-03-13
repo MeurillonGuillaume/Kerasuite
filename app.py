@@ -224,6 +224,7 @@ def clear_dataset():
         if project_manager.does_project_exist(project, session['username']):
             if project_manager.does_project_have_dataset(project, session['username']):
                 project_manager.clear_project_dataset(project, session['username'])
+                runtime_manager.stop_project(project, session['username'])
             return redirect(f'/run?project={project}')
     return redirect('/login')
 

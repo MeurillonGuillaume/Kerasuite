@@ -34,6 +34,7 @@ class ProjectManager:
             else:
                 projects[username] = [{'name': name, 'description': description}]
             self.__dbclient.set('projects', projects)
+            self.__dbclient.dump()
 
     def get_all_projects(self):
         """
@@ -61,6 +62,7 @@ class ProjectManager:
         project_to_trash = self.get_project(name, username)
         projects[username].remove(project_to_trash)
         self.__dbclient.set('projects', projects)
+        self.__dbclient.dump()
 
     def update_project(self, oldname, newname, description, username):
         """
@@ -79,6 +81,7 @@ class ProjectManager:
         projects = self.get_all_projects()
         projects[username] = user_projects
         self.__dbclient.set('projects', projects)
+        self.__dbclient.dump()
         return newname
 
     def does_project_exist(self, projectname, username):
@@ -107,6 +110,7 @@ class ProjectManager:
                 data[username][i]['dataset'] = name
                 data[username][i]['datatype'] = type
                 self.__dbclient.set('datasets', data)
+                self.__dbclient.dump()
                 return 1
             i += 1
         data[username].append({'projectname': projectname, 'datatype': type, 'dataset': name})
@@ -118,6 +122,7 @@ class ProjectManager:
             if data[username][i]['projectname'] == old_name:
                 data[username][i]['projectname'] = new_name
         self.__dbclient.set('datasets', data)
+        self.__dbclient.dump()
 
     def does_project_have_dataset(self, projectname, username):
         """
@@ -150,14 +155,10 @@ class ProjectManager:
         """
         data = self.get_all_datasets()
         if data:
-            if username in data.keys():
-                i = 0
-                for project in data[username]:
-                    if project['projectname'] == projectname:
-                        dataset = self.get_project_dataset(projectname, username)
-                        remove(f'{pathlib.Path(__file__).parent.parent.absolute()}/data/{dataset}')
-                        data[username].remove(data[username][i])
-                        self.__dbclient.set('datasets', data)
-                        return 1
-                    i += 1
-        return 0
+            for i in range(len(data[username])):
+                if data[username][i]['projectname'] == projectname:
+                    dataset = self.get_project_dataset(projectname, username)
+                    remove(f'{pathlib.Path(__file__).parent.parent.absolute()}/data/{dataset}')
+                    data[username].remove(data[username][i])
+                    self.__dbclient.set('datasets', data)
+                    self.__dbclient.dump()

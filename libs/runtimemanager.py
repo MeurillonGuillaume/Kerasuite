@@ -13,11 +13,14 @@ class RuntimeManager:
         """
         Register a project to the runtime
         :type project_name: str
-       p :type username: str
+        :type username: str
         :rtype: None
         """
         self.__runtime[username] = {
             project_name: ProjectRuntime(project_name, self.__project_manager, self.__dataset_dir)}
+
+    def stop_project(self, project_name, username):
+        self.__runtime[username].pop(project_name)
 
     def is_project_running(self, project_name, username):
         """
