@@ -9,7 +9,7 @@ setup(
     install_requires=[
         'flask==1.1.1',
         'numpy==1.18.1',
-        'pandas==0.24.2',
+        'pandas==1.0.1',
         'passlib==1.7.1',
         'bcrypt==3.1.7',
         'pickledb==0.9.2',

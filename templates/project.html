@@ -49,10 +49,15 @@
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
-                    {% if Dataset is undefined %}
-                        {{ Dataset }}
+                    {% if Dataset is none %}
+                        <p>You need to upload a dataset before you can inspect data.</p>
                     {% else %}
-                        You need to upload a dataset before you can inspect data.
+                        <div class="columns">
+                            <div class="column col-12">
+                                <p>Below are some samples from the dataset that was uploaded.</p>
+                                {{ Dataset | safe }}
+                            </div>
+                        </div>
                     {% endif %}
                 </li>
             </ul>

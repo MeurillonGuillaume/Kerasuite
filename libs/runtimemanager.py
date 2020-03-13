@@ -1,5 +1,6 @@
 from libs.projectruntime import ProjectRuntime
 import logging
+import json
 
 
 class RuntimeManager:
@@ -12,7 +13,7 @@ class RuntimeManager:
         """
         Register a project to the runtime
         :type project_name: str
-        :type username: str
+       p :type username: str
         :rtype: None
         """
         self.__runtime[username] = {
@@ -32,8 +33,10 @@ class RuntimeManager:
 
     def get_data_head(self, project_name, username):
         try:
-            print(self.__runtime[username][project_name].dataset.to_json())
-            return self.__runtime[username][project_name].dataset.to_json()
+            return self.__runtime[username][project_name].dataset.head().to_html(
+                classes='table table-striped table-hover table-scroll',
+                border=0,
+                notebook=False)
         except Exception as e:
             logging.error(e)
-            return False
+            return None
