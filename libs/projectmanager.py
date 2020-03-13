@@ -69,9 +69,13 @@ class ProjectManager:
         user_projects = self.get_user_projects(username)
         if self.does_project_exist(newname, username):
             return oldname
+        # Change settings for the general project
         for project in user_projects:
             if project['name'] == oldname:
                 user_projects[user_projects.index(project)] = {'name': newname, 'description': description}
+                if self.does_project_have_dataset(oldname, username):
+                    self.reassign_dataset(oldname, newname, username)
+
         projects = self.get_all_projects()
         projects[username] = user_projects
         self.__dbclient.set('projects', projects)
@@ -106,6 +110,13 @@ class ProjectManager:
                 return 1
             i += 1
         data[username].append({'projectname': projectname, 'datatype': type, 'dataset': name})
+        self.__dbclient.set('datasets', data)
+
+    def reassign_dataset(self, old_name, new_name, username):
+        data = self.get_all_datasets()
+        for i in range(len(data[username])):
+            if data[username][i]['projectname'] == old_name:
+                data[username][i]['projectname'] = new_name
         self.__dbclient.set('datasets', data)
 
     def does_project_have_dataset(self, projectname, username):
