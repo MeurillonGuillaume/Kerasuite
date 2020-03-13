@@ -1,6 +1,6 @@
 from libs.projectruntime import ProjectRuntime
 import logging
-import json
+import gc
 
 
 class RuntimeManager:
@@ -12,20 +12,34 @@ class RuntimeManager:
     def run_project(self, project_name, username):
         """
         Register a project to the runtime
+        :param project_name: The project to pop from runtime
         :type project_name: str
+
+        :param username: The username that is running the project
         :type username: str
-        :rtype: None
         """
         self.__runtime[username] = {
             project_name: ProjectRuntime(project_name, self.__project_manager, self.__dataset_dir)}
 
     def stop_project(self, project_name, username):
+        """
+        Delete a project from the project runtime
+        :param project_name: The project to pop from runtime
+        :type project_name: str
+
+        :param username: The username that is running the project
+        :type username: str
+        """
         self.__runtime[username].pop(project_name)
+        gc.collect()
 
     def is_project_running(self, project_name, username):
         """
         Check if a project is running or not
+        :param project_name: The project to pop from runtime
         :type project_name: str
+
+        :param username: The username that is running the project
         :type username: str
         :rtype: bool
         """
@@ -35,6 +49,17 @@ class RuntimeManager:
         return 0
 
     def get_data_head(self, project_name, username):
+        """
+        Return the head(5) from a dataset as HTML
+
+        :param project_name: The project to pop from runtime
+        :type project_name: str
+
+        :param username: The username that is running the project
+        :type username: str
+
+        :rtype: str or None
+        """
         try:
             return self.__runtime[username][project_name].dataset.head().to_html(
                 classes='table table-striped table-hover table-scroll',
