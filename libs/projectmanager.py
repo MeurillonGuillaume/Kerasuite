@@ -113,7 +113,8 @@ class ProjectManager:
         """
         user_projects = self.get_user_projects(username)
         if self.does_project_exist(newname, username):
-            return oldname
+            if oldname != newname:
+                return oldname
         # Change settings for the general project
         for project in user_projects:
             if project['name'] == oldname:

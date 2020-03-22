@@ -9,7 +9,7 @@ class UserManager:
         """
         Check if a password matches the front-end validation
         """
-        if match('(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$', password):
+        if match(r'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$', password):
             return 1
         return 0
 
