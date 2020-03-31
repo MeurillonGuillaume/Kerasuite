@@ -263,6 +263,9 @@ def create_user():
 
 @app.route('/op/user')
 def op_user():
+    """
+    Give a user elevated rights
+    """
     if is_user_logged_in():
         username = request.args.get('user')
         if username is not None and len(username) > 1:
