@@ -4,9 +4,9 @@ import pickledb
 from flask import Flask, render_template, redirect, request, session
 from werkzeug.utils import secure_filename
 from uuid import uuid4
-from libs.projectmanager import ProjectManager
-from libs.usermanager import UserManager
-from libs.runtimemanager import RuntimeManager
+from core.projectmanager import ProjectManager
+from core.usermanager import UserManager
+from core.runtimemanager import RuntimeManager
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'

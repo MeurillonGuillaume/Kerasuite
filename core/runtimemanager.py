@@ -1,4 +1,4 @@
-from libs.projectruntime import ProjectRuntime
+from core.projectruntime import ProjectRuntime
 import logging
 import gc
 
@@ -62,7 +62,7 @@ class RuntimeManager:
         """
         try:
             return self.__runtime[username][project_name].dataset.head().to_html(
-                classes='table table-striped table-hover table-scroll',
+                classes='table table-striped table-hover table-scroll text-center',
                 border=0,
                 notebook=False)
         except Exception as e:
