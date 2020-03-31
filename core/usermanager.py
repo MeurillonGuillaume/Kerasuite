@@ -24,7 +24,7 @@ class UserManager:
         :return: Boolean: True or False
         """
         try:
-            logging.info(f'Attempting to login with username "{username}" and password "{bcrypt.hash(password)}"')
+            logging.info(f'Attempting to login with username "{username}""')
             userdata = self.__dbclient.get('users')[username]['password']
             if userdata is not None:
                 # Will return True if the submitted password matches the hashed password
@@ -32,7 +32,7 @@ class UserManager:
             return 0
         except Exception as e:
             logging.error(
-                f'Failed attempt at logging in with username "{username}" and password "{bcrypt.hash(password)}": {e}')
+                f'Failed attempt at logging in with username "{username}": {e}')
             return 0
 
     def has_elevated_rights(self, username):

@@ -1,6 +1,12 @@
-from tensorflow import keras as K
+from tensorflow import keras
 
 
 class ModelManager:
+    LAYERS = [
+        'Dense',
+        'Input',
+        'Dropout'
+    ]
+
     def __init__(self):
-        self.__model = ...
+        self.__model = keras.models.Sequential()
