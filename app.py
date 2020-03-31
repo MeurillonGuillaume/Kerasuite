@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from uuid import uuid4
 from libs.projectmanager import ProjectManager
 from libs.usermanager import UserManager
+from libs.runtimemanager import RuntimeManager
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'
@@ -31,6 +32,7 @@ logging.info('Loading database into memory ...')
 database = pickledb.load(DATABASE_NAME, True)
 project_manager = ProjectManager(database)
 user_manager = UserManager(database)
+runtime_manager = RuntimeManager(project_manager, app.config['UPLOAD_FOLDER'])
 
 # Global variables
 ALLOWED_FILETYPES = ['csv', 'json']
@@ -180,14 +182,15 @@ def run():
         project = request.args.get('project')
         if project_manager.does_project_exist(project, session['username']):
             if project_manager.does_project_have_dataset(project, session['username']):
-                # TODO: load dataset in memory
-                ...
+                if not runtime_manager.is_project_running(project, session['username']):
+                    runtime_manager.run_project(project, session['username'])
             return render_template('project.html',
                                    Projectname=project,
                                    Projectdescription=project_manager.get_project(
                                        project, session['username'])['description'],
                                    LoggedIn=session['loggedin'],
-                                   HasDataset=project_manager.does_project_have_dataset(project, session['username']))
+                                   HasDataset=project_manager.does_project_have_dataset(project, session['username']),
+                                   Dataset=runtime_manager.get_data_head(project, session['username']))
     return redirect('/login')
 
 
@@ -221,6 +224,7 @@ def clear_dataset():
         if project_manager.does_project_exist(project, session['username']):
             if project_manager.does_project_have_dataset(project, session['username']):
                 project_manager.clear_project_dataset(project, session['username'])
+                runtime_manager.stop_project(project, session['username'])
             return redirect(f'/run?project={project}')
     return redirect('/login')
 

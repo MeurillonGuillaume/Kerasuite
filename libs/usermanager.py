@@ -9,7 +9,7 @@ class UserManager:
         """
         Check if a password matches the front-end validation
         """
-        if match('(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$', password):
+        if match(r'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$', password):
             return 1
         return 0
 
@@ -69,6 +69,7 @@ class UserManager:
         users = self.__dbclient.get('users')
         del users[username]
         self.__dbclient.set('users', users)
+        self.__dbclient.dump()
 
     def register_user(self, username, password, elevated_rights):
         """
@@ -77,6 +78,7 @@ class UserManager:
         users = self.__dbclient.get('users')
         users[username] = {"password": bcrypt.hash(password), "admin": elevated_rights}
         self.__dbclient.set('users', users)
+        self.__dbclient.dump()
 
     def change_permissions(self, username):
         """
@@ -85,6 +87,7 @@ class UserManager:
         users = self.__dbclient.get('users')
         users[username]['admin'] = not users[username]['admin']
         self.__dbclient.set('users', users)
+        self.__dbclient.dump()
 
     def admin_has_default_pass(self):
         """
@@ -101,3 +104,4 @@ class UserManager:
                 users = self.__dbclient.get('users')
                 users[username]['password'] = bcrypt.hash(new)
                 self.__dbclient.set('users', users)
+                self.__dbclient.dump()
