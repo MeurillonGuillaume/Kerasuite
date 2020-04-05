@@ -7,8 +7,11 @@
     </h1>
     <div class="accordion">
         <input id="accordion-1" type="radio" name="accordion-radio" hidden="" checked="">
-        <label class="accordion-header c-hand text-large" for="accordion-1"><i
-                class="icon icon-arrow-right mr-1"></i>1 Data uploading</label>
+        <label class="accordion-header c-hand" for="accordion-1">
+            <h3>
+                <i class="icon icon-arrow-right mr-1"></i>1 Data uploading
+            </h3>
+        </label>
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
@@ -44,11 +47,15 @@
     </div>
     <div class="accordion">
         <input id="accordion-2" type="radio" name="accordion-radio" hidden="">
-        <label class="accordion-header c-hand text-large" for="accordion-2"><i
-                class="icon icon-arrow-right mr-1"></i>2 Dataset inspection</label>
+        <label class="accordion-header c-hand" for="accordion-2">
+            <h3>
+                <i class="icon icon-arrow-right mr-1"></i>2 Dataset inspection
+            </h3>
+        </label>
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
+                    <h4>List some samples</h4>
                     {% if Dataset is none %}
                         <p>You need to upload a dataset before you can inspect data.</p>
                     {% else %}
@@ -63,16 +70,32 @@
             </ul>
         </div>
     </div>
+
     <div class="accordion">
         <input id="accordion-3" type="radio" name="accordion-radio" hidden="">
-        <label class="accordion-header c-hand text-large" for="accordion-3"><i
-                class="icon icon-arrow-right mr-1"></i>3 Preprocessing</label>
+        <label class="accordion-header c-hand" for="accordion-3">
+            <h3>
+                <i class="icon icon-arrow-right mr-1"></i>3 Preprocessing
+            </h3>
+        </label>
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
                     <div class="columns">
                         <div class="column col-12">
-                            <p>Time for some preprocessing</p>
+                            <h4>Train- & testset splitting</h4>
+                            <form action="#" method="post" enctype="multipart/form-data">
+                                <div class="form-group">
+                                    <label class="form-label" for="rangethingy">How much data should be in the
+                                        trainingset?</label>
+                                    <input id="rangethingy" class="slider tooltip mt-1" type="range" min="30"
+                                           max="90"
+                                           value="70"
+                                           step="1"
+                                           oninput="this.setAttribute('value', `${this.value}%`);">
+                                    <input type="hidden" value="{{ Projectname }}" name="project">
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </li>
@@ -82,14 +105,17 @@
 
     <div class="accordion">
         <input id="accordion-4" type="radio" name="accordion-radio" hidden="">
-        <label class="accordion-header c-hand text-large" for="accordion-4"><i
-                class="icon icon-arrow-right mr-1"></i>4 Data splitting</label>
+        <label class="accordion-header c-hand text-large" for="accordion-4">
+            <h3>
+                <i class="icon icon-arrow-right mr-1"></i>4 Model generation
+            </h3>
+        </label>
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
                     <div class="columns">
                         <div class="column col-12">
-                            <p>Time to create a train- and testset.</p>
+                            <p>Time to create a Neural Network.</p>
                         </div>
                     </div>
                 </li>
