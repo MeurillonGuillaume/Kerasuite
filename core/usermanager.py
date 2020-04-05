@@ -24,7 +24,7 @@ class UserManager:
         :return: Boolean: True or False
         """
         try:
-            logging.info(f'Attempting to login with username "{username}""')
+            logging.info(f'Attempting to login with username "{username}"')
             userdata = self.__dbclient.get('users')[username]['password']
             if userdata is not None:
                 # Will return True if the submitted password matches the hashed password

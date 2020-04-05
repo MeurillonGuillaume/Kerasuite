@@ -89,11 +89,14 @@ class ProjectManager:
         :param username: The user that owns this project
         :type username: str
         """
+        # Remove project from project list
         projects = self.get_all_projects()
         project_to_trash = self.get_project(name, username)
         projects[username].remove(project_to_trash)
         self.__dbclient.set('projects', projects)
         self.__dbclient.dump()
+        # Remove dataset from database entry
+        self.clear_project_dataset(project_to_trash['name'], username)
 
     def update_project(self, oldname, newname, description, username):
         """

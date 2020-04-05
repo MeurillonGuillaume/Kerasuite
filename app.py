@@ -154,6 +154,7 @@ def drop_project():
         project = request.args.get('project')
         if project is not None:
             project_manager.drop_project(project, session['username'])
+
         return redirect('/')
     return redirect('/login')
 
@@ -179,18 +180,22 @@ def run():
     Launch a project or redirect to login
     """
     if is_user_logged_in():
-        project = request.args.get('project')
-        if project_manager.does_project_exist(project, session['username']):
-            if project_manager.does_project_have_dataset(project, session['username']):
-                if not runtime_manager.is_project_running(project, session['username']):
-                    runtime_manager.run_project(project, session['username'])
-            return render_template('project.html',
-                                   Projectname=project,
-                                   Projectdescription=project_manager.get_project(
-                                       project, session['username'])['description'],
-                                   LoggedIn=session['loggedin'],
-                                   HasDataset=project_manager.does_project_have_dataset(project, session['username']),
-                                   Dataset=runtime_manager.get_data_head(project, session['username']))
+        try:
+            project = request.args.get('project')
+            if project_manager.does_project_exist(project, session['username']):
+                if project_manager.does_project_have_dataset(project, session['username']):
+                    if not runtime_manager.is_project_running(project, session['username']):
+                        runtime_manager.run_project(project, session['username'])
+                return render_template('project.html',
+                                       Projectname=project,
+                                       Projectdescription=project_manager.get_project(
+                                           project, session['username'])['description'],
+                                       LoggedIn=session['loggedin'],
+                                       HasDataset=project_manager.does_project_have_dataset(project,
+                                                                                            session['username']),
+                                       Dataset=runtime_manager.get_data_head(project, session['username']))
+        except Exception as e:
+            logging.error(e)
     return redirect('/login')
 
 

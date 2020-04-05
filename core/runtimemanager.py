@@ -66,5 +66,5 @@ class RuntimeManager:
                 border=0,
                 notebook=False)
         except Exception as e:
-            logging.error(e)
+            logging.error(f'Error loading dataset for {e}')
             return None
