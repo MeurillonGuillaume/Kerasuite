@@ -84,16 +84,18 @@
                     <div class="columns">
                         <div class="column col-12">
                             <h4>Train- & testset splitting</h4>
-                            <form action="#" method="post" enctype="multipart/form-data">
+                            <form action="/set/project/dataset/split" method="post" enctype="multipart/form-data">
                                 <div class="form-group">
-                                    <label class="form-label" for="rangethingy">How much data should be in the
+                                    <label class="form-label" for="train-test-range">How much data should be in the
                                         trainingset?</label>
-                                    <input id="rangethingy" class="slider tooltip mt-1" type="range" min="30"
+                                    <input id="train-test-range" class="slider tooltip mt-1" type="range" min="50"
                                            max="90"
-                                           value="70"
+                                           value="70%"
                                            step="1"
-                                           oninput="this.setAttribute('value', `${this.value}%`);">
+                                           oninput="this.setAttribute('value', `${this.value}%`);"
+                                           name="train-test-split">
                                     <input type="hidden" value="{{ Projectname }}" name="project">
+                                    <input type="submit" class="btn btn-success" value="Set size">
                                 </div>
                             </form>
                         </div>

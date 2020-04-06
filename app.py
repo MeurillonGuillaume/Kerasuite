@@ -41,7 +41,7 @@ ALLOWED_FILETYPES = ['csv', 'json']
 def is_user_logged_in():
     """
     Check if the requester is logged in
-    :return: Boolean: True or False
+    :rtype: bool
     """
     try:
         return session['loggedin']
@@ -54,11 +54,22 @@ def is_user_logged_in():
 def is_file_allowed(filename):
     """
     Check if a filetype is allowed
+    :type filename: str
+    :rtype: bool
     """
     try:
         return '.' in filename and str(filename).rsplit('.', 1)[1].lower() in ALLOWED_FILETYPES
     except Exception as e:
         return 0
+
+
+def post_has_keys(*args):
+    """
+    Check if a POST request contains all required keys
+    :type args: str
+    :rtype: bool
+    """
+    return all(k in request.form for k in args)
 
 
 @app.route('/')
@@ -79,7 +90,7 @@ def login():
     """
     if not is_user_logged_in():
         if request.method == 'POST':
-            if 'password' in request.form and 'username' in request.form:
+            if post_has_keys('password', 'username'):
                 if user_manager.attempt_login(request.form['username'], request.form['password']):
                     session['loggedin'] = True
                     session['username'] = request.form['username']
@@ -101,7 +112,7 @@ def change_password():
             if len(user) > 1 and user == session['username']:
                 return render_template('change_password.html', Username=user)
         elif request.method == 'POST':
-            if 'old_password' in request.form and 'new_password' in request.form and 'new_password_repeat' in request.form:
+            if post_has_keys('old_password', 'new_password', 'new_password_repeat'):
                 old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
                     'new_password_repeat']
                 user_manager.change_password(old, new, new_repeat, session['username'])
@@ -138,7 +149,7 @@ def create_project():
     Create a new project for a certain user
     """
     if request.method == 'POST' and is_user_logged_in():
-        if 'projectdescription' in request.form and 'projectname' in request.form:
+        if post_has_keys('projectdescription', 'projectname'):
             project_manager.create_project(request.form['projectname'],
                                            request.form['projectdescription'],
                                            session['username'])
@@ -165,7 +176,7 @@ def edit_project():
     Edit the fields of a project
     """
     if is_user_logged_in() and request.method == 'POST':
-        if 'projectdescription' in request.form and 'projectname' in request.form and 'old_projectname' in request.form:
+        if post_has_keys('projectdescription', 'projectname', 'old_projectname'):
             newname = project_manager.update_project(request.form['old_projectname'],
                                                      request.form['projectname'],
                                                      request.form['projectdescription'],
@@ -205,7 +216,7 @@ def set_dataset():
     Set a dataset for a certain project
     """
     if is_user_logged_in() and request.method == 'POST':
-        if 'dataset' in request.files and 'projectname' in request.form:
+        if post_has_keys('dataset', 'projectname'):
             dataset = request.files['dataset']
             if len(dataset.filename) > 1:
                 if is_file_allowed(dataset.filename):
@@ -217,6 +228,20 @@ def set_dataset():
                                                    session['username'])
                     return redirect(f'/run?project={request.form["projectname"]}')
     return redirect('/login')
+
+
+@app.route('/set/project/dataset/split', methods=['GET', 'POST'])
+def set_dataset_split():
+    """
+    Assign a certain percentage to split the training & test data with
+    """
+    if is_user_logged_in():
+        if request.method == 'POST':
+            if post_has_keys('project', 'train-test-split'):
+                project, splitsize = request.form['project'], request.form['train-test-split']
+                logging.info(f'User {session["username"]} set dataset split size to {splitsize} for {project}')
+                return redirect(f'/run?project={project}')
+    return redirect('/')
 
 
 @app.route('/clear/dataset')
@@ -255,7 +280,7 @@ def create_user():
     """
     if is_user_logged_in():
         if user_manager.has_elevated_rights(session['username']):
-            if 'username' in request.form and 'password' in request.form and 'password_repeat' in request.form:
+            if post_has_keys('username', 'password', 'password_repeat'):
                 username, password, pass_repeat = request.form['username'], request.form['password'], request.form[
                     'password_repeat']
                 if len('username') > 1 and password == pass_repeat:

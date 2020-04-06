@@ -68,3 +68,8 @@ class RuntimeManager:
         except Exception as e:
             logging.error(f'Error loading dataset for {e}')
             return None
+
+    def set_train_test_split(self, project_name, username, percentage):
+        if 0 < percentage < 1:
+            return 1
+        return 0
