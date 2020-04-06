@@ -1,4 +1,4 @@
-{% extends 'navbar.html' %}
+{% extends 'base.html' %}
 {% block Body %}
     <h1>Project: {{ Projectname }}
         <button class="btn btn-secondary btn-action btn-md tooltip tooltip-bottom"
@@ -12,28 +12,32 @@
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
-                    {% if not HasDataset %}
-                        <form action="/set/project/dataset" method="post" enctype="multipart/form-data">
-                            <div class="form-group">
-                                <input type="hidden" name="projectname" value="{{ Projectname }}">
-                                <label class="form-label" for="dataset">Load a dataset</label>
-                                <input type="file" class="form-input" id="dataset" name="dataset" accept=".csv,.json"
-                                       value="" required>
-                            </div>
-                            <input type="submit">
-                        </form>
-                    {% else %}
-                        <div class="columns">
-                            <div class="col-1">
+                    <div class="columns">
+                        <div class="column col-md-12 col-6">
+                            {% if not HasDataset %}
+                                <form action="/set/project/dataset" method="post" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <input type="hidden" name="projectname" value="{{ Projectname }}">
+                                        <label class="form-label" for="dataset">Load a dataset</label>
+                                        <input type="file" class="form-input" id="dataset" name="dataset"
+                                               accept=".csv,.json"
+                                               value="" required>
+                                    </div>
+                                    <button class="tooltip tooltip-right btn btn-success"
+                                            data-tooltip="Upload dataset!">Submit
+                                    </button>
+                                </form>
+                            {% else %}
+                                <p>There is a dataset submitted for this project.</p>
                                 <a href="/clear/dataset?project={{ Projectname }}"
                                    onclick="return confirm('Are you sure to delete this dataset? It will be deleted from disk!')"
                                    class="btn btn-error tooltip tooltip-right"
                                    data-tooltip="Delete the current dataset">
                                     <i class="icon icon-delete"></i> Delete dataset
                                 </a>
-                            </div>
+                            {% endif %}
                         </div>
-                    {% endif %}
+                    </div>
                 </li>
             </ul>
         </div>

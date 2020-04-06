@@ -9,10 +9,8 @@
 </head>
 <body>
 
-{% block Navbar %}
-{% endblock %}
-
 <div class="container centered">
+    {% include 'navbar.html' %}
     {% block Body %}
     {% endblock %}
 </div>

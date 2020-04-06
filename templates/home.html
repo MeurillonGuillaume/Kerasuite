@@ -1,4 +1,4 @@
-{% extends 'navbar.html' %}
+{% extends 'base.html' %}
 
 {% block Body %}
     <h1 class="text-center">Your projects</h1>
@@ -31,7 +31,7 @@
                             <p><span class="text-bold">Project description: </span>{{ project.description }}</p>
                             <a href="/run?project={{ project.name }}">
                                 <button class="btn btn-success tooltip tooltip-bottom"
-                                        data-tooltip="Open {{ project.name }}">Launch
+                                        data-tooltip="Launch {{ project.name }}"><i class="icon icon-shutdown"></i> Launch
                                 </button>
                             </a>
                             <a href="/drop/project?project={{ project.name }}"
