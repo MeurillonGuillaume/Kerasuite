@@ -216,7 +216,7 @@ def set_dataset():
     Set a dataset for a certain project
     """
     if is_user_logged_in() and request.method == 'POST':
-        if post_has_keys('dataset', 'projectname'):
+        if 'dataset' in request.files and post_has_keys('projectname'):
             dataset = request.files['dataset']
             if len(dataset.filename) > 1:
                 if is_file_allowed(dataset.filename):
