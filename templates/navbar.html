@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block Navbar %}
+    <header class="navbar" style="padding: 1rem;">
+        <div class="navbar-primary">
+            <a href="/" class="navbar-brand"><span class="text-large">Kerasuite</span></a>
+        </div>
+        <div class="navbar-section">
+            <a href="https://github.com/MeurillonGuillaume/Kerasuite" class="btn btn-primary hide-md" target="_blank">Github
+                repo</a>
+            {% if LoggedIn %}
+                <a href="/settings" class="btn btn-primary ml-1">
+                    Settings
+                </a>
+                <a href="/logout" class="btn btn-error tooltip tooltip-bottom ml-1" data-tooltip="Come back soon :)">
+                    Sign Out
+                </a>
+            {% endif %}
+        </div>
+    </header>
+{% endblock %}

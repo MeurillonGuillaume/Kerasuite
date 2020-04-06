@@ -1,0 +1,53 @@
+{% extends 'navbar.html' %}
+{% block Body %}
+    <h1>Project: {{ Projectname }}
+        <button class="btn btn-secondary btn-action btn-md tooltip tooltip-bottom"
+                data-tooltip="Edit project"
+                id="modalBtn"><i class="icon icon-edit"></i></button>
+    </h1>
+    <div class="accordion">
+        <input id="accordion-1" type="radio" name="accordion-radio" hidden="" checked="">
+        <label class="accordion-header c-hand text-large" for="accordion-1"><i
+                class="icon icon-arrow-right mr-1"></i>1. Data uploading</label>
+        <div class="accordion-body">
+            <ul class="menu menu-nav">
+                <li class="menu-item">
+                    {% if not HasDataset %}
+                        <form action="/set/project/dataset" method="post" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <input type="hidden" name="projectname" value="{{ Projectname }}">
+                                <label class="form-label" for="dataset">Load a dataset</label>
+                                <input type="file" class="form-input" id="dataset" name="dataset" accept=".csv,.json"
+                                       value="" required>
+                            </div>
+                            <input type="submit">
+                        </form>
+                    {% else %}
+                        <div class="columns">
+                            <div class="col-1">
+                                <a href="/clear/dataset?project={{ Projectname }}"
+                                   onclick="return confirm('Are you sure to delete this dataset? It will be deleted from disk!')"
+                                   class="btn btn-error tooltip tooltip-right"
+                                   data-tooltip="Delete the current dataset">
+                                    <i class="icon icon-delete"></i> Delete dataset
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="accordion">
+        <input id="accordion-2" type="radio" name="accordion-radio" hidden="">
+        <label class="accordion-header c-hand text-large" for="accordion-2"><i
+                class="icon icon-arrow-right mr-1"></i>2. To be continued ...</label>
+        <div class="accordion-body">
+            <ul class="menu menu-nav">
+                <li class="menu-item"><a href="#accordions">Item 1</a></li>
+                <li class="menu-item"><a href="#accordions">Item 2</a></li>
+            </ul>
+        </div>
+    </div>
+    {% include 'modal_editproject.html' %}
+{% endblock %}
