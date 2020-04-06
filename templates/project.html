@@ -8,7 +8,7 @@
     <div class="accordion">
         <input id="accordion-1" type="radio" name="accordion-radio" hidden="" checked="">
         <label class="accordion-header c-hand text-large" for="accordion-1"><i
-                class="icon icon-arrow-right mr-1"></i>1. Data uploading</label>
+                class="icon icon-arrow-right mr-1"></i>1 Data uploading</label>
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
@@ -45,11 +45,54 @@
     <div class="accordion">
         <input id="accordion-2" type="radio" name="accordion-radio" hidden="">
         <label class="accordion-header c-hand text-large" for="accordion-2"><i
-                class="icon icon-arrow-right mr-1"></i>2. To be continued ...</label>
+                class="icon icon-arrow-right mr-1"></i>2 Dataset inspection</label>
         <div class="accordion-body">
             <ul class="menu menu-nav">
-                <li class="menu-item"><a href="#accordions">Item 1</a></li>
-                <li class="menu-item"><a href="#accordions">Item 2</a></li>
+                <li class="menu-item">
+                    {% if Dataset is none %}
+                        <p>You need to upload a dataset before you can inspect data.</p>
+                    {% else %}
+                        <div class="columns">
+                            <div class="column col-12">
+                                <p>Below are some samples from the dataset that was uploaded.</p>
+                                {{ Dataset | safe }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="accordion">
+        <input id="accordion-3" type="radio" name="accordion-radio" hidden="">
+        <label class="accordion-header c-hand text-large" for="accordion-3"><i
+                class="icon icon-arrow-right mr-1"></i>3 Preprocessing</label>
+        <div class="accordion-body">
+            <ul class="menu menu-nav">
+                <li class="menu-item">
+                    <div class="columns">
+                        <div class="column col-12">
+                            <p>Time for some preprocessing</p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="accordion">
+        <input id="accordion-4" type="radio" name="accordion-radio" hidden="">
+        <label class="accordion-header c-hand text-large" for="accordion-4"><i
+                class="icon icon-arrow-right mr-1"></i>4 Data splitting</label>
+        <div class="accordion-body">
+            <ul class="menu menu-nav">
+                <li class="menu-item">
+                    <div class="columns">
+                        <div class="column col-12">
+                            <p>Time to create a train- and testset.</p>
+                        </div>
+                    </div>
+                </li>
             </ul>
         </div>
     </div>
