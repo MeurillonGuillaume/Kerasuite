@@ -180,13 +180,25 @@ class ProjectManager:
         i = 0
         for project in data[username]:
             if project['projectname'] == projectname:
-                data[username][i]['dataset'] = name
-                data[username][i]['datatype'] = data_type
+                data[username][i] = {
+                    'dataset': name,
+                    'datatype': data_type,
+                    'preprocessing': {
+                        'train-test-split': 0.7
+                    }
+                }
                 self.__dbclient.set('datasets', data)
                 self.__dbclient.dump()
                 return 1
             i += 1
-        data[username].append({'projectname': projectname, 'datatype': data_type, 'dataset': name})
+        data[username].append({
+            'projectname': projectname,
+            'datatype': data_type,
+            'dataset': name,
+            'preprocessing': {
+                'train-test-split': 0.7
+            }
+        })
         self.__dbclient.set('datasets', data)
 
     def reassign_dataset(self, old_name, new_name, username):
@@ -265,3 +277,54 @@ class ProjectManager:
                     data[username].remove(data[username][i])
                     self.__dbclient.set('datasets', data)
                     self.__dbclient.dump()
+
+    def set_train_test_split(self, project, username, percentage):
+        """
+        Set the train_test_split size in the database
+
+        :param project: The project to request size from
+        :type project: str
+
+        :param username: The owner of the project
+        :type username: str
+
+        :param percentage: A string of an integer that is a number between 0 - 100
+        :type percentage: str
+
+        :rtype: bool
+        """
+        try:
+            if isinstance(percentage, str):
+                percentage = int(percentage) / 100
+                data = self.get_all_datasets()
+                for _project in data[username]:
+                    if _project['projectname'] == project:
+                        logging.info(f'User {username} set dataset split size to {percentage} for {project}')
+                        _project['preprocessing']['train-test-split'] = percentage
+                        self.__dbclient.set('datasets', data)
+                        return 1
+                return 0
+        except Exception as e:
+            logging.error(f'Failed to set dataset percentage for {project} by user {username}: {e}')
+            return 0
+
+    def get_project_train_test_split(self, project_name, username):
+        """
+        Request the train_test_split size of a project's dataset
+
+        :param project_name: The project to request size from
+        :type project_name: str
+
+        :param username: The owner of the project
+        :type username: str
+
+        :rtype: float
+        """
+        try:
+            data = self.get_all_datasets()
+            for _project in data[username]:
+                if _project['projectname'] == project_name:
+                    return _project['preprocessing']['train-test-split']
+        except Exception as e:
+            logging.error(f'Failed to retrieve project {project_name} train_test_split data for user {username}')
+            return None

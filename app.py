@@ -199,12 +199,14 @@ def run():
                         runtime_manager.run_project(project, session['username'])
                 return render_template('project.html',
                                        Projectname=project,
-                                       Projectdescription=project_manager.get_project(
-                                           project, session['username'])['description'],
+                                       Projectdescription=project_manager.get_project(project, session['username'])[
+                                           'description'],
                                        LoggedIn=session['loggedin'],
                                        HasDataset=project_manager.does_project_have_dataset(project,
                                                                                             session['username']),
-                                       Dataset=runtime_manager.get_data_head(project, session['username']))
+                                       Dataset=runtime_manager.get_data_head(project, session['username']),
+                                       TrainTestSplit=project_manager.get_project_train_test_split(project,
+                                                                                                   session['username']))
         except Exception as e:
             logging.error(e)
     return redirect('/login')
@@ -239,7 +241,7 @@ def set_dataset_split():
         if request.method == 'POST':
             if post_has_keys('project', 'train-test-split'):
                 project, splitsize = request.form['project'], request.form['train-test-split']
-                logging.info(f'User {session["username"]} set dataset split size to {splitsize} for {project}')
+                project_manager.set_train_test_split(project, session['username'], splitsize)
                 return redirect(f'/run?project={project}')
     return redirect('/')
 

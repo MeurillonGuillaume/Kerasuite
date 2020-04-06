@@ -88,9 +88,13 @@
                                 <div class="form-group">
                                     <label class="form-label" for="train-test-range">How much data should be in the
                                         trainingset?</label>
-                                    <input id="train-test-range" class="slider tooltip mt-1" type="range" min="50"
+                                    <input id="train-test-range" class="slider tooltip m-1" type="range" min="50"
                                            max="90"
-                                           value="70%"
+                                            {% if TrainTestSplit %}
+                                           value="{{ TrainTestSplit * 100 | round(0) | int }}"
+                                            {% else %}
+                                           value="70"
+                                            {% endif %}
                                            step="1"
                                            oninput="this.setAttribute('value', `${this.value}%`);"
                                            name="train-test-split">
