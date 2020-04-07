@@ -5,7 +5,7 @@
                 data-tooltip="Edit project"
                 id="modalBtn"><i class="icon icon-edit"></i></button>
     </h1>
-    <div class="accordion">
+    <div class="accordion m-2">
         <input id="accordion-1" type="radio" name="accordion-radio" hidden="" checked="">
         <label class="accordion-header c-hand" for="accordion-1">
             <h3>
@@ -45,24 +45,74 @@
             </ul>
         </div>
     </div>
-    <div class="accordion">
+    <div class="accordion m-2">
         <input id="accordion-2" type="radio" name="accordion-radio" hidden="">
         <label class="accordion-header c-hand" for="accordion-2">
             <h3>
-                <i class="icon icon-arrow-right mr-1"></i>2 Dataset inspection
+                <i class="icon icon-arrow-right mr-1"></i>2 Dataset inspection & preprocessing
             </h3>
         </label>
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
-                    <h4>List some samples</h4>
+                    <h4>Dataset inspection</h4>
                     {% if Dataset is none %}
                         <p>You need to upload a dataset before you can inspect data.</p>
                     {% else %}
                         <div class="columns">
                             <div class="column col-12">
                                 <p>Below are some samples from the dataset that was uploaded.</p>
-                                {{ Dataset | safe }}
+                                <div class="mb-2">
+                                    {{ Dataset | safe }}
+                                </div>
+                            </div>
+
+                            <div class="column col-md-12 col-6">
+                                <h4>Replace values</h4>
+                                <form action="#" method="post" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label for="column">Replace values in column</label>
+                                        <select class="form-select" name="column" id="column">
+                                            <option>Hello</option>
+                                            <option>World</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="old-val">The value to replace</label>
+                                        <input class="form-input" type="text" name="old-value" id="old-val"
+                                               placeholder="Value123" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="new-val">Replace value with</label>
+                                        <input class="form-input" type="text" name="new-value" id="new-val"
+                                               placeholder="Newvalue-123" required>
+                                    </div>
+                                    <button class="btn btn-success btn-lg tooltip tooltip-bottom"
+                                            data-tooltip="Let's go!"><i class="icon icon-edit"></i> Replace values
+                                    </button>
+                                </form>
+
+                                <h4>Train- & testset splitting</h4>
+                                <form action="/set/project/dataset/split" method="post"
+                                      enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label class="form-label" for="train-test-range">How much data should be in
+                                            the trainingset?</label>
+                                        <input id="train-test-range" class="slider tooltip m-2" type="range"
+                                               min="50"
+                                               max="90"
+                                                {% if TrainTestSplit %}
+                                               value="{{ TrainTestSplit * 100 }}"
+                                                {% else %}
+                                               value="70"
+                                                {% endif %}
+                                               step="1"
+                                               oninput="this.setAttribute('value', `${this.value}%`);"
+                                               name="train-test-split">
+                                        <input type="hidden" value="{{ Projectname }}" name="project">
+                                        <input type="submit" class="btn btn-success" value="Set split size">
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     {% endif %}
@@ -71,57 +121,18 @@
         </div>
     </div>
 
-    <div class="accordion">
-        <input id="accordion-3" type="radio" name="accordion-radio" hidden="">
+    <div class="accordion m-2">
+        <input id="accordion-3" type="radio" name="accordion-radio" hidden="" checked="">
         <label class="accordion-header c-hand" for="accordion-3">
             <h3>
-                <i class="icon icon-arrow-right mr-1"></i>3 Preprocessing
+                <i class="icon icon-arrow-right mr-1"></i>3 Model building
             </h3>
         </label>
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
                     <div class="columns">
-                        <div class="column col-12">
-                            <h4>Train- & testset splitting</h4>
-                            <form action="/set/project/dataset/split" method="post" enctype="multipart/form-data">
-                                <div class="form-group">
-                                    <label class="form-label" for="train-test-range">How much data should be in the
-                                        trainingset?</label>
-                                    <input id="train-test-range" class="slider tooltip m-1" type="range" min="50"
-                                           max="90"
-                                            {% if TrainTestSplit %}
-                                           value="{{ TrainTestSplit * 100 | round(0) | int }}"
-                                            {% else %}
-                                           value="70"
-                                            {% endif %}
-                                           step="1"
-                                           oninput="this.setAttribute('value', `${this.value}%`);"
-                                           name="train-test-split">
-                                    <input type="hidden" value="{{ Projectname }}" name="project">
-                                    <input type="submit" class="btn btn-success" value="Set size">
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <div class="accordion">
-        <input id="accordion-4" type="radio" name="accordion-radio" hidden="">
-        <label class="accordion-header c-hand text-large" for="accordion-4">
-            <h3>
-                <i class="icon icon-arrow-right mr-1"></i>4 Model generation
-            </h3>
-        </label>
-        <div class="accordion-body">
-            <ul class="menu menu-nav">
-                <li class="menu-item">
-                    <div class="columns">
-                        <div class="column col-12">
-                            <p>Time to create a Neural Network.</p>
+                        <div class="column col-md-12 col-6">
                         </div>
                     </div>
                 </li>
