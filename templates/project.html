@@ -68,27 +68,84 @@
                             </div>
 
                             <div class="column col-md-12 col-6">
+                                <h4>Drop column</h4>
+                                <form action="#" method="post" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label for="column">Column to drop</label>
+                                        <select class="form-select" name="column" id="column">
+                                            {% if ColumnNames %}
+                                                {% for Column in ColumnNames %}
+                                                    <option value="{{ Column }}">{{ Column }}</option>
+                                                {% endfor %}
+                                            {% else %}
+                                                <option value="" selected="true" disabled="disabled">No columns
+                                                    found...
+                                                </option>
+                                            {% endif %}
+                                        </select>
+                                    </div>
+                                    <button class="btn btn-success btn-lg tooltip tooltip-bottom"
+                                            data-tooltip="Remove column">
+                                        <i class="icon icon-delete icon-resize-small"></i> Drop column
+                                    </button>
+                                </form>
+
+                                <h4>Rename column</h4>
+                                <form action="/set/column/name" method="post" enctype="multipart/form-data">
+                                    <div class="form-group">
+                                        <label for="column">Column to rename</label>
+                                        <select class="form-select" name="col_name_old" id="column">
+                                            {% if ColumnNames %}
+                                                {% for Column in ColumnNames %}
+                                                    <option value="{{ Column }}">{{ Column }}</option>
+                                                {% endfor %}
+                                            {% else %}
+                                                <option value="" selected="true" disabled="disabled">No columns
+                                                    found...
+                                                </option>
+                                            {% endif %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="old-val">New column name</label>
+                                        <input class="form-input" type="text" name="col_name_new" id="old-val"
+                                               placeholder="NewName36" required>
+                                    </div>
+                                    <input type="hidden" name="project" value="{{ Projectname }}">
+                                    <button class="btn btn-success btn-lg">
+                                        <i class="icon icon-edit"></i> Rename column
+                                    </button>
+                                </form>
+
                                 <h4>Replace values</h4>
                                 <form action="#" method="post" enctype="multipart/form-data">
                                     <div class="form-group">
                                         <label for="column">Replace values in column</label>
                                         <select class="form-select" name="column" id="column">
-                                            <option>Hello</option>
-                                            <option>World</option>
+                                            {% if ColumnNames %}
+                                                {% for Column in ColumnNames %}
+                                                    <option value="{{ Column }}">{{ Column }}</option>
+                                                {% endfor %}
+                                            {% else %}
+                                                <option value="" selected="true" disabled="disabled">No columns
+                                                    found...
+                                                </option>
+                                            {% endif %}
                                         </select>
                                     </div>
                                     <div class="form-group">
                                         <label for="old-val">The value to replace</label>
-                                        <input class="form-input" type="text" name="old-value" id="old-val"
+                                        <input class="form-input" type="text" name="col_name_old" id="old-val"
                                                placeholder="Value123" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="new-val">Replace value with</label>
-                                        <input class="form-input" type="text" name="new-value" id="new-val"
+                                        <input class="form-input" type="text" name="col_name_new" id="new-val"
                                                placeholder="Newvalue-123" required>
                                     </div>
-                                    <button class="btn btn-success btn-lg tooltip tooltip-bottom"
-                                            data-tooltip="Let's go!"><i class="icon icon-edit"></i> Replace values
+                                    <input type="hidden" name="project" value="{{ Projectname }}">
+                                    <button class="btn btn-success btn-lg">
+                                        <i class="icon icon-edit"></i> Replace values
                                     </button>
                                 </form>
 
@@ -121,23 +178,23 @@
         </div>
     </div>
 
-    <div class="accordion m-2">
-        <input id="accordion-3" type="radio" name="accordion-radio" hidden="" checked="">
-        <label class="accordion-header c-hand" for="accordion-3">
-            <h3>
-                <i class="icon icon-arrow-right mr-1"></i>3 Model building
-            </h3>
-        </label>
-        <div class="accordion-body">
-            <ul class="menu menu-nav">
-                <li class="menu-item">
-                    <div class="columns">
-                        <div class="column col-md-12 col-6">
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
+    {#    <div class="accordion m-2">#}
+    {#        <input id="accordion-3" type="radio" name="accordion-radio" hidden="">#}
+    {#        <label class="accordion-header c-hand" for="accordion-3">#}
+    {#            <h3>#}
+    {#                <i class="icon icon-arrow-right mr-1"></i>3 Model building#}
+    {#            </h3>#}
+    {#        </label>#}
+    {#        <div class="accordion-body">#}
+    {#            <ul class="menu menu-nav">#}
+    {#                <li class="menu-item">#}
+    {#                    <div class="columns">#}
+    {#                        <div class="column col-md-12 col-6">#}
+    {#                        </div>#}
+    {#                    </div>#}
+    {#                </li>#}
+    {#            </ul>#}
+    {#        </div>#}
+    {#    </div>#}
     {% include 'modal_editproject.html' %}
 {% endblock %}

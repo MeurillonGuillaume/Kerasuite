@@ -43,8 +43,8 @@ class RuntimeManager:
         :type username: str
         :rtype: bool
         """
-        for name, project in self.__runtime.items():
-            if name == username and project == project_name:
+        for name, projects in self.__runtime.items():
+            if name == username and project_name in projects:
                 return 1
         return 0
 
@@ -68,6 +68,22 @@ class RuntimeManager:
         except Exception as e:
             logging.error(f'Error loading dataset for {e}')
             return None
+
+    def get_column_names(self, project_name, username):
+        try:
+            return self.__runtime[username][project_name].dataset.columns.to_list()
+        except Exception as e:
+            logging.error(f'Error loading column names for project {project_name}: {e}')
+            return None
+
+    def rename_column(self, project_name, username, old_col_name, new_col_name):
+        try:
+            if old_col_name in self.get_column_names(project_name, username) and old_col_name != new_col_name:
+                self.__runtime[username][project_name].rename_column(old_col_name, new_col_name)
+            else:
+                raise ValueError(f'No such column "{old_col_name}" in project {project_name}')
+        except Exception as e:
+            logging.error(f'Error renaming column: {e}')
 
     def set_train_test_split(self, project_name, username, percentage):
         if 0 < percentage < 1:

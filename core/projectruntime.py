@@ -5,6 +5,7 @@ import logging
 
 class ProjectRuntime:
     def __init__(self, project_name, project_manager, dataset_dir):
+        self.dataset = None
         self.__project_name = project_name
         self.dataset_name = project_manager.get_project_dataset(self.__project_name, session['username'])
         self.__dataset_dir = dataset_dir
@@ -19,3 +20,14 @@ class ProjectRuntime:
         except Exception as e:
             logging.error(f'The dataset contains invalid encoding! {e}')
             self.dataset = None
+
+    def get_dataset_head(self):
+        return self.dataset.head().to_html(
+            classes='table table-striped table-hover table-scroll text-center',
+            border=0,
+            notebook=False)
+
+    def rename_column(self, old_name, new_name):
+        self.dataset = self.dataset.rename(columns={
+            old_name: new_name
+        })

@@ -206,9 +206,10 @@ def run():
                                                                                             session['username']),
                                        Dataset=runtime_manager.get_data_head(project, session['username']),
                                        TrainTestSplit=project_manager.get_project_train_test_split(project,
-                                                                                                   session['username']))
+                                                                                                   session['username']),
+                                       ColumnNames=runtime_manager.get_column_names(project, session['username']))
         except Exception as e:
-            logging.error(e)
+            logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')
 
 
@@ -243,6 +244,19 @@ def set_dataset_split():
                 project, splitsize = request.form['project'], request.form['train-test-split']
                 project_manager.set_train_test_split(project, session['username'], splitsize)
                 return redirect(f'/run?project={project}')
+    return redirect('/')
+
+
+@app.route('/set/column/name', methods=['GET', 'POST'])
+def set_column_name():
+    if is_user_logged_in():
+        if request.method == 'POST':
+            if post_has_keys('project', 'col_name_old', 'col_name_new'):
+                runtime_manager.rename_column(request.form['project'],
+                                              session['username'],
+                                              request.form['col_name_old'],
+                                              request.form['col_name_new'])
+                return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
 
