@@ -249,6 +249,9 @@ def set_dataset_split():
 
 @app.route('/set/column/name', methods=['GET', 'POST'])
 def set_column_name():
+    """
+    Change a column name
+    """
     if is_user_logged_in():
         if request.method == 'POST':
             if post_has_keys('project', 'col_name_old', 'col_name_new'):
@@ -258,6 +261,11 @@ def set_column_name():
                                               request.form['col_name_new'])
                 return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
+
+
+@app.route('/drop/column', methods=['GET', 'POST'])
+def drop_column():
+    pass
 
 
 @app.route('/clear/dataset')

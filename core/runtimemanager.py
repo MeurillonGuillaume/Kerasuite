@@ -70,6 +70,18 @@ class RuntimeManager:
             return None
 
     def get_column_names(self, project_name, username):
+        """
+        Retrieve all column names as a list
+
+        :param project_name: The project to pop from runtime
+        :type project_name: str
+
+        :param username: The username that is running the project
+        :type username: str
+
+        :returns: all column names as a list
+        :rtype: list
+        """
         try:
             return self.__runtime[username][project_name].dataset.columns.to_list()
         except Exception as e:
@@ -77,6 +89,23 @@ class RuntimeManager:
             return None
 
     def rename_column(self, project_name, username, old_col_name, new_col_name):
+        """
+        Change the name of a column in a DataFrame
+
+        :param project_name: The project to pop from runtime
+        :type project_name: str
+
+        :param username: The username that is running the project
+        :type username: str
+
+        :param old_col_name: The column to rename
+        :type old_col_name: str
+
+        :param new_col_name: The new column name
+        :type new_col_name: str
+
+        :returns: Nothing
+        """
         try:
             if old_col_name in self.get_column_names(project_name, username) and old_col_name != new_col_name:
                 self.__runtime[username][project_name].rename_column(old_col_name, new_col_name)
@@ -84,8 +113,3 @@ class RuntimeManager:
                 raise ValueError(f'No such column "{old_col_name}" in project {project_name}')
         except Exception as e:
             logging.error(f'Error renaming column: {e}')
-
-    def set_train_test_split(self, project_name, username, percentage):
-        if 0 < percentage < 1:
-            return 1
-        return 0
