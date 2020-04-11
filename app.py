@@ -116,7 +116,7 @@ def change_password():
         if post_has_keys('old_password', 'new_password', 'new_password_repeat'):
             old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
                 'new_password_repeat']
-            user_manager.change_password(old, new, new_repeat, session['username'])
+            user_manager.change_password(old, new, new_repeat)
             return redirect('/logout')
     return redirect('/login')
 
@@ -138,8 +138,8 @@ def settings():
     """
     if is_user_logged_in():
         return render_template('settings.html', LoggedIn=session['loggedin'],
-                               IsAdmin=user_manager.has_elevated_rights(session['username']),
-                               UserList=user_manager.get_users(session['username']),
+                               IsAdmin=user_manager.has_elevated_rights(),
+                               UserList=user_manager.get_users(),
                                Username=session['username'])
     return redirect('/login')
 
@@ -191,8 +191,8 @@ def run():
     Launch a project or redirect to login
     """
     if is_user_logged_in():
+        project = request.args.get('project')
         try:
-            project = request.args.get('project')
             if project_manager.does_project_exist(project, session['username']):
                 if project_manager.does_project_have_dataset(project, session['username']):
                     if not runtime_manager.is_project_running(project):
@@ -291,7 +291,7 @@ def remove_user():
     """
     if is_user_logged_in():
         username = request.args.get('username')
-        if user_manager.has_elevated_rights(session['username']) and username is not None and len(username) > 1:
+        if user_manager.has_elevated_rights() and username is not None and len(username) > 1:
             if user_manager.does_user_exist(username):
                 user_manager.delete_user(username)
         return redirect('/settings')
@@ -304,7 +304,7 @@ def create_user():
     Create a new user
     """
     if is_user_logged_in():
-        if user_manager.has_elevated_rights(session['username']):
+        if user_manager.has_elevated_rights():
             if post_has_keys('username', 'password', 'password_repeat'):
                 username, password, pass_repeat = request.form['username'], request.form['password'], request.form[
                     'password_repeat']
@@ -324,8 +324,7 @@ def op_user():
     if is_user_logged_in():
         username = request.args.get('user')
         if username is not None and len(username) > 1:
-            if user_manager.has_elevated_rights(
-                    session['username']) and username is not None and user_manager.does_user_exist(username):
+            if user_manager.has_elevated_rights() and username is not None and user_manager.does_user_exist(username):
                 user_manager.change_permissions(username)
         return redirect('/settings')
     return redirect('/login')

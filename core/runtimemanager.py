@@ -13,11 +13,9 @@ class RuntimeManager:
     def run_project(self, project_name):
         """
         Register a project to the runtime
+
         :param project_name: The project to pop from runtime
         :type project_name: str
-
-        :param username: The username that is running the project
-        :type username: str
         """
         self.__runtime[session['username']] = {
             project_name: ProjectRuntime(project_name, self.__project_manager, self.__dataset_dir)}
@@ -25,11 +23,9 @@ class RuntimeManager:
     def stop_project(self, project_name):
         """
         Delete a project from the project runtime
+
         :param project_name: The project to pop from runtime
         :type project_name: str
-
-        :param username: The username that is running the project
-        :type username: str
         """
         self.__runtime[session['username']].pop(project_name)
         gc.collect()
@@ -37,11 +33,11 @@ class RuntimeManager:
     def is_project_running(self, project_name):
         """
         Check if a project is running or not
+
         :param project_name: The project to pop from runtime
         :type project_name: str
 
-        :param username: The username that is running the project
-        :type username: str
+        :returns: A boolean representing the project running state
         :rtype: bool
         """
         for name, projects in self.__runtime.items():
@@ -55,9 +51,6 @@ class RuntimeManager:
 
         :param project_name: The project to pop from runtime
         :type project_name: str
-
-        :param username: The username that is running the project
-        :type username: str
 
         :rtype: str or None
         """
@@ -77,9 +70,6 @@ class RuntimeManager:
         :param project_name: The project to pop from runtime
         :type project_name: str
 
-        :param username: The username that is running the project
-        :type username: str
-
         :returns: all column names as a list
         :rtype: list
         """
@@ -95,9 +85,6 @@ class RuntimeManager:
 
         :param project_name: The project to pop from runtime
         :type project_name: str
-
-        :param username: The username that is running the project
-        :type username: str
 
         :param old_col_name: The column to rename
         :type old_col_name: str
@@ -121,9 +108,6 @@ class RuntimeManager:
 
         :param project_name: The project to pop from runtime
         :type project_name: str
-
-        :param username: The username that is running the project
-        :type username: str
 
         :param col_name: The column to drop
         :type col_name: str
