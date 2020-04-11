@@ -80,7 +80,8 @@ def home():
     Serve the homepage or redirect to the login page
     """
     if is_user_logged_in():
-        return render_template('home.html', LoggedIn=session['loggedin'],
+        return render_template('home.html',
+                               LoggedIn=session['loggedin'],
                                Projects=project_manager.get_user_projects(session['username']))
     return redirect('/login')
 
@@ -194,8 +195,8 @@ def run():
             project = request.args.get('project')
             if project_manager.does_project_exist(project, session['username']):
                 if project_manager.does_project_have_dataset(project, session['username']):
-                    if not runtime_manager.is_project_running(project, session['username']):
-                        runtime_manager.run_project(project, session['username'])
+                    if not runtime_manager.is_project_running(project):
+                        runtime_manager.run_project(project)
                 return render_template('project.html',
                                        Projectname=project,
                                        Projectdescription=project_manager.get_project(project, session['username'])[
@@ -203,10 +204,10 @@ def run():
                                        LoggedIn=session['loggedin'],
                                        HasDataset=project_manager.does_project_have_dataset(project,
                                                                                             session['username']),
-                                       Dataset=runtime_manager.get_data_head(project, session['username']),
+                                       Dataset=runtime_manager.get_data_head(project),
                                        TrainTestSplit=project_manager.get_project_train_test_split(project,
                                                                                                    session['username']),
-                                       ColumnNames=runtime_manager.get_column_names(project, session['username']))
+                                       ColumnNames=runtime_manager.get_column_names(project))
         except Exception as e:
             logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')
@@ -254,8 +255,7 @@ def set_column_name():
         if post_has_keys('project', 'col_name_old', 'col_name_new'):
             runtime_manager.rename_column(request.form['project'],
                                           session['username'],
-                                          request.form['col_name_old'],
-                                          request.form['col_name_new'])
+                                          request.form['col_name_old'])
             return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
@@ -264,7 +264,7 @@ def set_column_name():
 def drop_column():
     if is_user_logged_in():
         if post_has_keys('project', 'column'):
-            runtime_manager.drop_column(request.form['project'], session['username'], request.form['column'])
+            runtime_manager.drop_column(request.form['project'], request.form['column'])
             return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
@@ -279,7 +279,7 @@ def clear_dataset():
         if project_manager.does_project_exist(project, session['username']):
             if project_manager.does_project_have_dataset(project, session['username']):
                 project_manager.clear_project_dataset(project, session['username'])
-                runtime_manager.stop_project(project, session['username'])
+                runtime_manager.stop_project(project)
             return redirect(f'/run?project={project}')
     return redirect('/login')
 

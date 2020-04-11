@@ -1,10 +1,23 @@
+import logging
 import pandas as pd
 from flask import session
-import logging
+from core.projectmanager import ProjectManager
 
 
 class ProjectRuntime:
     def __init__(self, project_name, project_manager, dataset_dir):
+        """
+        Initialise project runtime
+
+        :param project_name:
+        :type project_name: str
+
+        :param project_manager:
+        :type project_manager: ProjectManager
+
+        :param dataset_dir:
+        :type dataset_dir: str
+        """
         self.dataset = None
         self.__project_name = project_name
         self.dataset_name = project_manager.get_project_dataset(self.__project_name, session['username'])
@@ -24,6 +37,9 @@ class ProjectRuntime:
             logging.error(f'The dataset contains invalid encoding! {e}')
             self.dataset = None
 
+    def __store_to_disk(self):
+        ...
+
     def get_dataset_head(self):
         """
         Return the head of the dataset as a HTML table
@@ -42,6 +58,9 @@ class ProjectRuntime:
 
         :param new_name: The new column name
         :type new_name: str
+
+        :returns: Nothing
+        :rtype: None
         """
         self.dataset = self.dataset.rename(columns={
             old_name: new_name
@@ -53,5 +72,8 @@ class ProjectRuntime:
 
         :param col_name: The column to drop
         :type col_name: str
+
+        :returns: Nothing
+        :rtype: None
         """
         self.dataset = self.dataset.drop([col_name], axis=1)
