@@ -1,0 +1,105 @@
+<div class="column col-md-12 col-6">
+    <h4>Drop column</h4>
+    <form action="/drop/column" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="column">Column to drop</label>
+            <select class="form-select" name="column" id="column">
+                {% if ColumnNames %}
+                    {% for Column in ColumnNames %}
+                        <option value="{{ Column }}">{{ Column }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="" selected="true" disabled="disabled">No columns
+                        found...
+                    </option>
+                {% endif %}
+            </select>
+            <input type="hidden" name="project" value="{{ Projectname }}">
+        </div>
+        <button class="btn btn-success btn-lg tooltip tooltip-bottom"
+                data-tooltip="Remove column">
+            <i class="icon icon-delete icon-resize-small"></i> Drop column
+        </button>
+    </form>
+
+    <h4>Rename column</h4>
+    <form action="/set/column/name" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="column">Column to rename</label>
+            <select class="form-select" name="col_name_old" id="column">
+                {% if ColumnNames %}
+                    {% for Column in ColumnNames %}
+                        <option value="{{ Column }}">{{ Column }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="" selected="true" disabled="disabled">No columns
+                        found...
+                    </option>
+                {% endif %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="old-val">New column name</label>
+            <input class="form-input" type="text" name="col_name_new" id="old-val"
+                   placeholder="NewName36" required>
+        </div>
+        <input type="hidden" name="project" value="{{ Projectname }}">
+        <button class="btn btn-success btn-lg">
+            <i class="icon icon-edit"></i> Rename column
+        </button>
+    </form>
+
+    <h4>Replace values</h4>
+    <form action="#" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="column">Replace values in column</label>
+            <select class="form-select" name="column" id="column">
+                {% if ColumnNames %}
+                    {% for Column in ColumnNames %}
+                        <option value="{{ Column }}">{{ Column }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="" selected="true" disabled="disabled">No columns
+                        found...
+                    </option>
+                {% endif %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="old-val">The value to replace</label>
+            <input class="form-input" type="text" name="col_name_old" id="old-val"
+                   placeholder="Value123" required>
+        </div>
+        <div class="form-group">
+            <label for="new-val">Replace value with</label>
+            <input class="form-input" type="text" name="col_name_new" id="new-val"
+                   placeholder="Newvalue-123" required>
+        </div>
+        <input type="hidden" name="project" value="{{ Projectname }}">
+        <button class="btn btn-success btn-lg">
+            <i class="icon icon-edit"></i> Replace values
+        </button>
+    </form>
+
+    <h4>Train- & testset splitting</h4>
+    <form action="/set/project/dataset/split" method="post"
+          enctype="multipart/form-data">
+        <div class="form-group">
+            <label class="form-label" for="train-test-range">How much data should be in
+                the trainingset?</label>
+            <input id="train-test-range" class="slider tooltip m-2" type="range"
+                   min="50"
+                   max="90"
+                    {% if TrainTestSplit %}
+                   value="{{ TrainTestSplit * 100 }}"
+                    {% else %}
+                   value="70"
+                    {% endif %}
+                   step="1"
+                   oninput="this.setAttribute('value', `${this.value}%`);"
+                   name="train-test-split">
+            <input type="hidden" value="{{ Projectname }}" name="project">
+            <input type="submit" class="btn btn-success" value="Set split size">
+        </div>
+    </form>
+</div>
