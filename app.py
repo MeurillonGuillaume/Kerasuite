@@ -69,7 +69,9 @@ def post_has_keys(*args):
     :type args: str
     :rtype: bool
     """
-    return all(k in request.form for k in args)
+    if request.method == 'POST':
+        return all(k in request.form for k in args)
+    return 0
 
 
 @app.route('/')
@@ -89,14 +91,13 @@ def login():
     Serve the login page or redirect to home
     """
     if not is_user_logged_in():
-        if request.method == 'POST':
-            if post_has_keys('password', 'username'):
-                if user_manager.attempt_login(request.form['username'], request.form['password']):
-                    session['loggedin'] = True
-                    session['username'] = request.form['username']
-                    if session['username'] == 'admin' and user_manager.admin_has_default_pass():
-                        return redirect('/change/password?user=admin')
-                    return redirect('/')
+        if post_has_keys('password', 'username'):
+            if user_manager.attempt_login(request.form['username'], request.form['password']):
+                session['loggedin'] = True
+                session['username'] = request.form['username']
+                if session['username'] == 'admin' and user_manager.admin_has_default_pass():
+                    return redirect('/change/password?user=admin')
+                return redirect('/')
         return render_template('login.html')
     return redirect('/')
 
@@ -111,12 +112,11 @@ def change_password():
             user = request.args.get('user')
             if len(user) > 1 and user == session['username']:
                 return render_template('change_password.html', Username=user)
-        elif request.method == 'POST':
-            if post_has_keys('old_password', 'new_password', 'new_password_repeat'):
-                old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
-                    'new_password_repeat']
-                user_manager.change_password(old, new, new_repeat, session['username'])
-                return redirect('/logout')
+        if post_has_keys('old_password', 'new_password', 'new_password_repeat'):
+            old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
+                'new_password_repeat']
+            user_manager.change_password(old, new, new_repeat, session['username'])
+            return redirect('/logout')
     return redirect('/login')
 
 
@@ -148,7 +148,7 @@ def create_project():
     """
     Create a new project for a certain user
     """
-    if request.method == 'POST' and is_user_logged_in():
+    if is_user_logged_in():
         if post_has_keys('projectdescription', 'projectname'):
             project_manager.create_project(request.form['projectname'],
                                            request.form['projectdescription'],
@@ -165,7 +165,6 @@ def drop_project():
         project = request.args.get('project')
         if project is not None:
             project_manager.drop_project(project, session['username'])
-
         return redirect('/')
     return redirect('/login')
 
@@ -175,7 +174,7 @@ def edit_project():
     """
     Edit the fields of a project
     """
-    if is_user_logged_in() and request.method == 'POST':
+    if is_user_logged_in():
         if post_has_keys('projectdescription', 'projectname', 'old_projectname'):
             newname = project_manager.update_project(request.form['old_projectname'],
                                                      request.form['projectname'],
@@ -218,7 +217,7 @@ def set_dataset():
     """
     Set a dataset for a certain project
     """
-    if is_user_logged_in() and request.method == 'POST':
+    if is_user_logged_in():
         if 'dataset' in request.files and post_has_keys('projectname'):
             dataset = request.files['dataset']
             if len(dataset.filename) > 1:
@@ -239,11 +238,10 @@ def set_dataset_split():
     Assign a certain percentage to split the training & test data with
     """
     if is_user_logged_in():
-        if request.method == 'POST':
-            if post_has_keys('project', 'train-test-split'):
-                project, splitsize = request.form['project'], request.form['train-test-split']
-                project_manager.set_train_test_split(project, session['username'], splitsize)
-                return redirect(f'/run?project={project}')
+        if post_has_keys('project', 'train-test-split'):
+            project, splitsize = request.form['project'], request.form['train-test-split']
+            project_manager.set_train_test_split(project, session['username'], splitsize)
+            return redirect(f'/run?project={project}')
     return redirect('/')
 
 
@@ -253,19 +251,21 @@ def set_column_name():
     Change a column name
     """
     if is_user_logged_in():
-        if request.method == 'POST':
-            if post_has_keys('project', 'col_name_old', 'col_name_new'):
-                runtime_manager.rename_column(request.form['project'],
-                                              session['username'],
-                                              request.form['col_name_old'],
-                                              request.form['col_name_new'])
-                return redirect(f'/run?project={request.form["project"]}')
+        if post_has_keys('project', 'col_name_old', 'col_name_new'):
+            runtime_manager.rename_column(request.form['project'],
+                                          session['username'],
+                                          request.form['col_name_old'],
+                                          request.form['col_name_new'])
+            return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
 
 @app.route('/drop/column', methods=['GET', 'POST'])
 def drop_column():
-    pass
+    if is_user_logged_in():
+        if post_has_keys(''):
+            ...
+    return redirect('/')
 
 
 @app.route('/clear/dataset')
