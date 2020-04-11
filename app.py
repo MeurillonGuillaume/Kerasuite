@@ -254,8 +254,8 @@ def set_column_name():
     if is_user_logged_in():
         if post_has_keys('project', 'col_name_old', 'col_name_new'):
             runtime_manager.rename_column(request.form['project'],
-                                          session['username'],
-                                          request.form['col_name_old'])
+                                          request.form['col_name_old'],
+                                          request.form['col_name_new'])
             return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
