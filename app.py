@@ -263,8 +263,9 @@ def set_column_name():
 @app.route('/drop/column', methods=['GET', 'POST'])
 def drop_column():
     if is_user_logged_in():
-        if post_has_keys(''):
-            ...
+        if post_has_keys('project', 'column'):
+            runtime_manager.drop_column(request.form['project'], session['username'], request.form['column'])
+            return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
 

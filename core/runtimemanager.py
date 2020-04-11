@@ -113,3 +113,24 @@ class RuntimeManager:
                 raise ValueError(f'No such column "{old_col_name}" in project {project_name}')
         except Exception as e:
             logging.error(f'Error renaming column: {e}')
+
+    def drop_column(self, project_name, username, col_name):
+        """
+        Remove a column
+
+        :param project_name: The project to pop from runtime
+        :type project_name: str
+
+        :param username: The username that is running the project
+        :type username: str
+
+        :param col_name: The column to drop
+        :type col_name: str
+        """
+        try:
+            if col_name in self.get_column_names(project_name, username):
+                self.__runtime[username][project_name].drop_column(col_name)
+            else:
+                raise ValueError(f'No such column name: {col_name}')
+        except Exception as e:
+            logging.error(f'Could not drop column {col_name} from {project_name}: {e}')
