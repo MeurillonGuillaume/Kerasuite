@@ -5,6 +5,22 @@ import gc
 
 
 class RuntimeManager:
+    NORMALIZATION_METHODS = {
+        'Standardization': [
+            'StandardScaler',
+            'MaxAbsScaler',
+            'RobustScaler',
+            'Min-Max Scaler'
+        ],
+        'Normalization': [
+            'Normalizer'
+        ],
+        'Non-Linear transformation': [
+            'QuantileTransformer',
+            'PowerTransformer'
+        ]
+    }
+
     def __init__(self, project_manager, dataset_dir):
         self.__runtime = {}
         self.__project_manager = project_manager

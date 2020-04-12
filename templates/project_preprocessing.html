@@ -1,7 +1,7 @@
 <div class="column col-md-12 col-6">
     <div class="accordion m-2">
-        <input id="preprocessing-1" type="radio" name="accordion-preprocessing" hidden="">
-        <label class="accordion-header c-hand" for="preprocessing-1">
+        <input id="preprocessing-drop" type="radio" name="accordion-preprocessing" hidden="">
+        <label class="accordion-header c-hand" for="preprocessing-drop">
             <h4>
                 <i class="icon icon-arrow-right mr-1"></i>Drop column
             </h4>
@@ -31,8 +31,8 @@
     </div>
 
     <div class="accordion m-2">
-        <input id="preprocessing-2" type="radio" name="accordion-preprocessing" hidden="">
-        <label class="accordion-header c-hand" for="preprocessing-2">
+        <input id="preprocessing-rename" type="radio" name="accordion-preprocessing" hidden="">
+        <label class="accordion-header c-hand" for="preprocessing-rename">
             <h4>
                 <i class="icon icon-arrow-right mr-1"></i>Rename column
             </h4>
@@ -67,8 +67,8 @@
     </div>
 
     <div class="accordion m-2">
-        <input id="preprocessing-3" type="radio" name="accordion-preprocessing" hidden="">
-        <label class="accordion-header c-hand" for="preprocessing-3">
+        <input id="preprocessing-replace" type="radio" name="accordion-preprocessing" hidden="">
+        <label class="accordion-header c-hand" for="preprocessing-replace">
             <h4>
                 <i class="icon icon-arrow-right mr-1"></i>Replace values
             </h4>
@@ -108,8 +108,50 @@
     </div>
 
     <div class="accordion m-2">
-        <input id="preprocessing-4" type="radio" name="accordion-preprocessing" hidden="">
-        <label class="accordion-header c-hand" for="preprocessing-4">
+        <input id="preprocessing-normalisation" type="radio" name="accordion-preprocessing" hidden="">
+        <label class="accordion-header c-hand" for="preprocessing-normalisation">
+            <h4>
+                <i class="icon icon-arrow-right mr-1"></i>Data normalisation
+            </h4>
+        </label>
+        <div class="accordion-body">
+            <form action="#" method="post"
+                  enctype="multipart/form-data">
+                <div class="form-group">
+                    <label class="form-label" for="select-column">Columns to normalize</label>
+                    <select class="form-select" name="column" id="select-column" multiple required>
+                        {% if ColumnNames %}
+                            {% for Column in ColumnNames %}
+                                <option name="{{ Column }}">{{ Column }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="" disabled>There are no columns</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="normalisation-method">Normalise data with method</label>
+                    <select class="form-select" name="normalisation-method" id="normalisation-method" required>
+                        {% if Normalizers %}
+                            {% for NormType in Normalizers %}
+                                <optgroup label="{{ NormType }}">
+                                    {% for Normalizer in Normalizers[NormType] %}
+                                        <option value="{{ Normalizer }}">{{ Normalizer }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        {% endif %}
+                    </select>
+                </div>
+                <input type="hidden" value="{{ Projectname }}" name="project" required>
+                <input type="submit" class="btn btn-success" value="Normalise data">
+            </form>
+        </div>
+    </div>
+
+    <div class="accordion m-2">
+        <input id="preprocessing-split" type="radio" name="accordion-preprocessing" hidden="">
+        <label class="accordion-header c-hand" for="preprocessing-split">
             <h4>
                 <i class="icon icon-arrow-right mr-1"></i>Train- & testset splitting
             </h4>

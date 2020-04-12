@@ -205,7 +205,8 @@ def run():
                                        Dataset=runtime_manager.get_data_head(project),
                                        TrainTestSplit=project_manager.get_preprocessing(project, 'train-test-split'),
                                        RandomState=project_manager.get_preprocessing(project, 'random-state'),
-                                       ColumnNames=runtime_manager.get_column_names(project))
+                                       ColumnNames=runtime_manager.get_column_names(project),
+                                       Normalizers=runtime_manager.NORMALIZATION_METHODS)
         except Exception as e:
             logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')
