@@ -262,11 +262,27 @@ def set_column_name():
 
 @app.route('/drop/column', methods=['GET', 'POST'])
 def drop_column():
+    """
+    Delete a column
+    """
     if is_user_logged_in():
         if post_has_keys('project', 'column'):
             runtime_manager.drop_column(request.form['project'], request.form['column'])
             return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
+
+
+@app.route('/replace/dataset/values', methods=['GET', 'POST'])
+def replace_dataset_values():
+    if is_user_logged_in():
+        if post_has_keys('column', 'project', 'value_old', 'value_new'):
+            runtime_manager.replace_values(request.form['project'],
+                                           request.form['column'],
+                                           request.form['value_old'],
+                                           request.form['value_new'])
+            return redirect(f'/run?project={request.form["project"]}')
+    return redirect('/')
+    pass
 
 
 @app.route('/clear/dataset')

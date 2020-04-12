@@ -74,7 +74,7 @@ class RuntimeManager:
         :rtype: list
         """
         try:
-            return self.__runtime[session['username']][project_name].dataset.columns.to_list()
+            return self.__runtime[session['username']][project_name].get_columns()
         except Exception as e:
             logging.error(f'Error loading column names for project {project_name}: {e}')
             return None
@@ -119,3 +119,15 @@ class RuntimeManager:
                 raise ValueError(f'No such column name: {col_name}')
         except Exception as e:
             logging.error(f'Could not drop column {col_name} from {project_name}: {e}')
+
+    def replace_values(self, project_name, col_name, value_old, value_new):
+        try:
+            if col_name in self.get_column_names(project_name):
+                self.__runtime[session['username']][project_name].replace_values(col_name,
+                                                                                 value_old,
+                                                                                 value_new)
+            else:
+                raise ValueError(f'No such column name: {col_name}')
+        except Exception as e:
+            logging.error(
+                f'Could not replace values ({value_old} -> {value_new}) in project {project_name} for column {col_name}: {e}')

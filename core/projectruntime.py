@@ -94,3 +94,30 @@ class ProjectRuntime:
         """
         self.dataset = self.dataset.drop([col_name], axis=1)
         self.__write_dataset_to_disk()
+
+    def get_columns(self):
+        """
+        Load all columns as a list
+
+        :returns: A list of column names
+        :rtype: list
+        """
+        return self.dataset.columns.to_list()
+
+    def replace_values(self, column, old_value, new_value):
+        """
+        Replace specific values in a column with a new value
+
+        :param column: The column in which values are to be changed
+        :type column: str
+
+        :param old_value: The value in the column to replace
+        :type old_value: str
+
+        :param new_value: The new value to put in the column
+        :type new_value: str
+        """
+        self.dataset[column] = self.dataset[column].map({
+            old_value: new_value
+        })
+        self.__write_dataset_to_disk()
