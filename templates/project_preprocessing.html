@@ -136,7 +136,8 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="random-state">Custom random state <i>(optional)</i></label>
-                    <input type="number" class="form-input" id="random-state" name="random-state" value="0" required>
+                    <input type="number" class="form-input" id="random-state" name="random-state"
+                           value="{% if RandomState %}{{ RandomState }}{% else %}0{% endif %}" required>
                 </div>
                 <input type="submit" class="btn btn-success" value="Set split size">
             </form>

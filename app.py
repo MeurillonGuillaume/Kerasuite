@@ -204,6 +204,7 @@ def run():
                                        HasDataset=project_manager.does_project_have_dataset(project),
                                        Dataset=runtime_manager.get_data_head(project),
                                        TrainTestSplit=project_manager.get_preprocessing(project, 'train-test-split'),
+                                       RandomState=project_manager.get_preprocessing(project, 'random-state'),
                                        ColumnNames=runtime_manager.get_column_names(project))
         except Exception as e:
             logging.error(f'Exception in /run?project{project}: {e}')
@@ -235,10 +236,14 @@ def set_dataset_split():
     Assign a certain percentage to split the training & test data with
     """
     if is_user_logged_in():
-        if post_has_keys('project', 'train-test-split'):
-            project, splitsize = request.form['project'], request.form['train-test-split']
-            project_manager.set_preprocessing(project, 'train-test-split', splitsize)
-            return redirect(f'/run?project={project}')
+        if post_has_keys('project', 'train-test-split', 'random-state'):
+            project_manager.set_preprocessing(request.form['project'],
+                                              'train-test-split',
+                                              request.form['train-test-split'])
+            project_manager.set_preprocessing(request.form['project'],
+                                              'random-state',
+                                              request.form['random-state'])
+            return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
 
