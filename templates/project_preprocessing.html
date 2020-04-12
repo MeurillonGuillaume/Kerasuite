@@ -99,7 +99,7 @@
                     <input class="form-input" type="text" name="value_new" id="new-val"
                            placeholder="Newvalue-123" required>
                 </div>
-                <input type="hidden" name="project" value="{{ Projectname }}">
+                <input type="hidden" name="project" value="{{ Projectname }}" required>
                 <button class="btn btn-success btn-lg">
                     <i class="icon icon-edit"></i> Replace values
                 </button>
@@ -120,20 +120,25 @@
                 <div class="form-group">
                     <label class="form-label" for="train-test-range">How much data should be in
                         the trainingset?</label>
-                    <input id="train-test-range" class="slider tooltip m-2" type="range"
+                    <input id="train-test-range" class="slider tooltip p-2" type="range"
                            min="50"
                            max="90"
                             {% if TrainTestSplit %}
-                           value="{{ TrainTestSplit * 100 }}"
+                           value="{{ TrainTestSplit }}"
                             {% else %}
                            value="70"
                             {% endif %}
                            step="1"
                            oninput="this.setAttribute('value', `${this.value}%`);"
-                           name="train-test-split">
-                    <input type="hidden" value="{{ Projectname }}" name="project">
-                    <input type="submit" class="btn btn-success" value="Set split size">
+                           name="train-test-split" required>
+                    <input type="hidden" value="{{ Projectname }}" name="project" required>
+
                 </div>
+                <div class="form-group">
+                    <label class="form-label" for="random-state">Custom random state <i>(optional)</i></label>
+                    <input type="number" class="form-input" id="random-state" name="random-state" value="0" required>
+                </div>
+                <input type="submit" class="btn btn-success" value="Set split size">
             </form>
         </div>
     </div>

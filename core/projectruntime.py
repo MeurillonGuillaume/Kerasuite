@@ -1,6 +1,5 @@
 import logging
 import pandas as pd
-from flask import session
 from core.projectmanager import ProjectManager
 
 
@@ -20,7 +19,7 @@ class ProjectRuntime:
         """
         self.dataset = None
         self.__project_name = project_name
-        self.dataset_name = project_manager.get_project_dataset(self.__project_name, session['username'])
+        self.dataset_name = project_manager.get_project_dataset(self.__project_name)
         self.__dataset_dir = dataset_dir
         self.__load_dataset()
 

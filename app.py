@@ -60,6 +60,7 @@ def is_file_allowed(filename):
     try:
         return '.' in filename and str(filename).rsplit('.', 1)[1].lower() in ALLOWED_FILETYPES
     except Exception as e:
+        logging.error(f'Error in checking if {filename} is allowed: {e}')
         return 0
 
 
@@ -82,7 +83,7 @@ def home():
     if is_user_logged_in():
         return render_template('home.html',
                                LoggedIn=session['loggedin'],
-                               Projects=project_manager.get_user_projects(session['username']))
+                               Projects=project_manager.get_user_projects())
     return redirect('/login')
 
 
@@ -152,8 +153,7 @@ def create_project():
     if is_user_logged_in():
         if post_has_keys('projectdescription', 'projectname'):
             project_manager.create_project(request.form['projectname'],
-                                           request.form['projectdescription'],
-                                           session['username'])
+                                           request.form['projectdescription'])
     return redirect('/login')
 
 
@@ -165,7 +165,7 @@ def drop_project():
     if is_user_logged_in():
         project = request.args.get('project')
         if project is not None:
-            project_manager.drop_project(project, session['username'])
+            project_manager.drop_project(project)
         return redirect('/')
     return redirect('/login')
 
@@ -179,8 +179,7 @@ def edit_project():
         if post_has_keys('projectdescription', 'projectname', 'old_projectname'):
             newname = project_manager.update_project(request.form['old_projectname'],
                                                      request.form['projectname'],
-                                                     request.form['projectdescription'],
-                                                     session['username'])
+                                                     request.form['projectdescription'])
             return redirect(f'/run?project={newname}')
     return redirect('/login')
 
@@ -193,20 +192,18 @@ def run():
     if is_user_logged_in():
         project = request.args.get('project')
         try:
-            if project_manager.does_project_exist(project, session['username']):
-                if project_manager.does_project_have_dataset(project, session['username']):
+            if project_manager.does_project_exist(project):
+                if project_manager.does_project_have_dataset(project):
                     if not runtime_manager.is_project_running(project):
                         runtime_manager.run_project(project)
                 return render_template('project.html',
                                        Projectname=project,
-                                       Projectdescription=project_manager.get_project(project, session['username'])[
+                                       Projectdescription=project_manager.get_project(project)[
                                            'description'],
                                        LoggedIn=session['loggedin'],
-                                       HasDataset=project_manager.does_project_have_dataset(project,
-                                                                                            session['username']),
+                                       HasDataset=project_manager.does_project_have_dataset(project),
                                        Dataset=runtime_manager.get_data_head(project),
-                                       TrainTestSplit=project_manager.get_project_train_test_split(project,
-                                                                                                   session['username']),
+                                       TrainTestSplit=project_manager.get_preprocessing(project, 'train-test-split'),
                                        ColumnNames=runtime_manager.get_column_names(project))
         except Exception as e:
             logging.error(f'Exception in /run?project{project}: {e}')
@@ -227,8 +224,7 @@ def set_dataset():
                     new_filename = str(uuid4())
                     dataset.save(f'{app.config["UPLOAD_FOLDER"]}/{new_filename}.{file_ext}')
                     project_manager.assign_dataset(new_filename, file_ext,
-                                                   request.form['projectname'],
-                                                   session['username'])
+                                                   request.form['projectname'])
                     return redirect(f'/run?project={request.form["projectname"]}')
     return redirect('/login')
 
@@ -241,7 +237,7 @@ def set_dataset_split():
     if is_user_logged_in():
         if post_has_keys('project', 'train-test-split'):
             project, splitsize = request.form['project'], request.form['train-test-split']
-            project_manager.set_train_test_split(project, session['username'], splitsize)
+            project_manager.set_preprocessing(project, 'train-test-split', splitsize)
             return redirect(f'/run?project={project}')
     return redirect('/')
 
@@ -292,9 +288,9 @@ def clear_dataset():
     """
     if is_user_logged_in():
         project = request.args.get('project')
-        if project_manager.does_project_exist(project, session['username']):
-            if project_manager.does_project_have_dataset(project, session['username']):
-                project_manager.clear_project_dataset(project, session['username'])
+        if project_manager.does_project_exist(project):
+            if project_manager.does_project_have_dataset(project):
+                project_manager.clear_project_dataset(project)
                 runtime_manager.stop_project(project)
             return redirect(f'/run?project={project}')
     return redirect('/login')
