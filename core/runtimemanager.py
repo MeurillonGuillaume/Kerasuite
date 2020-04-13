@@ -112,7 +112,8 @@ class RuntimeManager:
         """
         try:
             if old_col_name in self.get_column_names(project_name) and old_col_name != new_col_name:
-                self.__runtime[session['username']][project_name].rename_column(old_col_name, new_col_name)
+                self.__runtime[session['username']][project_name].rename_column(old_name=old_col_name,
+                                                                                new_name=new_col_name)
             else:
                 raise ValueError(f'No such column "{old_col_name}" in project {project_name}')
         except Exception as e:
@@ -130,20 +131,56 @@ class RuntimeManager:
         """
         try:
             if col_name in self.get_column_names(project_name):
-                self.__runtime[session['username']][project_name].drop_column(col_name)
+                self.__runtime[session['username']][project_name].drop_column(col_name=col_name)
             else:
                 raise ValueError(f'No such column name: {col_name}')
         except Exception as e:
             logging.error(f'Could not drop column {col_name} from {project_name}: {e}')
 
     def replace_values(self, project_name, col_name, value_old, value_new):
+        """
+        Replace the values in a column with new values
+        This function passes to the actual executor function in project runtime
+
+        :param project_name: The name of the project in the runtime
+        :type project_name: str
+
+        :param col_name: The column in which values are to be changed
+        :type col_name: str
+
+        :param value_old: The value in the column to replace
+        :type value_old: str
+
+        :param value_new: The new value to put in the column
+        :type value_new: str
+        """
         try:
             if col_name in self.get_column_names(project_name):
-                self.__runtime[session['username']][project_name].replace_values(col_name,
-                                                                                 value_old,
-                                                                                 value_new)
+                self.__runtime[session['username']][project_name].replace_values(column=col_name,
+                                                                                 old_value=value_old,
+                                                                                 new_value=value_new)
             else:
                 raise ValueError(f'No such column name: {col_name}')
         except Exception as e:
             logging.error(
                 f'Could not replace values ({value_old} -> {value_new}) in project {project_name} for column {col_name}: {e}')
+
+    def preprocess_project(self, project_name, method, columns):
+        """
+        Pass preprocessing to the project runtime
+
+        :param project_name: The name of the project in the runtime
+        :type project_name: str
+
+        :param method: The method to use to process the data
+        :type method: str
+
+        :param columns: The columns to preprocess
+        :type columns: list
+        """
+        try:
+            self.__runtime[session['username']][project_name].preprocess_dataset(method=method,
+                                                                                 columns=columns)
+        except Exception as e:
+            logging.error(
+                f'Could not preprocess the columns {columns} with method {method} in project {project_name}: {e}')

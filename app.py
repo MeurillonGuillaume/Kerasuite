@@ -262,6 +262,17 @@ def set_column_name():
     return redirect('/')
 
 
+@app.route('/preprocess/columns', methods=['GET', 'POST'])
+def preprocess_columns():
+    if is_user_logged_in():
+        if post_has_keys('project', 'columns[]', 'normalisation-method'):
+            runtime_manager.preprocess_project(project_name=request.form['project'],
+                                               method=request.form['normalisation-method'],
+                                               columns=request.form.getlist('columns[]'))
+            return redirect(f'/run?project={request.form["project"]}')
+    return redirect('/')
+
+
 @app.route('/drop/column', methods=['GET', 'POST'])
 def drop_column():
     """

@@ -1,5 +1,7 @@
 import logging
 import pandas as pd
+from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler, Normalizer, \
+    QuantileTransformer, PowerTransformer
 from core.projectmanager import ProjectManager
 
 
@@ -119,4 +121,39 @@ class ProjectRuntime:
         self.dataset[column] = self.dataset[column].map({
             old_value: new_value
         })
+        self.__write_dataset_to_disk()
+
+    def preprocess_dataset(self, columns, method):
+        """
+        Preprocess columns
+
+        :param columns: The columns to preprocess
+        :type columns: list
+
+        :param method: Which method of preprocessing to use, see RuntimeManager
+        :type method: str
+        """
+        logging.info(f'Preprocessing {columns} with {method}')
+
+        # Handle the preprocessing method
+        if method == 'StandardScaler':
+            scale_method = StandardScaler()
+        elif method == 'MaxAbsScaler':
+            scale_method = MaxAbsScaler()
+        elif method == 'RobustScaler':
+            scale_method = RobustScaler()
+        elif method == 'Min-Max Scaler':
+            scale_method = MinMaxScaler()
+        elif method == 'Normalizer':
+            scale_method = Normalizer()
+        elif method == 'QuantileTransformer':
+            scale_method = QuantileTransformer()
+        elif method == 'PowerTransformer':
+            scale_method = PowerTransformer()
+        else:
+            raise ValueError(f'Preprocessing {method} does not exist!')
+
+        # Process data
+        self.dataset[columns] = scale_method.fit_transform(self.dataset[columns])
+        # Write to disk
         self.__write_dataset_to_disk()

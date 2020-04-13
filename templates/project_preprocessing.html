@@ -115,14 +115,14 @@
             </h4>
         </label>
         <div class="accordion-body">
-            <form action="#" method="post"
+            <form action="/preprocess/columns" method="post"
                   enctype="multipart/form-data">
                 <div class="form-group">
                     <label class="form-label" for="select-column">Columns to normalize</label>
-                    <select class="form-select" name="column" id="select-column" multiple required>
+                    <select class="form-select" name="columns[]" id="select-column" multiple required>
                         {% if ColumnNames %}
                             {% for Column in ColumnNames %}
-                                <option name="{{ Column }}">{{ Column }}</option>
+                                <option value="{{ Column }}">{{ Column }}</option>
                             {% endfor %}
                         {% else %}
                             <option value="" disabled>There are no columns</option>
