@@ -1,0 +1,38 @@
+{{ Dataset | safe }}
+<div class="column col-6">
+    {% if DataBalance %}
+        <div class="form-group">
+            <label class="form-label" for="column-select">Select a column to visualize</label>
+            <select class="form-select" id="column-select">
+                {% for Column in DataBalance %}
+                    <option value="{{ Column }}">{{ Column }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <canvas id="canvas" style="display: block; width: 618px; height: 309px;" width="618" height="309"
+                class="chartjs-render-monitor"></canvas>
+    {% endif %}
+</div>
+
+
+<script>
+    {
+        window.onload = function () {
+            let ctx = document.getElementById('canvas').getContext('2d');
+            window.myBar = new Chart(ctx, {
+                "type": "bar",
+                "data": {
+                    "labels": ["a"],
+                    "datasets": [{
+                        "label": "My First Dataset",
+                        "data": [1],
+                        "fill": false,
+                        "borderWidth": 1
+                    }]
+                },
+                "options": {"scales": {"yAxes": [{"ticks": {"beginAtZero": true}}]}}
+            });
+        };
+    }
+</script>

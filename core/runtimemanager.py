@@ -184,3 +184,9 @@ class RuntimeManager:
         except Exception as e:
             logging.error(
                 f'Could not preprocess the columns {columns} with method {method} in project {project_name}: {e}')
+
+    def get_data_balance(self, projectname):
+        try:
+            return self.__runtime[session['username']][projectname].get_data_balance()
+        except Exception as e:
+            logging.error(e)

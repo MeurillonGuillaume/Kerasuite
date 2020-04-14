@@ -27,7 +27,8 @@
                                                value="" required>
                                     </div>
                                     <button class="tooltip tooltip-right btn btn-success"
-                                            data-tooltip="Upload dataset!"><i class="icon icon-upload"></i> Upload dataset
+                                            data-tooltip="Upload dataset!"><i class="icon icon-upload"></i> Upload
+                                        dataset
                                     </button>
                                 </form>
                             {% else %}
@@ -63,7 +64,9 @@
                             <div class="column col-12">
                                 <p>Below are some samples from the dataset that was uploaded.</p>
                                 <div class="mb-2">
-                                    {{ Dataset | safe }}
+                                    {% block Inspection %}
+                                        {% include 'project_inspection.html' %}
+                                    {% endblock %}
                                 </div>
                                 {% block Preprocessing %}
                                     {% include 'project_preprocessing.html' %}

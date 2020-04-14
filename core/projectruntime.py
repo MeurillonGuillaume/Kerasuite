@@ -157,3 +157,16 @@ class ProjectRuntime:
         self.dataset[columns] = scale_method.fit_transform(self.dataset[columns])
         # Write to disk
         self.__write_dataset_to_disk()
+
+    def get_data_balance(self):
+        """
+        Get the count for each unique value in each column
+
+        :rtype: dict
+        :returns: a dictionary with all unique values per column name and their value counts
+        """
+        results = {}
+        if self.dataset is not None:
+            for column in self.dataset.columns.to_list():
+                results[column] = self.dataset[column].value_counts().to_dict()
+        return results
