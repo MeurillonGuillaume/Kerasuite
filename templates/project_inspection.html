@@ -27,6 +27,7 @@
                 if (window.barChart != null) {
                     window.barChart.destroy();
                 }
+                document.getElementById('columns_select').value = column;
                 window.barChart = new Chart(chartContext, {
                     "type": "bar",
                     "data": {
