@@ -22,6 +22,17 @@
         let column = Object.keys(columnData)[0];
         let chartContext = document.getElementById('canvas').getContext('2d');
 
+        const GetRandomColor = (data) => {
+            let result = [];
+            for (let i = 0; i < data.length; i++) {
+                let r = Math.floor((Math.random() * 255) + 1),
+                    g = Math.floor((Math.random() * 255) + 1),
+                    b = Math.floor((Math.random() * 255) + 1);
+                result.push(`rgba(${r}, ${g}, ${b}, 0.4)`);
+            }
+            return result;
+        }
+
         const SetGraph = () => {
             if (column in columnData) {
                 if (window.barChart != null) {
@@ -35,8 +46,8 @@
                         "datasets": [{
                             "label": `Unique values for column ${column}`,
                             "data": Object.values(columnData[column]),
-                            "fill": true,
-                            "borderWidth": 1
+                            "borderWidth": 1,
+                            "backgroundColor": GetRandomColor(Object.values(columnData[column]))
                         }]
                     },
                     "options": {"scales": {"yAxes": [{"ticks": {"beginAtZero": true}}]}}
