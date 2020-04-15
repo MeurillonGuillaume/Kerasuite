@@ -24,7 +24,10 @@
 
         const SetGraph = () => {
             if (column in columnData) {
-                window.myBar = new Chart(chartContext, {
+                if (window.barChart != null) {
+                    window.barChart.destroy();
+                }
+                window.barChart = new Chart(chartContext, {
                     "type": "bar",
                     "data": {
                         "labels": Object.keys(columnData[column]),
