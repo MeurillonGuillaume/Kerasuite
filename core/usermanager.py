@@ -1,6 +1,7 @@
 from passlib.hash import bcrypt
 import logging
 from re import match
+from flask import session
 
 
 class UserManager:
@@ -24,7 +25,7 @@ class UserManager:
         :return: Boolean: True or False
         """
         try:
-            logging.info(f'Attempting to login with username "{username}" and password "{bcrypt.hash(password)}"')
+            logging.info(f'Attempting to login with username "{username}"')
             userdata = self.__dbclient.get('users')[username]['password']
             if userdata is not None:
                 # Will return True if the submitted password matches the hashed password
@@ -32,24 +33,24 @@ class UserManager:
             return 0
         except Exception as e:
             logging.error(
-                f'Failed attempt at logging in with username "{username}" and password "{bcrypt.hash(password)}": {e}')
+                f'Failed attempt at logging in with username "{username}": {e}')
             return 0
 
-    def has_elevated_rights(self, username):
+    def has_elevated_rights(self):
         """
         Check if a user has elevated rights or not
         """
         try:
-            return self.__dbclient.get('users')[username]["admin"]
+            return self.__dbclient.get('users')[session['username']]["admin"]
         except Exception as e:
             logging.error(f'Error retrieving user rights: {e}')
             return 0
 
-    def get_users(self, username):
+    def get_users(self):
         """
         Get all users
         """
-        if self.has_elevated_rights(username):
+        if self.has_elevated_rights():
             return self.__dbclient.get('users')
         return None
 
@@ -95,13 +96,13 @@ class UserManager:
         """
         return bcrypt.verify('Kerasuite', self.__dbclient.get('users')['admin']['password'])
 
-    def change_password(self, old, new, new_repeat, username):
+    def change_password(self, old, new, new_repeat):
         """
         Change the current users password
         """
         if new == new_repeat:
-            if self.attempt_login(username, old):
+            if self.attempt_login(session['username'], old):
                 users = self.__dbclient.get('users')
-                users[username]['password'] = bcrypt.hash(new)
+                users[session['username']]['password'] = bcrypt.hash(new)
                 self.__dbclient.set('users', users)
                 self.__dbclient.dump()
