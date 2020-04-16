@@ -13,7 +13,8 @@ setup(
         'passlib==1.7.1',
         'bcrypt==3.1.7',
         'pickledb==0.9.2',
-        'Werkzeug==0.15.2'
+        'Werkzeug==0.15.2',
+        'tensorflow==2.1.0'
     ],
 )
 

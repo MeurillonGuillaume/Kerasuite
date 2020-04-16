@@ -4,9 +4,9 @@ import pickledb
 from flask import Flask, render_template, redirect, request, session
 from werkzeug.utils import secure_filename
 from uuid import uuid4
-from libs.projectmanager import ProjectManager
-from libs.usermanager import UserManager
-from libs.runtimemanager import RuntimeManager
+from core.projectmanager import ProjectManager
+from core.usermanager import UserManager
+from core.runtimemanager import RuntimeManager
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'
@@ -41,7 +41,7 @@ ALLOWED_FILETYPES = ['csv', 'json']
 def is_user_logged_in():
     """
     Check if the requester is logged in
-    :return: Boolean: True or False
+    :rtype: bool
     """
     try:
         return session['loggedin']
@@ -54,11 +54,25 @@ def is_user_logged_in():
 def is_file_allowed(filename):
     """
     Check if a filetype is allowed
+    :type filename: str
+    :rtype: bool
     """
     try:
         return '.' in filename and str(filename).rsplit('.', 1)[1].lower() in ALLOWED_FILETYPES
     except Exception as e:
+        logging.error(f'Error in checking if {filename} is allowed: {e}')
         return 0
+
+
+def post_has_keys(*args):
+    """
+    Check if a POST request contains all required keys
+    :type args: str
+    :rtype: bool
+    """
+    if request.method == 'POST':
+        return all(k in request.form for k in args)
+    return 0
 
 
 @app.route('/')
@@ -67,8 +81,9 @@ def home():
     Serve the homepage or redirect to the login page
     """
     if is_user_logged_in():
-        return render_template('home.html', LoggedIn=session['loggedin'],
-                               Projects=project_manager.get_user_projects(session['username']))
+        return render_template('home.html',
+                               LoggedIn=session['loggedin'],
+                               Projects=project_manager.get_user_projects())
     return redirect('/login')
 
 
@@ -78,14 +93,13 @@ def login():
     Serve the login page or redirect to home
     """
     if not is_user_logged_in():
-        if request.method == 'POST':
-            if 'password' in request.form and 'username' in request.form:
-                if user_manager.attempt_login(request.form['username'], request.form['password']):
-                    session['loggedin'] = True
-                    session['username'] = request.form['username']
-                    if session['username'] == 'admin' and user_manager.admin_has_default_pass():
-                        return redirect('/change/password?user=admin')
-                    return redirect('/')
+        if post_has_keys('password', 'username'):
+            if user_manager.attempt_login(request.form['username'], request.form['password']):
+                session['loggedin'] = True
+                session['username'] = request.form['username']
+                if session['username'] == 'admin' and user_manager.admin_has_default_pass():
+                    return redirect('/change/password?user=admin')
+                return redirect('/')
         return render_template('login.html')
     return redirect('/')
 
@@ -100,12 +114,11 @@ def change_password():
             user = request.args.get('user')
             if len(user) > 1 and user == session['username']:
                 return render_template('change_password.html', Username=user)
-        elif request.method == 'POST':
-            if 'old_password' in request.form and 'new_password' in request.form and 'new_password_repeat' in request.form:
-                old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
-                    'new_password_repeat']
-                user_manager.change_password(old, new, new_repeat, session['username'])
-                return redirect('/logout')
+        if post_has_keys('old_password', 'new_password', 'new_password_repeat'):
+            old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
+                'new_password_repeat']
+            user_manager.change_password(old, new, new_repeat)
+            return redirect('/logout')
     return redirect('/login')
 
 
@@ -126,8 +139,8 @@ def settings():
     """
     if is_user_logged_in():
         return render_template('settings.html', LoggedIn=session['loggedin'],
-                               IsAdmin=user_manager.has_elevated_rights(session['username']),
-                               UserList=user_manager.get_users(session['username']),
+                               IsAdmin=user_manager.has_elevated_rights(),
+                               UserList=user_manager.get_users(),
                                Username=session['username'])
     return redirect('/login')
 
@@ -137,11 +150,10 @@ def create_project():
     """
     Create a new project for a certain user
     """
-    if request.method == 'POST' and is_user_logged_in():
-        if 'projectdescription' in request.form and 'projectname' in request.form:
+    if is_user_logged_in():
+        if post_has_keys('projectdescription', 'projectname'):
             project_manager.create_project(request.form['projectname'],
-                                           request.form['projectdescription'],
-                                           session['username'])
+                                           request.form['projectdescription'])
     return redirect('/login')
 
 
@@ -153,7 +165,7 @@ def drop_project():
     if is_user_logged_in():
         project = request.args.get('project')
         if project is not None:
-            project_manager.drop_project(project, session['username'])
+            project_manager.drop_project(project)
         return redirect('/')
     return redirect('/login')
 
@@ -163,12 +175,11 @@ def edit_project():
     """
     Edit the fields of a project
     """
-    if is_user_logged_in() and request.method == 'POST':
-        if 'projectdescription' in request.form and 'projectname' in request.form and 'old_projectname' in request.form:
+    if is_user_logged_in():
+        if post_has_keys('projectdescription', 'projectname', 'old_projectname'):
             newname = project_manager.update_project(request.form['old_projectname'],
                                                      request.form['projectname'],
-                                                     request.form['projectdescription'],
-                                                     session['username'])
+                                                     request.form['projectdescription'])
             return redirect(f'/run?project={newname}')
     return redirect('/login')
 
@@ -180,17 +191,25 @@ def run():
     """
     if is_user_logged_in():
         project = request.args.get('project')
-        if project_manager.does_project_exist(project, session['username']):
-            if project_manager.does_project_have_dataset(project, session['username']):
-                if not runtime_manager.is_project_running(project, session['username']):
-                    runtime_manager.run_project(project, session['username'])
-            return render_template('project.html',
-                                   Projectname=project,
-                                   Projectdescription=project_manager.get_project(
-                                       project, session['username'])['description'],
-                                   LoggedIn=session['loggedin'],
-                                   HasDataset=project_manager.does_project_have_dataset(project, session['username']),
-                                   Dataset=runtime_manager.get_data_head(project, session['username']))
+        try:
+            if project_manager.does_project_exist(project):
+                if project_manager.does_project_have_dataset(project):
+                    if not runtime_manager.is_project_running(project):
+                        runtime_manager.run_project(project)
+                return render_template('project.html',
+                                       Projectname=project,
+                                       Projectdescription=project_manager.get_project(project)[
+                                           'description'],
+                                       LoggedIn=session['loggedin'],
+                                       HasDataset=project_manager.does_project_have_dataset(project),
+                                       Dataset=runtime_manager.get_data_head(project),
+                                       TrainTestSplit=project_manager.get_preprocessing(project, 'train-test-split'),
+                                       RandomState=project_manager.get_preprocessing(project, 'random-state'),
+                                       ColumnNames=runtime_manager.get_column_names(project),
+                                       Normalizers=runtime_manager.NORMALIZATION_METHODS,
+                                       DataBalance=runtime_manager.get_data_balance(project))
+        except Exception as e:
+            logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')
 
 
@@ -199,8 +218,8 @@ def set_dataset():
     """
     Set a dataset for a certain project
     """
-    if is_user_logged_in() and request.method == 'POST':
-        if 'dataset' in request.files and 'projectname' in request.form:
+    if is_user_logged_in():
+        if 'dataset' in request.files and post_has_keys('projectname'):
             dataset = request.files['dataset']
             if len(dataset.filename) > 1:
                 if is_file_allowed(dataset.filename):
@@ -208,10 +227,76 @@ def set_dataset():
                     new_filename = str(uuid4())
                     dataset.save(f'{app.config["UPLOAD_FOLDER"]}/{new_filename}.{file_ext}')
                     project_manager.assign_dataset(new_filename, file_ext,
-                                                   request.form['projectname'],
-                                                   session['username'])
+                                                   request.form['projectname'])
                     return redirect(f'/run?project={request.form["projectname"]}')
     return redirect('/login')
+
+
+@app.route('/set/project/dataset/split', methods=['GET', 'POST'])
+def set_dataset_split():
+    """
+    Assign a certain percentage to split the training & test data with
+    """
+    if is_user_logged_in():
+        if post_has_keys('project', 'train-test-split', 'random-state'):
+            project_manager.set_preprocessing(request.form['project'],
+                                              'train-test-split',
+                                              request.form['train-test-split'])
+            project_manager.set_preprocessing(request.form['project'],
+                                              'random-state',
+                                              request.form['random-state'])
+            return redirect(f'/run?project={request.form["project"]}')
+    return redirect('/')
+
+
+@app.route('/set/column/name', methods=['GET', 'POST'])
+def set_column_name():
+    """
+    Change a column name
+    """
+    if is_user_logged_in():
+        if post_has_keys('project', 'col_name_old', 'col_name_new'):
+            runtime_manager.rename_column(request.form['project'],
+                                          request.form['col_name_old'],
+                                          request.form['col_name_new'])
+            return redirect(f'/run?project={request.form["project"]}')
+    return redirect('/')
+
+
+@app.route('/preprocess/columns', methods=['GET', 'POST'])
+def preprocess_columns():
+    if is_user_logged_in():
+        if post_has_keys('project', 'columns[]', 'normalisation-method'):
+            runtime_manager.preprocess_project(project_name=request.form['project'],
+                                               method=request.form['normalisation-method'],
+                                               columns=request.form.getlist('columns[]'))
+            return redirect(f'/run?project={request.form["project"]}')
+    return redirect('/')
+
+
+@app.route('/drop/column', methods=['GET', 'POST'])
+def drop_column():
+    """
+    Delete a column
+    """
+    if is_user_logged_in():
+        if post_has_keys('project', 'column'):
+            runtime_manager.drop_column(request.form['project'], request.form['column'])
+            return redirect(f'/run?project={request.form["project"]}')
+    return redirect('/')
+
+
+@app.route('/replace/dataset/values', methods=['GET', 'POST'])
+def replace_dataset_values():
+    if is_user_logged_in():
+        if post_has_keys('column', 'project', 'value_old', 'value_new'):
+            runtime_manager.replace_values(request.form['project'],
+                                           request.form['column'],
+                                           request.form['value_old'],
+                                           request.form['value_new'])
+            return redirect(f'/run?project={request.form["project"]}')
+    return redirect('/')
+    pass
 
 
 @app.route('/clear/dataset')
@@ -221,10 +306,10 @@ def clear_dataset():
     """
     if is_user_logged_in():
         project = request.args.get('project')
-        if project_manager.does_project_exist(project, session['username']):
-            if project_manager.does_project_have_dataset(project, session['username']):
-                project_manager.clear_project_dataset(project, session['username'])
-                runtime_manager.stop_project(project, session['username'])
+        if project_manager.does_project_exist(project):
+            if project_manager.does_project_have_dataset(project):
+                project_manager.clear_project_dataset(project)
+                runtime_manager.stop_project(project)
             return redirect(f'/run?project={project}')
     return redirect('/login')
 
@@ -236,7 +321,7 @@ def remove_user():
     """
     if is_user_logged_in():
         username = request.args.get('username')
-        if user_manager.has_elevated_rights(session['username']) and username is not None and len(username) > 1:
+        if user_manager.has_elevated_rights() and username is not None and len(username) > 1:
             if user_manager.does_user_exist(username):
                 user_manager.delete_user(username)
         return redirect('/settings')
@@ -249,8 +334,8 @@ def create_user():
     Create a new user
     """
     if is_user_logged_in():
-        if user_manager.has_elevated_rights(session['username']):
-            if 'username' in request.form and 'password' in request.form and 'password_repeat' in request.form:
+        if user_manager.has_elevated_rights():
+            if post_has_keys('username', 'password', 'password_repeat'):
                 username, password, pass_repeat = request.form['username'], request.form['password'], request.form[
                     'password_repeat']
                 if len('username') > 1 and password == pass_repeat:
@@ -263,11 +348,13 @@ def create_user():
 
 @app.route('/op/user')
 def op_user():
+    """
+    Give a user elevated rights
+    """
     if is_user_logged_in():
         username = request.args.get('user')
         if username is not None and len(username) > 1:
-            if user_manager.has_elevated_rights(
-                    session['username']) and username is not None and user_manager.does_user_exist(username):
+            if user_manager.has_elevated_rights() and username is not None and user_manager.does_user_exist(username):
                 user_manager.change_permissions(username)
         return redirect('/settings')
     return redirect('/login')
