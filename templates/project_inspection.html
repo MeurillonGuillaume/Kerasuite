@@ -1,18 +1,27 @@
-{{ Dataset | safe }}
-<div class="column col-6">
-    {% if DataBalance %}
-        <div class="form-group">
-            <label class="form-label" for="column_select">Select a column to visualize</label>
-            <select class="form-select" id="columns_select">
-                {% for Column in DataBalance %}
-                    <option value="{{ Column }}">{{ Column }}</option>
-                {% endfor %}
-            </select>
-        </div>
+<div class="accordion m-2">
+    <input id="preprocessing-graph" type="radio" name="accordion-preprocessing" hidden="">
+    <label class="accordion-header c-hand" for="preprocessing-graph">
+        <h4>
+            <i class="icon icon-arrow-right mr-1"></i>Data balance graph
+        </h4>
+    </label>
+    <div class="accordion-body">
+        <div class="column col-md-12 col-10">
+            {% if DataBalance %}
+                <div class="form-group">
+                    <label class="form-label" for="column_select">Select a column to visualize</label>
+                    <select class="form-select" id="columns_select">
+                        {% for Column in DataBalance %}
+                            <option value="{{ Column }}">{{ Column }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-        <canvas id="canvas" style="display: block; width: 618px; height: 309px;" width="618" height="309"
-                class="chartjs-render-monitor"></canvas>
-    {% endif %}
+                <canvas id="canvas" style="display: block; width: 618px; height: 309px;" width="618" height="309"
+                        class="chartjs-render-monitor"></canvas>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
 

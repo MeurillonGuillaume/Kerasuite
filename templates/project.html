@@ -64,9 +64,7 @@
                             <div class="column col-12">
                                 <p>Below are some samples from the dataset that was uploaded.</p>
                                 <div class="mb-2">
-                                    {% block Inspection %}
-                                        {% include 'project_inspection.html' %}
-                                    {% endblock %}
+                                    {{ Dataset | safe }}
                                 </div>
                                 {% block Preprocessing %}
                                     {% include 'project_preprocessing.html' %}
