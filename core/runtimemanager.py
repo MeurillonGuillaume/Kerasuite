@@ -33,8 +33,16 @@ class RuntimeManager:
         :param project_name: The project to pop from runtime
         :type project_name: str
         """
-        self.__runtime[session['username']] = {
-            project_name: ProjectRuntime(project_name, self.__project_manager, self.__dataset_dir)}
+        if session['username'] in self.__runtime:
+            self.__runtime[session['username']][project_name] = ProjectRuntime(project_name,
+                                                                               self.__project_manager,
+                                                                               self.__dataset_dir)
+        else:
+            self.__runtime[session['username']] = {
+                project_name: ProjectRuntime(project_name,
+                                             self.__project_manager,
+                                             self.__dataset_dir)
+            }
 
     def stop_project(self, project_name):
         """
@@ -190,3 +198,12 @@ class RuntimeManager:
             return self.__runtime[session['username']][projectname].get_data_balance()
         except Exception as e:
             logging.error(e)
+
+    def get_running_projects(self):
+        try:
+            if session['username'] in self.__runtime:
+                return list(self.__runtime[session['username']].keys())
+            return []
+        except Exception as e:
+            logging.error(f'Error loading active projects for {session["username"]}: {e}')
+            return []

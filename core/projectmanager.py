@@ -165,7 +165,7 @@ class ProjectManager:
                     'dataset': name,
                     'datatype': data_type,
                     'preprocessing': {
-                        'train-test-split': 0.7,
+                        'train-test-split': 70,
                         'random_state': 0
                     }
                 }
@@ -178,7 +178,8 @@ class ProjectManager:
             'datatype': data_type,
             'dataset': name,
             'preprocessing': {
-                'train-test-split': 0.7
+                'train-test-split': 70,
+                'random_state': 0
             }
         })
         self.__dbclient.set('datasets', data)

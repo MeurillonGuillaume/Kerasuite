@@ -83,7 +83,8 @@ def home():
     if is_user_logged_in():
         return render_template('home.html',
                                LoggedIn=session['loggedin'],
-                               Projects=project_manager.get_user_projects())
+                               Projects=project_manager.get_user_projects(),
+                               ActiveProjects=runtime_manager.get_running_projects())
     return redirect('/login')
 
 
@@ -210,6 +211,16 @@ def run():
                                        DataBalance=runtime_manager.get_data_balance(project))
         except Exception as e:
             logging.error(f'Exception in /run?project{project}: {e}')
+    return redirect('/login')
+
+
+@app.route('/quit')
+def quit():
+    if is_user_logged_in():
+        project = request.args.get('project')
+        if project_manager.does_project_exist(project):
+            runtime_manager.stop_project(project)
+            return redirect('/')
     return redirect('/login')
 
 

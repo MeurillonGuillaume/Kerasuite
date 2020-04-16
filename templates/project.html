@@ -47,8 +47,8 @@
         </div>
     </div>
     <div class="accordion m-2">
-        <input id="accordion-2" type="radio" name="accordion-radio" hidden="">
-        <label class="accordion-header c-hand" for="accordion-2">
+        <input id="accordion-3" type="radio" name="accordion-radio" hidden="">
+        <label class="accordion-header c-hand" for="accordion-3">
             <h3>
                 <i class="icon icon-arrow-right mr-1"></i>2 Dataset inspection & preprocessing
             </h3>
@@ -71,6 +71,23 @@
                                 {% endblock %}
                             </div>
                         </div>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="accordion m-2">
+        <input id="accordion-2" type="radio" name="accordion-radio" hidden="">
+        <label class="accordion-header c-hand" for="accordion-2">
+            <h3>
+                <i class="icon icon-arrow-right mr-1"></i>3 Model building
+            </h3>
+        </label>
+        <div class="accordion-body">
+            <ul class="menu menu-nav">
+                <li class="menu-item">
+                    {% if HasDataset %}
+                        {% include 'project_modelbuilding.html' %}
                     {% endif %}
                 </li>
             </ul>

@@ -31,9 +31,19 @@
                             <p><span class="text-bold">Project description: </span>{{ project.description }}</p>
                             <a href="/run?project={{ project.name }}">
                                 <button class="btn btn-success tooltip tooltip-bottom"
-                                        data-tooltip="Launch {{ project.name }}"><i class="icon icon-shutdown"></i> Launch
+                                        data-tooltip="Launch {{ project.name }}"><i class="icon icon-shutdown"></i>
+                                    Launch
                                 </button>
                             </a>
+                            {% if project.name in ActiveProjects %}
+                                <a href="/quit?project={{ project.name }}">
+                                    <button class="btn btn-warning tooltip tooltip-bottom"
+                                            data-tooltip="Shutdown {{ project.name }}"><i
+                                            class="icon icon-shutdown"></i>
+                                        Shutdown
+                                    </button>
+                                </a>
+                            {% endif %}
                             <a href="/drop/project?project={{ project.name }}"
                                onclick="return confirm('Are you sure to delete {{ project.name }}?')">
                                 <button class="btn btn-error tooltip tooltip-bottom"
@@ -46,7 +56,6 @@
                 </div>
             {% endfor %}
         {% endif %}
-
         {% include 'modal_newproject.html' %}
     </div>
 {% endblock %}
