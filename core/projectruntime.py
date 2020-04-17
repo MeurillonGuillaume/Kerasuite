@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler, Normalizer, \
     QuantileTransformer, PowerTransformer
 from core.projectmanager import ProjectManager
+from core.modelmanager import ModelManager
 
 
 class ProjectRuntime:
@@ -24,6 +25,7 @@ class ProjectRuntime:
         self.dataset_name = project_manager.get_project_dataset(self.__project_name)
         self.__dataset_dir = dataset_dir
         self.__load_dataset()
+        self.__model = ModelManager(project_name)
 
     def __load_dataset(self):
         """

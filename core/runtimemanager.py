@@ -20,6 +20,17 @@ class RuntimeManager:
             'PowerTransformer'
         ]
     }
+    LAYERS = {
+        'Core layers':
+            [
+                'Dense',
+                'Dropout',
+                'Input'
+            ],
+        'Normalization layers': [
+            'BatchNormalization'
+        ]
+    }
 
     def __init__(self, project_manager, dataset_dir):
         self.__runtime = {}

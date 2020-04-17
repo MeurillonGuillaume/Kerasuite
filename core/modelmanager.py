@@ -3,12 +3,6 @@ from tensorflow import keras
 
 
 class ModelManager:
-    LAYERS = {
-        'Dense',
-        'Input',
-        'Dropout'
-    }
-
     def __init__(self, projectname):
         self.__projectname = projectname
         self.__model = keras.models.Sequential()

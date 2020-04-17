@@ -1,1 +1,22 @@
-<p>Work in progress ...</p>
+<div class="columns">
+    <div class="column col-lg-12 col-6">
+        <h4>Model overview</h4>
+        ...
+        <h4>Add new layer</h4>
+        <form action="#" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label" for="model-layer">Layer type</label>
+                <select class="form-select" name="" id="model-layer">
+                    {% for LayerType in ModelLayers | sort %}
+                        <optgroup label="{{ LayerType }}">
+                            {% for Layer in ModelLayers[LayerType] | sort %}
+                                <option value="{{ Layer }}">{{ Layer }}</option>
+                            {% endfor %}
+                        </optgroup>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="submit" class="btn btn-success" value="Add new layer">
+        </form>
+    </div>
+</div>

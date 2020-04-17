@@ -208,7 +208,8 @@ def run():
                                        RandomState=project_manager.get_preprocessing(project, 'random-state'),
                                        ColumnNames=runtime_manager.get_column_names(project),
                                        Normalizers=runtime_manager.NORMALIZATION_METHODS,
-                                       DataBalance=runtime_manager.get_data_balance(project))
+                                       DataBalance=runtime_manager.get_data_balance(project),
+                                       ModelLayers=runtime_manager.LAYERS)
         except Exception as e:
             logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')
