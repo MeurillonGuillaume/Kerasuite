@@ -6,7 +6,7 @@
                 id="modalBtn"><i class="icon icon-edit"></i></button>
     </h1>
     <div class="accordion m-2">
-        <input id="accordion-1" type="radio" name="accordion-radio" hidden="" checked="">
+        <input id="accordion-1" type="radio" name="accordion-radio" hidden="">
         <label class="accordion-header c-hand" for="accordion-1">
             <h3>
                 <i class="icon icon-arrow-right mr-1"></i>1 Data uploading
@@ -56,15 +56,26 @@
         <div class="accordion-body">
             <ul class="menu menu-nav">
                 <li class="menu-item">
-                    <h4>Dataset inspection</h4>
                     {% if Dataset is none %}
                         <p>You need to upload a dataset before you can inspect data.</p>
                     {% else %}
                         <div class="columns">
                             <div class="column col-12">
-                                <p>Below are some samples from the dataset that was uploaded.</p>
-                                <div class="mb-2">
-                                    {{ Dataset | safe }}
+                                <div class="m-2">
+                                    <div class="accordion m-2">
+                                        <input id="preprocessing-table" type="radio" name="accordion-preprocessing"
+                                               hidden="">
+                                        <label class="accordion-header c-hand" for="preprocessing-table">
+                                            <h4>
+                                                <i class="icon icon-arrow-right mr-1"></i>Dataset inspection
+                                            </h4>
+                                        </label>
+                                        <div class="accordion-body">
+                                            <p>Below are some samples from the dataset that was uploaded.</p>
+                                            {{ Dataset | safe }}
+                                        </div>
+                                    </div>
+
                                 </div>
                                 {% block Preprocessing %}
                                     {% include 'project_preprocessing.html' %}
