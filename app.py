@@ -209,7 +209,8 @@ def run():
                                        ColumnNames=runtime_manager.get_column_names(project),
                                        Normalizers=runtime_manager.NORMALIZATION_METHODS,
                                        DataBalance=runtime_manager.get_data_balance(project),
-                                       ModelLayers=runtime_manager.LAYERS)
+                                       ModelLayers=runtime_manager.LAYERS,
+                                       OutputColumns=project_manager.get_preprocessing(project, 'output-columns'))
         except Exception as e:
             logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')
@@ -250,13 +251,16 @@ def set_dataset_split():
     Assign a certain percentage to split the training & test data with
     """
     if is_user_logged_in():
-        if post_has_keys('project', 'train-test-split', 'random-state'):
+        if post_has_keys('project', 'train-test-split', 'random-state', 'column-output[]'):
             project_manager.set_preprocessing(request.form['project'],
                                               'train-test-split',
                                               request.form['train-test-split'])
             project_manager.set_preprocessing(request.form['project'],
                                               'random-state',
                                               request.form['random-state'])
+            project_manager.set_preprocessing(request.form['project'],
+                                              'output-columns',
+                                              request.form.getlist('column-output[]'))
             return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
@@ -278,7 +282,7 @@ def set_column_name():
 @app.route('/preprocess/columns', methods=['GET', 'POST'])
 def preprocess_columns():
     if is_user_logged_in():
-        if post_has_keys('project', 'columns[]', 'normalisation-method'):
+        if post_has_keys('project', 'columns[]', 'normalisation-method', 'column-output[]'):
             runtime_manager.preprocess_project(project_name=request.form['project'],
                                                method=request.form['normalisation-method'],
                                                columns=request.form.getlist('columns[]'))

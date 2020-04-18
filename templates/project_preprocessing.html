@@ -155,7 +155,7 @@
         <input id="preprocessing-split" type="radio" name="accordion-preprocessing" hidden="">
         <label class="accordion-header c-hand" for="preprocessing-split">
             <h4>
-                <i class="icon icon-arrow-right mr-1"></i>Train- & testset splitting
+                <i class="icon icon-arrow-right mr-1"></i>Data splitting &amp; output selection
             </h4>
         </label>
         <div class="accordion-body">
@@ -184,10 +184,15 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="column-output">Select output column(s)</label>
-                    <select class="form-select" name="column-output" id="column-output" multiple required>
+                    <select class="form-select" name="column-output[]" id="column-output" multiple required>
                         {% if ColumnNames %}
                             {% for Column in ColumnNames %}
-                                <option value="{{ Column }}">{{ Column }}</option>
+                                {% if OutputColumns is not none %}
+                                    <option value="{{ Column }}"
+                                            {% if Column in OutputColumns %}selected{% endif %}>{{ Column }}</option>
+                                {% else %}
+                                    <option value="{{ Column }}">{{ Column }}</option>
+                                {% endif %}
                             {% endfor %}
                         {% else %}
                             <option value="" disabled>There are no columns</option>

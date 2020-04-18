@@ -41,9 +41,15 @@ class ProjectManager:
 
         if not self.does_project_exist(name):
             if session['username'] in projects.keys():
-                projects[session['username']].append({'name': name, 'description': description})
+                projects[session['username']].append({
+                    'name': name,
+                    'description': description
+                })
             else:
-                projects[session['username']] = [{'name': name, 'description': description}]
+                projects[session['username']] = [{
+                    'name': name,
+                    'description': description
+                }]
             self.__dbclient.set('projects', projects)
             self.__dbclient.dump()
 
@@ -166,7 +172,8 @@ class ProjectManager:
                     'datatype': data_type,
                     'preprocessing': {
                         'train-test-split': 70,
-                        'random_state': 0
+                        'random_state': 0,
+                        'output-columns': []
                     }
                 }
                 self.__dbclient.set('datasets', data)
@@ -179,7 +186,8 @@ class ProjectManager:
             'dataset': name,
             'preprocessing': {
                 'train-test-split': 70,
-                'random_state': 0
+                'random_state': 0,
+                'output-columns': []
             }
         })
         self.__dbclient.set('datasets', data)
