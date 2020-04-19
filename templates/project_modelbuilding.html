@@ -1,7 +1,11 @@
 <div class="columns">
     <div class="column col-lg-12 col-6">
         <h4>Model overview</h4>
-        ...
+        {% if ProjectModel is none %}
+            <p>No model has been created yet, please create a model first.</p>
+        {% else %}
+            <p>Got a model</p>
+        {% endif %}
         <h4>Add new layer</h4>
         <form action="#" method="post" enctype="multipart/form-data">
             <div class="form-group">

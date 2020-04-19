@@ -317,18 +317,24 @@ class ProjectManager:
         except Exception as e:
             logging.error(f'Error loading models: {e}')
 
-    def load_project_models(self, project_name):
+    def load_latest_model(self, project_name):
         """
-        Get model settings for a certain project
+        Get the latest model for a certain project
 
         :param project_name: The name of the project to get models from
         :type project_name: str
+
+        :returns:
+        :rtype: dict
         """
         data = self.get_all_models()
         if not data or session['username'] not in data or project_name not in data[session['username']]:
-            return []
+            return None
         else:
-            return data[session['username']][project_name]
+            data = data[session['username']][project_name]
+            return {
+                'layers': ['testlayer']
+            }
 
     def store_model(self, project_name, layers, epochs, batch_size, validation_split):
         """

@@ -210,7 +210,8 @@ def run():
                                        Normalizers=runtime_manager.NORMALIZATION_METHODS,
                                        DataBalance=runtime_manager.get_data_balance(project),
                                        ModelLayers=runtime_manager.LAYERS,
-                                       OutputColumns=project_manager.get_preprocessing(project, 'output-columns'))
+                                       OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
+                                       ProjectModel=project_manager.load_latest_model(project))
         except Exception as e:
             logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')

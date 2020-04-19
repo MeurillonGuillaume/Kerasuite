@@ -29,18 +29,26 @@
                         </div>
                         <div class="card-body">
                             <p><span class="text-bold">Project description: </span>{{ project.description }}</p>
-                            <a href="/run?project={{ project.name }}">
-                                <button class="btn btn-success tooltip tooltip-bottom"
-                                        data-tooltip="Launch {{ project.name }}"><i class="icon icon-shutdown"></i>
-                                    Launch
-                                </button>
-                            </a>
                             {% if project.name in ActiveProjects %}
+                                <p><i>Project is running.</i></p>
+                                <a href="/run?project={{ project.name }}">
+                                    <button class="btn btn-success tooltip tooltip-bottom"
+                                            data-tooltip="Open {{ project.name }}"><i class="icon icon-plus"></i>
+                                        Open
+                                    </button>
+                                </a>
                                 <a href="/quit?project={{ project.name }}">
                                     <button class="btn btn-warning tooltip tooltip-bottom"
                                             data-tooltip="Shutdown {{ project.name }}"><i
                                             class="icon icon-shutdown"></i>
                                         Shutdown
+                                    </button>
+                                </a>
+                            {% else %}
+                                <a href="/run?project={{ project.name }}">
+                                    <button class="btn btn-success tooltip tooltip-bottom"
+                                            data-tooltip="Launch {{ project.name }}"><i class="icon icon-shutdown"></i>
+                                        Launch
                                     </button>
                                 </a>
                             {% endif %}
