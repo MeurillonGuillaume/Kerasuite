@@ -1,4 +1,5 @@
 import logging
+import time
 from os import remove
 import pathlib
 from flask import session
@@ -306,3 +307,69 @@ class ProjectManager:
             logging.error(
                 f'Failed to retrieve project {project_name} train_test_split data for user {session["username"]}: {e}')
             return None
+
+    def get_all_models(self):
+        """
+        Load all models that have been created
+        """
+        try:
+            return self.__dbclient.get('models')
+        except Exception as e:
+            logging.error(f'Error loading models: {e}')
+
+    def load_project_models(self, project_name):
+        """
+        Get model settings for a certain project
+
+        :param project_name: The name of the project to get models from
+        :type project_name: str
+        """
+        data = self.get_all_models()
+        if not data or session['username'] not in data or project_name not in data[session['username']]:
+            return []
+        else:
+            return data[session['username']][project_name]
+
+    def store_model(self, project_name, layers, epochs, batch_size, validation_split):
+        """
+        Store model settings to disk
+
+        :param project_name: The name of the project to create a model for
+        :type project_name: str
+
+        :param layers: A list of layers for the model
+        :type layers: list
+
+        :param epochs: How many epochs will the model train
+        :type epochs: int
+
+        :param batch_size: After how many samples will weights be updated
+        :type batch_size: int
+        
+        :param validation_split:
+        :type validation_split: float
+        """
+        models = self.get_all_models()
+        # Check if models exist
+        if not models:
+            models = {}
+
+        # Create model
+        if session['username'] not in models:
+            models[session['username']] = [{
+                "projectname": project_name,
+                "layers": layers,
+                "epochs": epochs,
+                "batchsize": batch_size,
+                "validation-split": validation_split,
+                "timestamp": int(time.time())
+            }]
+        else:
+            models[session['username']].append({
+                "projectname": project_name,
+                "layers": layers,
+                "epochs": epochs,
+                "batchsize": batch_size,
+                "validation-split": validation_split,
+                "timestamp": int(time.time())
+            })

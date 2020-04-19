@@ -120,9 +120,7 @@ class ProjectRuntime:
         :param new_value: The new value to put in the column
         :type new_value: str
         """
-        self.dataset[column] = self.dataset[column].map({
-            old_value: new_value
-        })
+        self.dataset[column] = self.dataset[column].replace(old_value, new_value)
         self.__write_dataset_to_disk()
 
     def preprocess_dataset(self, columns, method):
