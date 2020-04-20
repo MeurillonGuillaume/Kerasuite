@@ -3,6 +3,7 @@ import time
 from os import remove
 import pathlib
 from flask import session
+from uuid import uuid4
 
 
 class ProjectManager:
@@ -317,65 +318,51 @@ class ProjectManager:
         except Exception as e:
             logging.error(f'Error loading models: {e}')
 
-    def load_latest_model(self, project_name):
-        """
-        Get the latest model for a certain project
-
-        :param project_name: The name of the project to get models from
-        :type project_name: str
-
-        :returns:
-        :rtype: dict
-        """
-        data = self.get_all_models()
-        if not data or session['username'] not in data or project_name not in data[session['username']]:
-            return None
-        else:
-            data = data[session['username']][project_name]
-            return {
-                'layers': ['testlayer']
-            }
-
-    def store_model(self, project_name, layers, epochs, batch_size, validation_split):
-        """
-        Store model settings to disk
-
-        :param project_name: The name of the project to create a model for
-        :type project_name: str
-
-        :param layers: A list of layers for the model
-        :type layers: list
-
-        :param epochs: How many epochs will the model train
-        :type epochs: int
-
-        :param batch_size: After how many samples will weights be updated
-        :type batch_size: int
-        
-        :param validation_split:
-        :type validation_split: float
-        """
+    def create_model(self, project_name):
         models = self.get_all_models()
-        # Check if models exist
+
+        # Handle if models is empty
         if not models:
             models = {}
 
-        # Create model
+        # Handle if user has no models yet
         if session['username'] not in models:
-            models[session['username']] = [{
-                "projectname": project_name,
-                "layers": layers,
-                "epochs": epochs,
-                "batchsize": batch_size,
-                "validation-split": validation_split,
-                "timestamp": int(time.time())
-            }]
+            models[session['username']] = {}
+
+        # Check if project has a model defined
+        if project_name not in models[session['username']]:
+            models[session['username']][project_name] = {
+                'epochs': 5,
+                'batch-size': 1,
+                'layers': [],
+                'timestamp': time.time(),
+                'validation-split': 0.75
+            }
+            # TODO: handle creating a new model
+        self.__dbclient.set('models', models)
+
+    def add_model_layer(self, project_name, layer_type):
+        models = self.get_all_models()
+
+        # Create a base model if it doesn't exist
+        if not models or session['username'] not in models or project_name not in models[session['username']]:
+            self.create_model(project_name)
+            models = self.get_all_models()
+
+        # Check the layer count for order
+        layer_number = len(models[session['username']][project_name]['layers'])
+
+        # Add new layer
+        models[session['username']][project_name]['layers'].append({
+            'layerType': layer_type,
+            'layerId': str(uuid4()),
+            'order': layer_number
+        })
+        self.__dbclient.set('models', models)
+
+    def load_model(self, project_name):
+        models = self.get_all_models()
+        if not models or session['username'] not in models or project_name not in models[session['username']]:
+            return None
         else:
-            models[session['username']].append({
-                "projectname": project_name,
-                "layers": layers,
-                "epochs": epochs,
-                "batchsize": batch_size,
-                "validation-split": validation_split,
-                "timestamp": int(time.time())
-            })
+            return models[session['username']][project_name]

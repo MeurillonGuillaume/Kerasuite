@@ -4,13 +4,15 @@
         {% if ProjectModel is none %}
             <p>No model has been created yet, please create a model first.</p>
         {% else %}
-            <p>Got a model</p>
+            {% for Layer in ProjectModel.layers | sort(attribute='order') %}
+                <p>{{ Layer['layerType'] }}</p>
+            {% endfor %}
         {% endif %}
         <h4>Add new layer</h4>
-        <form action="#" method="post" enctype="multipart/form-data">
+        <form action="/create/layer" method="post" enctype="multipart/form-data">
             <div class="form-group">
                 <label class="form-label" for="model-layer">Layer type</label>
-                <select class="form-select" name="" id="model-layer">
+                <select class="form-select" name="new-layer" id="model-layer">
                     {% for LayerType in ModelLayers | sort %}
                         <optgroup label="{{ LayerType }}">
                             {% for Layer in ModelLayers[LayerType] | sort %}
@@ -20,6 +22,7 @@
                     {% endfor %}
                 </select>
             </div>
+            <input type="hidden" name="project" value="{{ Projectname }}">
             <input type="submit" class="btn btn-success" value="Add new layer">
         </form>
     </div>

@@ -211,7 +211,7 @@ def run():
                                        DataBalance=runtime_manager.get_data_balance(project),
                                        ModelLayers=runtime_manager.LAYERS,
                                        OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
-                                       ProjectModel=project_manager.load_latest_model(project))
+                                       ProjectModel=project_manager.load_model(project))
         except Exception as e:
             logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')
@@ -255,7 +255,7 @@ def set_dataset_split():
         if post_has_keys('project', 'train-test-split', 'random-state', 'column-output[]'):
             project_manager.set_preprocessing(request.form['project'],
                                               'train-test-split',
-                                              request.form['train-test-split'])
+                                              int(request.form['train-test-split']))
             project_manager.set_preprocessing(request.form['project'],
                                               'random-state',
                                               request.form['random-state'])
@@ -375,6 +375,16 @@ def op_user():
                 user_manager.change_permissions(username)
         return redirect('/settings')
     return redirect('/login')
+
+
+@app.route('/create/layer', methods=['GET', 'POST'])
+def create_layer():
+    if is_user_logged_in():
+        if post_has_keys('project', 'new-layer'):
+            project_manager.add_model_layer(project_name=request.form['project'],
+                                            layer_type=request.form['new-layer'])
+            return redirect(f'/run?project={request.form["project"]}')
+    return redirect('/')
 
 
 if __name__ == '__main__':
