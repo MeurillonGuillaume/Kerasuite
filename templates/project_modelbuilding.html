@@ -4,9 +4,14 @@
         {% if ProjectModel is none %}
             <p>No model has been created yet, please create a model first.</p>
         {% else %}
-            {% for Layer in ProjectModel.layers | sort(attribute='order') %}
-                <p>{{ Layer['layerType'] }}</p>
-            {% endfor %}
+            <ol>
+                {% for Layer in ProjectModel.layers | sort(attribute='order') %}
+                    <li>{{ Layer['layerType'] }} (<a
+                            href="/remove/layer?project={{ Projectname }}&layer={{ Layer['layerId'] }}">Remove
+                        layer</a>)
+                    </li>
+                {% endfor %}
+            </ol>
         {% endif %}
         <h4>Add new layer</h4>
         <form action="/create/layer" method="post" enctype="multipart/form-data">

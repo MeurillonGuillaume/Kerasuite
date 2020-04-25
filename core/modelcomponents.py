@@ -20,12 +20,8 @@ LAYERS = {
     'Core layers':
         [
             'Dense',
-            'Dropout',
-            'Input'
-        ],
-    'Normalization layers': [
-        'BatchNormalization'
-    ]
+            'Dropout'
+        ]
 }
 
 # Define activation functions with explanation of what they do

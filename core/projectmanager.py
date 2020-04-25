@@ -341,7 +341,7 @@ class ProjectManager:
         if project_name not in models[session['username']]:
             models[session['username']][project_name] = {
                 'epochs': 5,
-                'batch-size': 1,
+                'batch-size': 10,
                 'layers': [],
                 'timestamp': time.time(),
                 'validation-split': 0.75
@@ -373,9 +373,35 @@ class ProjectManager:
         models[session['username']][project_name]['layers'].append({
             'layerType': layer_type,
             'layerId': str(uuid4()),
-            'order': layer_number
+            'order': layer_number,
+            'parameters': {}
         })
         self.__dbclient.set('models', models)
+
+    def remove_model_layer(self, project_name, layer_id):
+        """
+        Remove a layer from a model
+
+        :param project_name:
+        :type project_name: str
+
+        :param layer_id:
+        :type layer_id: str
+
+        :rtype: bool
+        """
+        models = self.get_all_models()
+
+        # Check if models exist
+        if not models or session['username'] not in models or project_name not in models[session['username']]:
+            return 0
+
+        # Remove layer
+        for layer in models[session['username']][project_name]['layers']:
+            if layer['layerId'] == layer_id:
+                models[session['username']][project_name]['layers'].remove(layer)
+                return 1
+        return 0
 
     def load_model(self, project_name):
         """
