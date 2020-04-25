@@ -29,22 +29,24 @@
 
 </div>
 <script>
-    document.addEventListener("DOMContentLoaded", function (event) {
-        let button = document.getElementById('modalBtn'),
-            modal = document.getElementById('modal-id'),
-            modalCloseBtn = document.getElementById('modalCloseBtn'),
-            modalCloseArea = document.getElementById('modalCloseArea');
+    {
+        document.addEventListener("DOMContentLoaded", function (event) {
+            let button = document.getElementById('modalBtn'),
+                modal = document.getElementById('modal-id'),
+                modalCloseBtn = document.getElementById('modalCloseBtn'),
+                modalCloseArea = document.getElementById('modalCloseArea');
 
-        button.onclick = function () {
-            modal.classList.add('active');
-        };
+            button.onclick = function () {
+                modal.classList.add('active');
+            };
 
-        modalCloseBtn.onclick = function () {
-            modal.classList.remove('active');
-        };
+            modalCloseBtn.onclick = function () {
+                modal.classList.remove('active');
+            };
 
-        modalCloseArea.onclick = function () {
-            modal.classList.remove('active');
-        };
-    })
+            modalCloseArea.onclick = function () {
+                modal.classList.remove('active');
+            };
+        })
+    }
 </script>

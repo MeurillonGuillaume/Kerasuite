@@ -7,6 +7,7 @@ from uuid import uuid4
 from core.projectmanager import ProjectManager
 from core.usermanager import UserManager
 from core.runtimemanager import RuntimeManager
+from core.modelcomponents import LAYERS, NORMALIZATION_METHODS, LAYER_OPTIONS
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'
@@ -75,6 +76,49 @@ def post_has_keys(*args):
     return 0
 
 
+def get_has_keys(*args):
+    """
+    Check if required keys are in a GET request and return data if so
+
+    :param args:
+    :type: any
+
+    :rtype: dict
+    """
+    _isvalid, _res = [], {}
+    if request.method == 'GET':
+        # Check if items are not empty
+        for _item in args:
+            _data = str(request.args.get(_item))
+            if _data is not None and len(_data.strip()) > 0:
+                _isvalid.append(1)
+            else:
+                _isvalid.append(0)
+            _res[_item] = str(request.args.get(_item))
+        if all(_isvalid):
+            return _res
+    return
+
+
+def get_layer_params(layer_type):
+    """
+    Request data for all params defined for a certain layer
+
+    :param layer_type:
+    :type layer_type: str
+
+    :rtype: dict
+    """
+    _res = {}
+    for _o in LAYER_OPTIONS[layer_type]:
+        # Attempt to convert to most fitting datatype, else use String
+        try:
+            _res[_o] = eval(request.form[_o])
+        except Exception:
+            _res[_o] = request.form[_o]
+    return _res
+
+
 @app.route('/')
 def home():
     """
@@ -111,10 +155,9 @@ def change_password():
     Change a users password
     """
     if is_user_logged_in():
-        if request.method == 'GET':
-            user = request.args.get('user')
-            if len(user) > 1 and user == session['username']:
-                return render_template('change_password.html', Username=user)
+        data = get_has_keys('user')
+        if data is not None and data['user'] == session['username']:
+            return render_template('change_password.html', Username=data['user'])
         if post_has_keys('old_password', 'new_password', 'new_password_repeat'):
             old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
                 'new_password_repeat']
@@ -164,10 +207,10 @@ def drop_project():
     Drop a project for a certain user
     """
     if is_user_logged_in():
-        project = request.args.get('project')
-        if project is not None:
-            project_manager.drop_project(project)
-        return redirect('/')
+        data = get_has_keys('project')
+        if data is not None:
+            project_manager.drop_project(data['project'])
+            return redirect('/')
     return redirect('/login')
 
 
@@ -191,36 +234,43 @@ def run():
     Launch a project or redirect to login
     """
     if is_user_logged_in():
-        project = request.args.get('project')
-        try:
-            if project_manager.does_project_exist(project):
-                if project_manager.does_project_have_dataset(project):
-                    if not runtime_manager.is_project_running(project):
-                        runtime_manager.run_project(project)
-                return render_template('project.html',
-                                       Projectname=project,
-                                       Projectdescription=project_manager.get_project(project)[
-                                           'description'],
-                                       LoggedIn=session['loggedin'],
-                                       HasDataset=project_manager.does_project_have_dataset(project),
-                                       Dataset=runtime_manager.get_data_head(project),
-                                       TrainTestSplit=project_manager.get_preprocessing(project, 'train-test-split'),
-                                       RandomState=project_manager.get_preprocessing(project, 'random-state'),
-                                       ColumnNames=runtime_manager.get_column_names(project),
-                                       Normalizers=runtime_manager.NORMALIZATION_METHODS,
-                                       DataBalance=runtime_manager.get_data_balance(project))
-        except Exception as e:
-            logging.error(f'Exception in /run?project{project}: {e}')
+        data = get_has_keys('project')
+        if data is not None:
+            project = data['project']
+            try:
+                if project_manager.does_project_exist(project):
+                    if project_manager.does_project_have_dataset(project):
+                        if not runtime_manager.is_project_running(project):
+                            runtime_manager.run_project(project)
+                    return render_template('project.html',
+                                           Projectname=project,
+                                           Projectdescription=project_manager.get_project(project)['description'],
+                                           LoggedIn=session['loggedin'],
+                                           HasDataset=project_manager.does_project_have_dataset(project),
+                                           Dataset=runtime_manager.get_data_head(project),
+                                           TrainTestSplit=project_manager.get_preprocessing(project,
+                                                                                            'train-test-split'),
+                                           RandomState=project_manager.get_preprocessing(project, 'random-state'),
+                                           ColumnNames=runtime_manager.get_column_names(project),
+                                           Normalizers=NORMALIZATION_METHODS,
+                                           DataBalance=runtime_manager.get_data_balance(project),
+                                           ModelLayers=LAYERS,
+                                           OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
+                                           ProjectModel=project_manager.load_model(project),
+                                           LayerOptions=LAYER_OPTIONS)
+            except Exception as e:
+                logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')
 
 
 @app.route('/quit')
-def quit():
+def quit_project():
     if is_user_logged_in():
-        project = request.args.get('project')
-        if project_manager.does_project_exist(project):
-            runtime_manager.stop_project(project)
-            return redirect('/')
+        data = get_has_keys('project')
+        if data is not None:
+            if project_manager.does_project_exist(data['project']):
+                runtime_manager.stop_project(data['project'])
+                return redirect('/')
     return redirect('/login')
 
 
@@ -249,13 +299,16 @@ def set_dataset_split():
     Assign a certain percentage to split the training & test data with
     """
     if is_user_logged_in():
-        if post_has_keys('project', 'train-test-split', 'random-state'):
+        if post_has_keys('project', 'train-test-split', 'random-state', 'column-output[]'):
             project_manager.set_preprocessing(request.form['project'],
                                               'train-test-split',
-                                              request.form['train-test-split'])
+                                              int(request.form['train-test-split']))
             project_manager.set_preprocessing(request.form['project'],
                                               'random-state',
                                               request.form['random-state'])
+            project_manager.set_preprocessing(request.form['project'],
+                                              'output-columns',
+                                              request.form.getlist('column-output[]'))
             return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
@@ -316,12 +369,13 @@ def clear_dataset():
     Clear the dataset of a project
     """
     if is_user_logged_in():
-        project = request.args.get('project')
-        if project_manager.does_project_exist(project):
-            if project_manager.does_project_have_dataset(project):
-                project_manager.clear_project_dataset(project)
-                runtime_manager.stop_project(project)
-            return redirect(f'/run?project={project}')
+        data = get_has_keys('project')
+        if data is not None:
+            if project_manager.does_project_exist(data['project']):
+                if project_manager.does_project_have_dataset(data['project']):
+                    project_manager.clear_project_dataset(data['project'])
+                    runtime_manager.stop_project(data['project'])
+                return redirect(f'/run?project={data["project"]}')
     return redirect('/login')
 
 
@@ -331,10 +385,10 @@ def remove_user():
     Remove a user from the system
     """
     if is_user_logged_in():
-        username = request.args.get('username')
-        if user_manager.has_elevated_rights() and username is not None and len(username) > 1:
-            if user_manager.does_user_exist(username):
-                user_manager.delete_user(username)
+        data = get_has_keys('username')
+        if user_manager.has_elevated_rights() and data is not None:
+            if user_manager.does_user_exist(data['username']):
+                user_manager.delete_user(data['username'])
         return redirect('/settings')
     return redirect('/login')
 
@@ -363,12 +417,41 @@ def op_user():
     Give a user elevated rights
     """
     if is_user_logged_in():
-        username = request.args.get('user')
-        if username is not None and len(username) > 1:
-            if user_manager.has_elevated_rights() and username is not None and user_manager.does_user_exist(username):
-                user_manager.change_permissions(username)
+        data = get_has_keys('user')
+        if data is not None:
+            if user_manager.has_elevated_rights() and user_manager.does_user_exist(data['user']):
+                user_manager.change_permissions(data['user'])
         return redirect('/settings')
     return redirect('/login')
+
+
+@app.route('/create/layer', methods=['GET', 'POST'])
+def create_layer():
+    """
+    Create a new layer in a model
+    """
+    if is_user_logged_in():
+        if post_has_keys('project', 'new-layer'):
+            project_manager.add_model_layer(project_name=request.form['project'],
+                                            layer_type=request.form['new-layer'],
+                                            layer_params=get_layer_params(request.form['new-layer']))
+            return redirect(f'/run?project={request.form["project"]}')
+    return redirect('/')
+
+
+@app.route('/remove/layer')
+def remove_layer():
+    """
+    Remove a layer from a model
+    """
+    if is_user_logged_in():
+        data = get_has_keys('project', 'layer')
+        if data is not None:
+            project_manager.remove_model_layer(
+                project_name=data['project'],
+                layer_id=data['layer'])
+            return redirect(f'/run?project={data["project"]}')
+    return redirect('/')
 
 
 if __name__ == '__main__':

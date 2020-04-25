@@ -1,6 +1,8 @@
 import logging
-from os import remove
 import pathlib
+import time
+from os import remove
+from uuid import uuid4
 from flask import session
 
 
@@ -41,9 +43,15 @@ class ProjectManager:
 
         if not self.does_project_exist(name):
             if session['username'] in projects.keys():
-                projects[session['username']].append({'name': name, 'description': description})
+                projects[session['username']].append({
+                    'name': name,
+                    'description': description
+                })
             else:
-                projects[session['username']] = [{'name': name, 'description': description}]
+                projects[session['username']] = [{
+                    'name': name,
+                    'description': description
+                }]
             self.__dbclient.set('projects', projects)
             self.__dbclient.dump()
 
@@ -166,7 +174,8 @@ class ProjectManager:
                     'datatype': data_type,
                     'preprocessing': {
                         'train-test-split': 70,
-                        'random_state': 0
+                        'random_state': 0,
+                        'output-columns': []
                     }
                 }
                 self.__dbclient.set('datasets', data)
@@ -179,7 +188,8 @@ class ProjectManager:
             'dataset': name,
             'preprocessing': {
                 'train-test-split': 70,
-                'random_state': 0
+                'random_state': 0,
+                'output-columns': []
             }
         })
         self.__dbclient.set('datasets', data)
@@ -298,3 +308,116 @@ class ProjectManager:
             logging.error(
                 f'Failed to retrieve project {project_name} train_test_split data for user {session["username"]}: {e}')
             return None
+
+    def get_all_models(self):
+        """
+        Load all models that have been created
+
+        :rtype: dict
+        """
+        try:
+            return self.__dbclient.get('models')
+        except Exception as e:
+            logging.error(f'Error loading models: {e}')
+
+    def create_model(self, project_name):
+        """
+        Create a new model dataholder in the database for a project
+
+        :param project_name: The project to create a model for
+        :type project_name: str
+        """
+        models = self.get_all_models()
+
+        # Handle if models is empty
+        if not models:
+            models = {}
+
+        # Handle if user has no models yet
+        if session['username'] not in models:
+            models[session['username']] = {}
+
+        # Check if project has a model defined
+        if project_name not in models[session['username']]:
+            models[session['username']][project_name] = {
+                'epochs': 5,
+                'batch-size': 10,
+                'layers': [],
+                'timestamp': time.time(),
+                'validation-split': 0.75
+            }
+            # TODO: handle creating a new model + store old model in database
+        self.__dbclient.set('models', models)
+
+    def add_model_layer(self, project_name, layer_type, layer_params):
+        """
+        Create a new layer in a model
+
+        :param project_name: The project that will get an updated model
+        :type project_name: str
+
+        :param layer_type: The layer to add to the model
+        :type layer_type: str
+
+        :param layer_params: A dictionary of layer parameters
+        :type layer_params: dict
+        """
+        models = self.get_all_models()
+
+        # Create a base model if it doesn't exist
+        if not models or session['username'] not in models or project_name not in models[session['username']]:
+            self.create_model(project_name)
+            models = self.get_all_models()
+
+        # Check the layer count for order
+        layer_number = len(models[session['username']][project_name]['layers'])
+
+        # Add new layer
+        models[session['username']][project_name]['layers'].append({
+            'layerType': layer_type,
+            'layerId': str(uuid4()),
+            'order': layer_number,
+            'parameters': layer_params
+        })
+        self.__dbclient.set('models', models)
+
+    def remove_model_layer(self, project_name, layer_id):
+        """
+        Remove a layer from a model
+
+        :param project_name:
+        :type project_name: str
+
+        :param layer_id:
+        :type layer_id: str
+
+        :rtype: bool
+        """
+        models = self.get_all_models()
+
+        # Check if models exist
+        if not models or session['username'] not in models or project_name not in models[session['username']]:
+            return 0
+
+        # Remove layer
+        for layer in models[session['username']][project_name]['layers']:
+            if layer['layerId'] == layer_id:
+                models[session['username']][project_name]['layers'].remove(layer)
+                self.__dbclient.set('models', models)
+                return 1
+        return 0
+
+    def load_model(self, project_name):
+        """
+        Load a model for a project from the database
+
+        :param project_name: The project of which to load the model
+        :type project_name: str
+
+        :rtype: dict
+        """
+        models = self.get_all_models()
+        if not models or session['username'] not in models or project_name not in models[session['username']]:
+            return None
+        else:
+            return models[session['username']][project_name]

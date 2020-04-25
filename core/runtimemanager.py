@@ -1,26 +1,10 @@
-from core.projectruntime import ProjectRuntime
+import gc
 import logging
 from flask import session
-import gc
+from core.projectruntime import ProjectRuntime
 
 
 class RuntimeManager:
-    NORMALIZATION_METHODS = {
-        'Standardization': [
-            'StandardScaler',
-            'MaxAbsScaler',
-            'RobustScaler',
-            'Min-Max Scaler'
-        ],
-        'Normalization': [
-            'Normalizer'
-        ],
-        'Non-Linear transformation': [
-            'QuantileTransformer',
-            'PowerTransformer'
-        ]
-    }
-
     def __init__(self, project_manager, dataset_dir):
         self.__runtime = {}
         self.__project_manager = project_manager
@@ -193,13 +177,26 @@ class RuntimeManager:
             logging.error(
                 f'Could not preprocess the columns {columns} with method {method} in project {project_name}: {e}')
 
-    def get_data_balance(self, projectname):
+    def get_data_balance(self, project_name):
+        """
+        Return the balancing of a dataset
+
+        :param project_name: The project to request data balance from
+        :type project_name: str
+
+        :rtype: dict
+        """
         try:
-            return self.__runtime[session['username']][projectname].get_data_balance()
+            return self.__runtime[session['username']][project_name].get_data_balance()
         except Exception as e:
             logging.error(e)
 
     def get_running_projects(self):
+        """
+        Retrieve a list of currently running projects for a user
+
+        :rtype: list
+        """
         try:
             if session['username'] in self.__runtime:
                 return list(self.__runtime[session['username']].keys())

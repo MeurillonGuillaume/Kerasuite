@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler, Normalizer, \
     QuantileTransformer, PowerTransformer
+from core.modelmanager import ModelManager
 from core.projectmanager import ProjectManager
 
 
@@ -24,6 +25,7 @@ class ProjectRuntime:
         self.dataset_name = project_manager.get_project_dataset(self.__project_name)
         self.__dataset_dir = dataset_dir
         self.__load_dataset()
+        self.__model = ModelManager(project_name)
 
     def __load_dataset(self):
         """
@@ -59,6 +61,8 @@ class ProjectRuntime:
     def get_dataset_head(self):
         """
         Return the head of the dataset as a HTML table
+
+        :rtype: str
         """
         return self.dataset.head().to_html(
             classes='table table-striped table-hover table-scroll text-center',
@@ -118,9 +122,7 @@ class ProjectRuntime:
         :param new_value: The new value to put in the column
         :type new_value: str
         """
-        self.dataset[column] = self.dataset[column].map({
-            old_value: new_value
-        })
+        self.dataset[column] = self.dataset[column].replace(old_value, new_value)
         self.__write_dataset_to_disk()
 
     def preprocess_dataset(self, columns, method):
