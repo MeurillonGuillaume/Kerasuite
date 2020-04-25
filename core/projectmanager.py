@@ -349,7 +349,7 @@ class ProjectManager:
             # TODO: handle creating a new model + store old model in database
         self.__dbclient.set('models', models)
 
-    def add_model_layer(self, project_name, layer_type):
+    def add_model_layer(self, project_name, layer_type, layer_params):
         """
         Create a new layer in a model
 
@@ -358,6 +358,9 @@ class ProjectManager:
 
         :param layer_type: The layer to add to the model
         :type layer_type: str
+
+        :param layer_params: A dictionary of layer parameters
+        :type layer_params: dict
         """
         models = self.get_all_models()
 
@@ -374,7 +377,7 @@ class ProjectManager:
             'layerType': layer_type,
             'layerId': str(uuid4()),
             'order': layer_number,
-            'parameters': {}
+            'parameters': layer_params
         })
         self.__dbclient.set('models', models)
 

@@ -97,7 +97,26 @@ def get_has_keys(*args):
             _res[_item] = str(request.args.get(_item))
         if all(_isvalid):
             return _res
-    return None
+    return
+
+
+def get_layer_params(layer_type):
+    """
+    Request data for all params defined for a certain layer
+
+    :param layer_type:
+    :type layer_type: str
+
+    :rtype: dict
+    """
+    _res = {}
+    for _o in LAYER_OPTIONS[layer_type]:
+        # Attempt to convert to most fitting datatype, else use String
+        try:
+            _res[_o] = eval(request.form[_o])
+        except Exception:
+            _res[_o] = request.form[_o]
+    return _res
 
 
 @app.route('/')
@@ -414,7 +433,8 @@ def create_layer():
     if is_user_logged_in():
         if post_has_keys('project', 'new-layer'):
             project_manager.add_model_layer(project_name=request.form['project'],
-                                            layer_type=request.form['new-layer'])
+                                            layer_type=request.form['new-layer'],
+                                            layer_params=get_layer_params(request.form['new-layer']))
             return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
