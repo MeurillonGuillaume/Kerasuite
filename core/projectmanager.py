@@ -312,6 +312,8 @@ class ProjectManager:
     def get_all_models(self):
         """
         Load all models that have been created
+
+        :rtype: dict
         """
         try:
             return self.__dbclient.get('models')
@@ -319,6 +321,12 @@ class ProjectManager:
             logging.error(f'Error loading models: {e}')
 
     def create_model(self, project_name):
+        """
+        Create a new model dataholder in the database for a project
+
+        :param project_name: The project to create a model for
+        :type project_name: str
+        """
         models = self.get_all_models()
 
         # Handle if models is empty
@@ -338,10 +346,19 @@ class ProjectManager:
                 'timestamp': time.time(),
                 'validation-split': 0.75
             }
-            # TODO: handle creating a new model
+            # TODO: handle creating a new model + store old model in database
         self.__dbclient.set('models', models)
 
     def add_model_layer(self, project_name, layer_type):
+        """
+        Create a new layer in a model
+
+        :param project_name: The project that will get an updated model
+        :type project_name: str
+
+        :param layer_type: The layer to add to the model
+        :type layer_type: str
+        """
         models = self.get_all_models()
 
         # Create a base model if it doesn't exist
@@ -361,6 +378,14 @@ class ProjectManager:
         self.__dbclient.set('models', models)
 
     def load_model(self, project_name):
+        """
+        Load a model for a project from the database
+
+        :param project_name: The project of which to load the model
+        :type project_name: str
+
+        :rtype: dict
+        """
         models = self.get_all_models()
         if not models or session['username'] not in models or project_name not in models[session['username']]:
             return None

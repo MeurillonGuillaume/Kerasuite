@@ -61,6 +61,8 @@ class ProjectRuntime:
     def get_dataset_head(self):
         """
         Return the head of the dataset as a HTML table
+
+        :rtype: str
         """
         return self.dataset.head().to_html(
             classes='table table-striped table-hover table-scroll text-center',
