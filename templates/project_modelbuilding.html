@@ -1,7 +1,7 @@
 <div class="columns">
     <div class="column col-lg-12 col-6">
         <h4>Model overview</h4>
-        {% if ProjectModel is none %}
+        {% if ProjectModel is none or ProjectModel.layers|length < 1 %}
             <p>No model has been created yet, please create a model first.</p>
         {% else %}
             <ol>

@@ -423,6 +423,7 @@ def remove_layer():
             project_manager.remove_model_layer(
                 project_name=data['project'],
                 layer_id=data['layer'])
+            return redirect(f'/run?project={data["project"]}')
     return redirect('/')
 
 

@@ -400,6 +400,7 @@ class ProjectManager:
         for layer in models[session['username']][project_name]['layers']:
             if layer['layerId'] == layer_id:
                 models[session['username']][project_name]['layers'].remove(layer)
+                self.__dbclient.set('models', models)
                 return 1
         return 0
 
