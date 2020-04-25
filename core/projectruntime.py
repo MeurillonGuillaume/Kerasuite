@@ -2,8 +2,8 @@ import logging
 import pandas as pd
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler, Normalizer, \
     QuantileTransformer, PowerTransformer
-from core.projectmanager import ProjectManager
 from core.modelmanager import ModelManager
+from core.projectmanager import ProjectManager
 
 
 class ProjectRuntime:

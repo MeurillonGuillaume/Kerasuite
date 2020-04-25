@@ -7,6 +7,7 @@ from uuid import uuid4
 from core.projectmanager import ProjectManager
 from core.usermanager import UserManager
 from core.runtimemanager import RuntimeManager
+from core.modelcomponents import LAYERS, NORMALIZATION_METHODS
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'
@@ -199,17 +200,16 @@ def run():
                         runtime_manager.run_project(project)
                 return render_template('project.html',
                                        Projectname=project,
-                                       Projectdescription=project_manager.get_project(project)[
-                                           'description'],
+                                       Projectdescription=project_manager.get_project(project)['description'],
                                        LoggedIn=session['loggedin'],
                                        HasDataset=project_manager.does_project_have_dataset(project),
                                        Dataset=runtime_manager.get_data_head(project),
                                        TrainTestSplit=project_manager.get_preprocessing(project, 'train-test-split'),
                                        RandomState=project_manager.get_preprocessing(project, 'random-state'),
                                        ColumnNames=runtime_manager.get_column_names(project),
-                                       Normalizers=runtime_manager.NORMALIZATION_METHODS,
+                                       Normalizers=NORMALIZATION_METHODS,
                                        DataBalance=runtime_manager.get_data_balance(project),
-                                       ModelLayers=runtime_manager.LAYERS,
+                                       ModelLayers=LAYERS,
                                        OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
                                        ProjectModel=project_manager.load_model(project))
         except Exception as e:

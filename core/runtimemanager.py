@@ -1,37 +1,10 @@
-from core.projectruntime import ProjectRuntime
+import gc
 import logging
 from flask import session
-import gc
+from core.projectruntime import ProjectRuntime
 
 
 class RuntimeManager:
-    NORMALIZATION_METHODS = {
-        'Standardization': [
-            'StandardScaler',
-            'MaxAbsScaler',
-            'RobustScaler',
-            'Min-Max Scaler'
-        ],
-        'Normalization': [
-            'Normalizer'
-        ],
-        'Non-Linear transformation': [
-            'QuantileTransformer',
-            'PowerTransformer'
-        ]
-    }
-    LAYERS = {
-        'Core layers':
-            [
-                'Dense',
-                'Dropout',
-                'Input'
-            ],
-        'Normalization layers': [
-            'BatchNormalization'
-        ]
-    }
-
     def __init__(self, project_manager, dataset_dir):
         self.__runtime = {}
         self.__project_manager = project_manager

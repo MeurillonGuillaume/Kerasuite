@@ -1,9 +1,9 @@
 import logging
+import pathlib
 import time
 from os import remove
-import pathlib
-from flask import session
 from uuid import uuid4
+from flask import session
 
 
 class ProjectManager:

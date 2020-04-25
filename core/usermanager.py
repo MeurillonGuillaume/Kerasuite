@@ -1,7 +1,7 @@
-from passlib.hash import bcrypt
 import logging
 from re import match
 from flask import session
+from passlib.hash import bcrypt
 
 
 class UserManager:
