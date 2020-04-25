@@ -1,0 +1,58 @@
+<div class="modal" id="modal-id">
+    <a href="#close" class="modal-overlay" id="modalCloseArea" aria-label="Close"></a>
+    <div class="modal-container">
+        <form action="/create/project" method="post" enctype="multipart/form-data">
+            <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right" id="modalCloseBtn" aria-label="Close"></a>
+                <div class="modal-title h5">New project</div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <div class="form-group">
+                        <label class="form-label" for="projectname">Name</label>
+                        <div class="has-icon-left">
+                            <input type="text" name="projectname" class="form-input" id="projectname"
+                                   placeholder="The amazing Hello, World!" autofocus required>
+                            <i class="form-icon icon icon-edit"></i>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="projectdescription">Description <i>(optional)</i></label>
+                        <div class="has-icon-left">
+                        <textarea class="form-input" name="projectdescription" id="projectdescription"
+                                  placeholder="This project is the most advanced Hello, World! your eyes have ever seen."
+                                  rows="1"></textarea>
+                            <i class="form-icon icon icon-message"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="submit" value="Create project!" class="btn btn-success">
+            </div>
+        </form>
+    </div>
+
+</div>
+<script>
+    {
+        document.addEventListener("DOMContentLoaded", function (event) {
+            let button = document.getElementById('modalBtn'),
+                modal = document.getElementById('modal-id'),
+                modalCloseBtn = document.getElementById('modalCloseBtn'),
+                modalCloseArea = document.getElementById('modalCloseArea');
+
+            button.onclick = function () {
+                modal.classList.add('active');
+            };
+
+            modalCloseBtn.onclick = function () {
+                modal.classList.remove('active');
+            };
+
+            modalCloseArea.onclick = function () {
+                modal.classList.remove('active');
+            };
+        })
+    }
+</script>

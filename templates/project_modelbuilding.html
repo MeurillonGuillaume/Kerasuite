@@ -1,0 +1,33 @@
+<div class="columns">
+    <div class="column col-lg-12 col-6">
+        <h4>Model overview</h4>
+        {% if ProjectModel is none or ProjectModel.layers|length < 1 %}
+            <p>No model has been created yet, please create a model below first.</p>
+        {% else %}
+            <ol>
+                {% for Layer in ProjectModel.layers | sort(attribute='order') %}
+                    <li>{{ Layer['layerType'] }} (<a
+                            href="/remove/layer?project={{ Projectname }}&layer={{ Layer['layerId'] }}"
+                            onclick="return confirm('Are you sure to remove this {{ Layer['layerType'] }} layer?')">Remove
+                        layer</a>)
+                    </li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+        <h4>Add new layer</h4>
+        <div class="form-group">
+            <label class="form-label" for="model-layer">Layer type</label>
+            <select class="form-select" name="new-layer" id="model-layer">
+                {% for LayerType in ModelLayers | sort %}
+                    <optgroup label="{{ LayerType }}">
+                        {% for Layer in ModelLayers[LayerType] | sort %}
+                            <option value="{{ Layer }}">{{ Layer }}</option>
+                        {% endfor %}
+                    </optgroup>
+                {% endfor %}
+            </select>
+        </div>
+        <input type="hidden" name="project" value="{{ Projectname }}">
+        <button class="btn btn-success" id="btn-new-layer">Create layer</button>
+    </div>
+</div>

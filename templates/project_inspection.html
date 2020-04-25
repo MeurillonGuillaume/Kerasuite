@@ -1,0 +1,79 @@
+<div class="accordion m-2">
+    <input id="preprocessing-graph" type="radio" name="accordion-preprocessing" hidden="">
+    <label class="accordion-header c-hand" for="preprocessing-graph">
+        <h4>
+            <i class="icon icon-arrow-right mr-1"></i>Data balance graph
+        </h4>
+    </label>
+    <div class="accordion-body">
+        <div class="column col-md-12 col-10">
+            {% if DataBalance %}
+                <div class="form-group">
+                    <label class="form-label" for="column_select">Select a column to visualize</label>
+                    <select class="form-select" id="columns_select">
+                        {% for Column in DataBalance %}
+                            <option value="{{ Column }}">{{ Column }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <canvas id="canvas" style="display: block; width: 618px; height: 309px;" width="618" height="309"
+                        class="chartjs-render-monitor"></canvas>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<script>
+    {
+        let columnData = {{ DataBalance | tojson }};
+        let column = Object.keys(columnData)[0];
+        let chartContext = document.getElementById('canvas').getContext('2d');
+
+        const GetRandomColor = (data) => {
+            let result = [];
+            for (let i = 0; i < data.length; i++) {
+                let r = Math.floor((Math.random() * 255) + 1),
+                    g = Math.floor((Math.random() * 255) + 1),
+                    b = Math.floor((Math.random() * 255) + 1);
+                result.push(`rgba(${r}, ${g}, ${b}, 0.4)`);
+            }
+            return result;
+        }
+
+        const SetGraph = () => {
+            if (column in columnData) {
+                if (window.barChart != null) {
+                    window.barChart.destroy();
+                }
+                document.getElementById('columns_select').value = column;
+                window.barChart = new Chart(chartContext, {
+                    "type": "bar",
+                    "data": {
+                        "labels": Object.keys(columnData[column]),
+                        "datasets": [{
+                            "label": `Unique values for column ${column}`,
+                            "data": Object.values(columnData[column]),
+                            "borderWidth": 1,
+                            "backgroundColor": GetRandomColor(Object.values(columnData[column]))
+                        }]
+                    },
+                    "options": {"scales": {"yAxes": [{"ticks": {"beginAtZero": true}}]}}
+                });
+            }
+        };
+
+        const GetColumnName = () => {
+            column = document.getElementById('columns_select').value;
+        }
+
+        window.onload = function () {
+            SetGraph();
+            document.getElementById('columns_select').addEventListener("change", function () {
+                GetColumnName();
+                SetGraph();
+            })
+        };
+    }
+</script>

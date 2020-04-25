@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block Body %}
+    <div class="columns">
+        <div class="column col-md-12 col-6 col-mx-auto">
+            <h1 class="text-center">Sign In</h1>
+            <div class="form-group">
+                <form method="post" action="/login" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username</label>
+                        <div class="has-icon-left">
+                            <input type="text" name="username" class="form-input" id="username" placeholder="John Doe"
+                                   autofocus required>
+                            <i class="form-icon icon icon-people"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="has-icon-left">
+                            <input type="password" name="password" class="form-input" id="password"
+                                   placeholder="P@$$w0rd"
+                                   required>
+                            <i class="form-icon icon icon-emoji"></i>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-success btn-lg tooltip tooltip-bottom" data-tooltip="Let's go!"><i
+                            class="icon icon-check"></i> Sign In
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
