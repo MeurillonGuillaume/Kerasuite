@@ -38,3 +38,34 @@ ACTIVATION_FUNCTIONS = {
     'Exponential': 'Exponential function',
     'Hyperbolic Tangent': 'S-shaped tanh functon with limits between y=-1 and y=1'
 }
+
+# Layer options: Which parameters have to be set for a layer
+LAYER_OPTIONS = {
+    'Dense': {
+        'Units': {
+            'description': 'The amount of neurons generated for this layer, equals the dimensionality of the output',
+            'inputInfo': {
+                'type': 'number',
+                'min': 0,
+                'max': None
+            }
+        },
+        'Activation': {
+            'description': 'The type of mathematical function to use as activation function',
+            'inputInfo': {
+                'type': 'select',
+                'values': ACTIVATION_FUNCTIONS
+            }
+        }
+    },
+    'Dropout': {
+        'Rate': {
+            'description': 'The amount of neurons that randomly disabled at once',
+            'inputInfo': {
+                'type': 'range',
+                'min': 0,
+                'max': 75
+            }
+        }
+    }
+}

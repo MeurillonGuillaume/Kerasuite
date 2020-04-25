@@ -7,7 +7,7 @@ from uuid import uuid4
 from core.projectmanager import ProjectManager
 from core.usermanager import UserManager
 from core.runtimemanager import RuntimeManager
-from core.modelcomponents import LAYERS, NORMALIZATION_METHODS
+from core.modelcomponents import LAYERS, NORMALIZATION_METHODS, LAYER_OPTIONS
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'
@@ -237,7 +237,8 @@ def run():
                                            DataBalance=runtime_manager.get_data_balance(project),
                                            ModelLayers=LAYERS,
                                            OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
-                                           ProjectModel=project_manager.load_model(project))
+                                           ProjectModel=project_manager.load_model(project),
+                                           LayerOptions=LAYER_OPTIONS)
             except Exception as e:
                 logging.error(f'Exception in /run?project{project}: {e}')
     return redirect('/login')
@@ -407,6 +408,9 @@ def op_user():
 
 @app.route('/create/layer', methods=['GET', 'POST'])
 def create_layer():
+    """
+    Create a new layer in a model
+    """
     if is_user_logged_in():
         if post_has_keys('project', 'new-layer'):
             project_manager.add_model_layer(project_name=request.form['project'],
@@ -417,6 +421,9 @@ def create_layer():
 
 @app.route('/remove/layer')
 def remove_layer():
+    """
+    Remove a layer from a model
+    """
     if is_user_logged_in():
         data = get_has_keys('project', 'layer')
         if data is not None:

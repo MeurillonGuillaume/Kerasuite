@@ -1,0 +1,90 @@
+<div class="modal" id="modal-layer-options">
+    <a href="#close" class="modal-overlay" id="modal-layer-close-area" aria-label="Close"></a>
+    <div class="modal-container">
+        <form action="/create/layer" method="post" enctype="multipart/form-data">
+            <div class="modal-header">
+                <a href="#close" class="btn btn-clear float-right" id="modal-layer-close" aria-label="Close"></a>
+                <div class="modal-title h5" id="modal-layer-title"></div>
+            </div>
+            <div class="modal-body">
+                <div class="content">
+                    <div class="form-group" id="dynamic-params">
+
+                    </div>
+                    <input type="hidden" name="project" value="{{ Projectname }}">
+                    <input type="hidden" name="layer-type" id="hidden-layertype">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="submit" value="Add layer" class="btn btn-success">
+            </div>
+        </form>
+    </div>
+
+</div>
+<script>
+    {
+        document.addEventListener("DOMContentLoaded", function (event) {
+            let button = document.getElementById('btn-new-layer'),
+                modal = document.getElementById('modal-layer-options'),
+                modalCloseBtn = document.getElementById('modal-layer-close'),
+                modalCloseArea = document.getElementById('modal-layer-close-area'),
+                modalTitle = document.getElementById('modal-layer-title'),
+                paramHolder = document.getElementById('dynamic-params'),
+                layerType = "",
+                layerOptions = Object({{ LayerOptions|tojson }});
+
+            let loadFormElement = param_name => {
+                paramHolder.innerHTML += `<label for="param-${param_name}" class="form-label"><b>${param_name}</b>: ${layerOptions[layerType][param_name].description}</label>`;
+                switch (layerOptions[layerType][param_name].inputInfo.type) {
+                    case "select":
+                        paramHolder.innerHTML += `<select class="form-select" name="${param_name}" id="param-${param_name}"></select>`;
+                        for (let value in layerOptions[layerType][param_name].inputInfo.values) {
+                            document.getElementById(`param-${param_name}`).innerHTML += `<option value="${value}">${value}: ${layerOptions[layerType][param_name].inputInfo.values[value]}</option>`;
+                        }
+                        break;
+                    case "number":
+                        paramHolder.innerHTML += `<input name="${param_name}"
+                            type="number"
+                            class="form-input"
+                            id="param-${param_name}"
+                            min="${layerOptions[layerType][param_name].inputInfo.min}"
+                            max="${layerOptions[layerType][param_name].inputInfo.max}"/>`;
+                        break;
+                    case "range":
+                        paramHolder.innerHTML += `<input id="train-test-range" class="slider tooltip p-2" type="range"
+                           min="${layerOptions[layerType][param_name].inputInfo.min}"
+                           max="${layerOptions[layerType][param_name].inputInfo.max}"
+                           step="1"
+                           value="0"
+                           id="param-${param_name}"
+                           name="${param_name}" required>`;
+                        break;
+                }
+            };
+
+            const setModalTitle = () => {
+                paramHolder.innerHTML = "";
+                layerType = document.getElementById('model-layer').value;
+                modalTitle.innerText = `Options for ${layerType} layer`;
+                document.getElementById('hidden-layertype').value = layerType;
+                for (let key in layerOptions[layerType]) {
+                    loadFormElement(key);
+                }
+            };
+
+            button.onclick = function () {
+                modal.classList.add('active');
+                setModalTitle();
+            };
+
+            modalCloseBtn.onclick = function () {
+                modal.classList.remove('active');
+            };
+
+            modalCloseArea.onclick = function () {
+                modal.classList.remove('active');
+            };
+        })
+    }
+</script>
