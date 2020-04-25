@@ -40,6 +40,15 @@ ACTIVATION_FUNCTIONS = {
 }
 
 # Layer options: Which parameters have to be set for a layer
+# How to add new layers & parameters?
+# 1. Layer name
+#   - Param
+#       - description: (required) What does the parameter do?
+#       - inputInfo: Information for the HTML input (required)
+#           - type: (required) which input-type to use
+#           - min: (required for input range/number) minimum value
+#           - max: (required for input range/number) maximum value
+#           - values: (required for type=select) a dict of values & description of these values
 LAYER_OPTIONS = {
     'Dense': {
         'Units': {
@@ -60,7 +69,7 @@ LAYER_OPTIONS = {
     },
     'Dropout': {
         'Rate': {
-            'description': 'The amount of neurons that randomly disabled at once',
+            'description': 'The percentage of neurons that randomly disabled at once',
             'inputInfo': {
                 'type': 'range',
                 'min': 0,

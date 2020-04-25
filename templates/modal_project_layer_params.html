@@ -35,6 +35,11 @@
                 layerOptions = Object({{ LayerOptions|tojson }});
 
             let loadFormElement = param_name => {
+                /**
+                 * Create a new form element for a layer parameter
+                 * @param   {String}    param_name   The name of the parameter to create an input for
+                 * @return
+                 */
                 paramHolder.innerHTML += `<label for="param-${param_name}" class="form-label"><b>${param_name}</b>: ${layerOptions[layerType][param_name].description}</label>`;
                 switch (layerOptions[layerType][param_name].inputInfo.type) {
                     case "select":
@@ -48,22 +53,30 @@
                             type="number"
                             class="form-input"
                             id="param-${param_name}"
+                            value="0"
                             min="${layerOptions[layerType][param_name].inputInfo.min}"
                             max="${layerOptions[layerType][param_name].inputInfo.max}"/>`;
                         break;
                     case "range":
-                        paramHolder.innerHTML += `<input id="train-test-range" class="slider tooltip p-2" type="range"
-                           min="${layerOptions[layerType][param_name].inputInfo.min}"
-                           max="${layerOptions[layerType][param_name].inputInfo.max}"
-                           step="1"
-                           value="0"
-                           id="param-${param_name}"
-                           name="${param_name}" required>`;
+                        paramHolder.innerHTML += `<input id="train-test-range"
+                            class="slider tooltip p-2"
+                            type="range"
+                            min="${layerOptions[layerType][param_name].inputInfo.min}"
+                            max="${layerOptions[layerType][param_name].inputInfo.max}"
+                            step="1"
+                            value="0"
+                            oninput="this.setAttribute('value', this.value);"
+                            id="param-${param_name}"
+                            name="${param_name}" required>`;
                         break;
                 }
             };
 
             const setModalTitle = () => {
+                /**
+                 * Initialise variables & dynamically fill the modal form
+                 * @return
+                 */
                 paramHolder.innerHTML = "";
                 layerType = document.getElementById('model-layer').value;
                 modalTitle.innerText = `Options for ${layerType} layer`;
