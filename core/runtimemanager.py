@@ -204,3 +204,12 @@ class RuntimeManager:
         except Exception as e:
             logging.error(f'Error loading active projects for {session["username"]}: {e}')
             return []
+
+    def split_project_dataset(self, project_name):
+        """
+        Split the dataset in a train- and testset for a certain project
+
+        :param project_name: The project to split the dataset for
+        :type project_name: str
+        """
+        self.__runtime[session['username']][project_name].train_test_split()

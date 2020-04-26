@@ -9,12 +9,17 @@ from core.projectmanager import ProjectManager
 from core.runtimemanager import RuntimeManager
 from core.usermanager import UserManager
 from core.validation import is_user_logged_in, get_has_keys, post_has_keys, is_file_allowed, get_layer_params
+import absl.logging
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'
 
 # Enable logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)  # Default logging level
+
+# Remove Tensorflow logging bug
+logging.root.removeHandler(absl.logging._absl_handler)
+absl.logging._warn_preinit_stderr = False
 
 # Create Flask app
 app = Flask(__name__)
@@ -160,6 +165,8 @@ def run():
                     if project_manager.does_project_have_dataset(project):
                         if not runtime_manager.is_project_running(project):
                             runtime_manager.run_project(project)
+
+                    runtime_manager.split_project_dataset(project)
                     return render_template('project.html',
                                            Projectname=project,
                                            Projectdescription=project_manager.get_project(project)['description'],
@@ -350,11 +357,14 @@ def create_layer():
     """
     if is_user_logged_in():
         if post_has_keys('project', 'new-layer', 'layer-description'):
-            project_manager.add_model_layer(project_name=request.form['project'],
-                                            layer_type=request.form['new-layer'],
-                                            layer_params=get_layer_params(request.form['new-layer']),
-                                            description=request.form['layer-description'])
-            return redirect(f'/run?project={request.form["project"]}')
+            if runtime_manager.add_model_layer(request.form['project'],
+                                               request.form['new-layer'],
+                                               get_layer_params(request.form['new-layer'])):
+                project_manager.add_model_layer(project_name=request.form['project'],
+                                                layer_type=request.form['new-layer'],
+                                                layer_params=get_layer_params(request.form['new-layer']),
+                                                description=request.form['layer-description'])
+                return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
 

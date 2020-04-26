@@ -174,7 +174,7 @@ class ProjectManager:
                     'datatype': data_type,
                     'preprocessing': {
                         'train-test-split': 70,
-                        'random_state': 0,
+                        'random-state': 0,
                         'output-columns': []
                     }
                 }
@@ -188,7 +188,7 @@ class ProjectManager:
             'dataset': name,
             'preprocessing': {
                 'train-test-split': 70,
-                'random_state': 0,
+                'random-state': 0,
                 'output-columns': []
             }
         })
@@ -279,7 +279,11 @@ class ProjectManager:
             for _project in data[session['username']]:
                 if _project['projectname'] == project:
                     logging.info(f'User {session["username"]} set {param} to {value} for {project}')
-                    _project['preprocessing'][param] = value
+                    # Attempt to store non-strings as their correct type
+                    try:
+                        _project['preprocessing'][param] = eval(value)
+                    except Exception:
+                        _project['preprocessing'][param] = value
                     self.__dbclient.set('datasets', data)
                     return 1
             return 0
