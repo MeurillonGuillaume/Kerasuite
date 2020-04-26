@@ -7,7 +7,11 @@
             {% for Layer in ProjectModel.layers | sort(attribute='order') %}
                 <div class="tile mb-1">
                     <div class="tile-content">
-                        <div class="tile-title">{{ Layer['order'] + 1 }}. {{ Layer['layerType'] }} layer</div>
+                        <div class="tile-title">{{ Layer['order'] + 1 }}. {{ Layer['layerType'] }} layer
+                            ({% for param in Layer['parameters'] %}
+                                <code>{{ param | lower }}</code>: {{ Layer['parameters'][param] }}
+                            {% endfor %})
+                        </div>
                         {% if Layer['description']|length > 0 %}
                             <small class="tile-subtitle"><b>Description:</b> {{ Layer['description'] }}</small>
                         {% endif %}
