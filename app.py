@@ -349,10 +349,11 @@ def create_layer():
     Create a new layer in a model
     """
     if is_user_logged_in():
-        if post_has_keys('project', 'new-layer'):
+        if post_has_keys('project', 'new-layer', 'layer-description'):
             project_manager.add_model_layer(project_name=request.form['project'],
                                             layer_type=request.form['new-layer'],
-                                            layer_params=get_layer_params(request.form['new-layer']))
+                                            layer_params=get_layer_params(request.form['new-layer']),
+                                            description=request.form['layer-description'])
             return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 

@@ -8,8 +8,15 @@
             </div>
             <div class="modal-body">
                 <div class="content">
-                    <div class="form-group" id="dynamic-params">
-
+                    <div class="form-group" id="dynamic-params"></div>
+                    <div class="form-group">
+                        <label for="layer-description" class="form-label"><b>Layer description</b>
+                            <i>(optional)</i>:</label>
+                        <textarea class="form-input"
+                                  name="layer-description"
+                                  id="layer-description"
+                                  rows="2"
+                                  placeholder="Extra information about this layer"></textarea>
                     </div>
                     <input type="hidden" name="project" value="{{ Projectname }}">
                     <input type="hidden" name="new-layer" id="hidden-layertype">
