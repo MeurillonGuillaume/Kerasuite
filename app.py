@@ -42,6 +42,18 @@ user_manager = UserManager(database)
 runtime_manager = RuntimeManager(project_manager, app.config['UPLOAD_FOLDER'])
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    """
+    Redirect home on non-existing URL
+
+    :param e: The error to handle, print in console
+    :type e: str
+    """
+    logging.error(e)
+    return redirect('/')
+
+
 @app.route('/')
 def home():
     """
@@ -357,14 +369,11 @@ def create_layer():
     """
     if is_user_logged_in():
         if post_has_keys('project', 'new-layer', 'layer-description'):
-            if runtime_manager.add_model_layer(request.form['project'],
-                                               request.form['new-layer'],
-                                               get_layer_params(request.form['new-layer'])):
-                project_manager.add_model_layer(project_name=request.form['project'],
-                                                layer_type=request.form['new-layer'],
-                                                layer_params=get_layer_params(request.form['new-layer']),
-                                                description=request.form['layer-description'])
-                return redirect(f'/run?project={request.form["project"]}')
+            project_manager.add_model_layer(project_name=request.form['project'],
+                                            layer_type=request.form['new-layer'],
+                                            layer_params=get_layer_params(request.form['new-layer']),
+                                            description=request.form['layer-description'])
+            return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
 
@@ -379,6 +388,15 @@ def remove_layer():
             project_manager.remove_model_layer(
                 project_name=data['project'],
                 layer_id=data['layer'])
+            return redirect(f'/run?project={data["project"]}')
+    return redirect('/')
+
+
+@app.route('/train/model')
+def train_model():
+    if is_user_logged_in():
+        data = get_has_keys('project')
+        if data is not None:
             return redirect(f'/run?project={data["project"]}')
     return redirect('/')
 

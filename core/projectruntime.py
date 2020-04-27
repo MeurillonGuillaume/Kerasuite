@@ -27,7 +27,7 @@ class ProjectRuntime:
         self.__project_manager = project_manager
         self.__dataset_dir = dataset_dir
         self.__load_dataset()
-        self.model_manager = ModelManager(project_name)
+        self.model_manager = ModelManager(project_name, project_manager)
         self.__x_train, self.__x_test, self.__y_train, self.__y_test = None, None, None, None
 
     def __load_dataset(self):
@@ -197,3 +197,6 @@ class ProjectRuntime:
                                                                                             train_size=_split_size)
             return 1
         return 0
+
+    def create_model(self):
+        self.model_manager.create_model()
