@@ -213,3 +213,6 @@ class RuntimeManager:
         :type project_name: str
         """
         self.__runtime[session['username']][project_name].train_test_split()
+
+    def train_project_model(self, project_name):
+        self.__runtime[session['username']][project_name].train_model()

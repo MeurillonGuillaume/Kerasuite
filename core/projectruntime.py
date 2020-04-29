@@ -198,5 +198,8 @@ class ProjectRuntime:
             return 1
         return 0
 
-    def create_model(self):
-        self.model_manager.create_model()
+    def train_model(self):
+        self.model_manager.train_model(
+            x_train=self.__x_train,
+            y_train=self.__y_train
+        )

@@ -397,6 +397,7 @@ def train_model():
     if is_user_logged_in():
         data = get_has_keys('project')
         if data is not None:
+            runtime_manager.train_project_model(data['project'])
             return redirect(f'/run?project={data["project"]}')
     return redirect('/')
 
