@@ -197,7 +197,14 @@ def run():
                                        ModelLayers=LAYERS,
                                        OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
                                        ProjectModel=project_manager.load_model(project),
-                                       LayerOptions=LAYER_OPTIONS)
+                                       LayerOptions=LAYER_OPTIONS,
+                                       TrainScoring=project_manager.load_model_scoring(
+                                           project_name=project,
+                                           scoring_source=project_manager.SCORING_TRAIN),
+                                       TestScoring=project_manager.load_model_scoring(
+                                           project_name=project,
+                                           scoring_source=project_manager.SCORING_TEST)
+                                       )
 
     return redirect('/login')
 

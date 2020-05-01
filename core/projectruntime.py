@@ -210,7 +210,7 @@ class ProjectRuntime:
                 x_train=self.__x_train,
                 y_train=self.__y_train
             ),
-            scoring_source='train'
+            scoring_source=self.__project_manager.SCORING_TRAIN
         )
 
     def test_model(self):
@@ -222,5 +222,6 @@ class ProjectRuntime:
             scoring=self.model_manager.test_model(
                 x_test=self.__x_test,
                 y_test=self.__y_test
-            )
+            ),
+            scoring_source=self.__project_manager.SCORING_TEST
         )

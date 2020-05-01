@@ -1,53 +1,85 @@
 <div class="columns">
     <div class="column col-lg-12 col-6">
-        <h4>Training evaluation</h4>
-        <div>
-            <canvas id="chart-train-evaluation" style="display: block; width: 618px; height: 309px;" width="618"
-                    height="309"
-                    class="chartjs-render-monitor"></canvas>
-            <script>
-                {
-                    let chartContext = document.getElementById('chart-train-evaluation').getContext('2d');
-                    new Chart(chartContext, {
-                        "type": "bar",
-                        "data": {
-                            "labels": ["a", "b", 'c'],
-                            "datasets": [{
-                                "label": `Unique values`,
-                                "data": [1, 2, 3],
-                                "borderWidth": 1,
-                                "backgroundColor": GetRandomColors(3)
-                            }]
-                        },
-                        "options": {"scales": {"yAxes": [{"ticks": {"beginAtZero": true}}]}}
-                    });
-                }
-            </script>
+        <div class="accordion m-2">
+            <input id="evaluation-train" type="radio" name="accordion-preprocessing" hidden="">
+            <label class="accordion-header c-hand" for="evaluation-train">
+                <h4>
+                    <i class="icon icon-arrow-right mr-1"></i>Training evaluation
+                </h4>
+            </label>
+            <div class="accordion-body">
+                {% if TrainScoring is not none %}
+                    <div>
+                        <canvas id="chart-train-evaluation" style="display: block; width: 618px; height: 309px;"
+                                width="618"
+                                height="309"
+                                class="chartjs-render-monitor"></canvas>
+                        <script>
+                            {
+                                let chartContext = document.getElementById('chart-train-evaluation').getContext('2d');
+                                let chartData = {{ TrainScoring|tojson }};
+                                let labels = [], data = [];
+
+                                for (let metric in chartData) {
+                                    if (labels.length === 0) {
+                                        for (let i = 0; i < chartData[metric].length; i++) {
+                                            labels.push(`Epoch ${i + 1}`)
+                                        }
+                                    }
+
+                                    data.push({
+                                        "label": metric,
+                                        "data": chartData[metric],
+                                        "borderColor": GetRandomColor(0.35),
+                                        "fill": false
+                                    })
+                                }
+
+                                new Chart(chartContext, {
+                                    "type": "line",
+                                    "data": {
+                                        "labels": labels,
+                                        "datasets": data
+                                    },
+                                    "options": {"scales": {"yAxes": [{"ticks": {"beginAtZero": true}}]}}
+                                });
+                            }
+                        </script>
+                    </div>
+                {% else %}
+                    <p>No model has been trained yet, can't show any statistics.</p>
+                {% endif %}
+            </div>
         </div>
 
-        <h4>Testing evaluation</h4>
-        <div>
-            <canvas id="chart-test-evaluation" style="display: block; width: 618px; height: 309px;" width="618"
-                    height="309"
-                    class="chartjs-render-monitor"></canvas>
-            <script>
-                {
-                    let chartContext = document.getElementById('chart-test-evaluation').getContext('2d');
-                    new Chart(chartContext, {
-                        "type": "bar",
-                        "data": {
-                            "labels": ["a", "b", 'c'],
-                            "datasets": [{
-                                "label": `Unique values`,
-                                "data": [1, 2, 3],
-                                "borderWidth": 1,
-                                "backgroundColor": GetRandomColors(3)
-                            }]
-                        },
-                        "options": {"scales": {"yAxes": [{"ticks": {"beginAtZero": true}}]}}
-                    });
-                }
-            </script>
+        <div class="accordion m-2">
+            <input id="evaluation-test" type="radio" name="accordion-preprocessing" hidden="">
+            <label class="accordion-header c-hand" for="evaluation-test">
+                <h4>
+                    <i class="icon icon-arrow-right mr-1"></i>Testing evaluation
+                </h4>
+            </label>
+            <div class="accordion-body">
+                {% if TestScoring %}
+                    <p>How well did the model behave on the test-set?</p>
+                    <div class="form-group">
+                        <label for="test-acc"><b>Test-set accuracy</b> <i>(Higher &equals; better)</i></label>
+                        <meter id="test-acc" class="meter tooltip"
+                               value="{{ (TestScoring['test_accuracy'] * 100) | round(2) }}"
+                               optimum="100" min="0" max="100" low="50" high="80"
+                               data-tooltip="Test-set accuracy: {{ (TestScoring['test_accuracy'] * 100) | round(3) }}%"></meter>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="test-loss"><b>Test-set loss</b> <i>(Lower &equals; better)</i></label>
+                        <meter id="test-acc" class="meter tooltip"
+                               value="{{ (TestScoring['test_loss']* 100) | round(2) }}"
+                               optimum="0" min="0" max="100" low="35" high="60"
+                               data-tooltip="Test-set loss: {{ (TestScoring['test_loss']* 100) | round(3) }}%"></meter>
+                    </div>
+                {% else %}
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

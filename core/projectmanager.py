@@ -8,6 +8,9 @@ from flask import session
 
 
 class ProjectManager:
+    SCORING_TEST = 'test'
+    SCORING_TRAIN = 'train'
+
     def __init__(self, db_instance):
         """
         Initialise the database connector
@@ -439,7 +442,7 @@ class ProjectManager:
         else:
             return models[session['username']][project_name]
 
-    def store_model_scoring(self, project_name, scoring, scoring_source='test'):
+    def store_model_scoring(self, project_name, scoring, scoring_source):
         """
         Write test-results to the database
 
@@ -457,6 +460,29 @@ class ProjectManager:
         if not models or session['username'] not in models or project_name not in models[session['username']]:
             return 0
 
-        models[session['username']][project_name][f'{scoring_source}_score'] = scoring
-        self.__db_client.set('models', models)
-        return 1
+        if scoring_source in [self.SCORING_TEST, self.SCORING_TRAIN]:
+            models[session['username']][project_name][f'{scoring_source}_score'] = scoring
+            self.__db_client.set('models', models)
+            return 1
+        return 0
+
+    def load_model_scoring(self, project_name, scoring_source):
+        """
+        Retrieve scoring for a model
+
+        :param project_name: The project to get model scoring from
+        :type project_name: str
+
+        :param scoring_source: The source of the scoring (train or test)
+        :type scoring_source: str
+
+        :rtype: dict
+        """
+        models = self.get_all_models()
+        # Check if models exist
+        if not models or session['username'] not in models or project_name not in models[session['username']]:
+            return None
+
+        if scoring_source in [self.SCORING_TEST, self.SCORING_TRAIN]:
+            return models[session['username']][project_name][f'{scoring_source}_score']
+        return None
