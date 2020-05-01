@@ -33,7 +33,7 @@ Properly preprocessed datasets can be used as training input for neural networks
 
 ### Installing Kerasuite
 
-1. Download the [latest release](https://github.com/MeurillonGuillaume/Kerasuite/releases) of Kerasuite, or clone the Master branch for the latest working version:
+1. Download the [latest release](https://github.com/MeurillonGuillaume/Kerasuite/releases) of Kerasuite, or clone the `master` branch for the latest working version. Clone the `develop` branch if you are feeling a little more adventurous.
     ```shell script
     git clone https://github.com/MeurillonGuillaume/Kerasuite
     ```
@@ -47,11 +47,11 @@ Properly preprocessed datasets can be used as training input for neural networks
     python3 app.py
     ```
 
-
 ## Future features
 
 - Export complete trained models to embed in a production-ready environment;
 - Iterate versions of generated models, which improves reverting changes and improves performance gain visualisation;
 - Host created models directly as REST-based API in Kerasuite with the click of a button;
+- Sharing projects between multiple users;
 - Seeking for something else in Kerasuite? [Hit me up](mailto://guillaume.meurillon@hotmail.com) or create an [issue](https://github.com/MeurillonGuillaume/Kerasuite/issues)!
  
