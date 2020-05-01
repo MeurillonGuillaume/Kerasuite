@@ -144,8 +144,13 @@ class ModelManager:
         """
         ...
 
-    def test_model(self):
+    def test_model(self, x_test, y_test):
         """
         Test how good the model scores using the X_test and y_test data, store metrics in database
         """
-        ...
+        if self.__layer_count > 0:
+            results = self.__model.evaluate(x_test, y_test, batch_size=self.__get_batch_size())
+            return {
+                "test_loss": results[0],
+                "test_accuracy": results[1]
+            }

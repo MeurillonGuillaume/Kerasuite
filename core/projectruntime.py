@@ -203,3 +203,7 @@ class ProjectRuntime:
             x_train=self.__x_train,
             y_train=self.__y_train
         )
+        print(self.model_manager.test_model(
+            x_test=self.__x_test,
+            y_test=self.__y_test
+        ))
