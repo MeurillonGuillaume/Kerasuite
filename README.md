@@ -4,9 +4,9 @@
 
 1. [What is Kerasuite](#what-is-kerasuite)
 2. [How does it work](#how-does-it-work)
-3. [Getting started](#getting-started)
     1. [Administrative functionalities](#administrative-functionalities)
     2. [Data projects](#data-projects)
+3. [Getting started](#getting-started)
 4. [Future features](#future-features)
 
 ## What is Kerasuite
