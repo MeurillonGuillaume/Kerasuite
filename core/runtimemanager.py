@@ -216,3 +216,4 @@ class RuntimeManager:
 
     def train_project_model(self, project_name):
         self.__runtime[session['username']][project_name].train_model()
+        self.__runtime[session['username']][project_name].test_model()

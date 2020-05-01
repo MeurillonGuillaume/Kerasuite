@@ -151,6 +151,6 @@ class ModelManager:
         if self.__layer_count > 0:
             results = self.__model.evaluate(x_test, y_test, batch_size=self.__get_batch_size())
             return {
-                "test_loss": results[0],
-                "test_accuracy": results[1]
+                "test_loss": float(results[0]),
+                "test_accuracy": float(results[1])
             }

@@ -54,6 +54,7 @@ class ProjectManager:
                 }]
             self.__dbclient.set('projects', projects)
             self.__dbclient.dump()
+            self.create_model(project_name=name)
 
     def get_all_projects(self):
         """
@@ -348,7 +349,8 @@ class ProjectManager:
                 'batch-size': 10,
                 'layers': [],
                 'timestamp': time.time(),
-                'validation-split': 0.15
+                'validation-split': 0.15,
+                'test_score': {}
             }
             # TODO: handle creating a new model + store old model in database
         self.__dbclient.set('models', models)
@@ -429,3 +431,22 @@ class ProjectManager:
             return None
         else:
             return models[session['username']][project_name]
+
+    def store_model_scoring(self, project_name, scoring):
+        """
+        Write test-results to the database
+
+        :param project_name: The project which model has been tested
+        :type project_name: str
+
+        :param scoring: A dictionary with model scoring metrics
+        :type scoring: dict
+        """
+        models = self.get_all_models()
+        # Check if models exist
+        if not models or session['username'] not in models or project_name not in models[session['username']]:
+            return 0
+
+        models[session['username']][project_name]['test_score'] = scoring
+        self.__dbclient.set('models', models)
+        return 1

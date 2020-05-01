@@ -199,11 +199,22 @@ class ProjectRuntime:
         return 0
 
     def train_model(self):
+        """
+        Attempt training the model for the current running project
+        """
         self.model_manager.train_model(
             x_train=self.__x_train,
             y_train=self.__y_train
         )
-        print(self.model_manager.test_model(
-            x_test=self.__x_test,
-            y_test=self.__y_test
-        ))
+
+    def test_model(self):
+        """
+        Attempt evaluating the model that has been trained for the current project
+        """
+        self.__project_manager.store_model_scoring(
+            self.__project_name,
+            self.model_manager.test_model(
+                x_test=self.__x_test,
+                y_test=self.__y_test
+            )
+        )

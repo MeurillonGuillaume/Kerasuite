@@ -172,31 +172,28 @@ def run():
         data = get_has_keys('project')
         if data is not None:
             project = data['project']
-            try:
-                if project_manager.does_project_exist(project):
-                    if project_manager.does_project_have_dataset(project):
-                        if not runtime_manager.is_project_running(project):
-                            runtime_manager.run_project(project)
+            if project_manager.does_project_exist(project):
+                if project_manager.does_project_have_dataset(project):
+                    if not runtime_manager.is_project_running(project):
+                        runtime_manager.run_project(project)
 
-                    runtime_manager.split_project_dataset(project)
-                    return render_template('project.html',
-                                           Projectname=project,
-                                           Projectdescription=project_manager.get_project(project)['description'],
-                                           LoggedIn=session['loggedin'],
-                                           HasDataset=project_manager.does_project_have_dataset(project),
-                                           Dataset=runtime_manager.get_data_head(project),
-                                           TrainTestSplit=project_manager.get_preprocessing(project,
-                                                                                            'train-test-split'),
-                                           RandomState=project_manager.get_preprocessing(project, 'random-state'),
-                                           ColumnNames=runtime_manager.get_column_names(project),
-                                           Normalizers=NORMALIZATION_METHODS,
-                                           DataBalance=runtime_manager.get_data_balance(project),
-                                           ModelLayers=LAYERS,
-                                           OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
-                                           ProjectModel=project_manager.load_model(project),
-                                           LayerOptions=LAYER_OPTIONS)
-            except Exception as e:
-                logging.error(f'Exception in /run?project{project}: {e}')
+                return render_template('project.html',
+                                       Projectname=project,
+                                       Projectdescription=project_manager.get_project(project)['description'],
+                                       LoggedIn=session['loggedin'],
+                                       HasDataset=project_manager.does_project_have_dataset(project),
+                                       Dataset=runtime_manager.get_data_head(project),
+                                       TrainTestSplit=project_manager.get_preprocessing(project,
+                                                                                        'train-test-split'),
+                                       RandomState=project_manager.get_preprocessing(project, 'random-state'),
+                                       ColumnNames=runtime_manager.get_column_names(project),
+                                       Normalizers=NORMALIZATION_METHODS,
+                                       DataBalance=runtime_manager.get_data_balance(project),
+                                       ModelLayers=LAYERS,
+                                       OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
+                                       ProjectModel=project_manager.load_model(project),
+                                       LayerOptions=LAYER_OPTIONS)
+
     return redirect('/login')
 
 
@@ -397,6 +394,7 @@ def train_model():
     if is_user_logged_in():
         data = get_has_keys('project')
         if data is not None:
+            runtime_manager.split_project_dataset(data['project'])
             runtime_manager.train_project_model(data['project'])
             return redirect(f'/run?project={data["project"]}')
     return redirect('/')
