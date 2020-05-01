@@ -439,7 +439,7 @@ class ProjectManager:
         else:
             return models[session['username']][project_name]
 
-    def store_model_scoring(self, project_name, scoring):
+    def store_model_scoring(self, project_name, scoring, scoring_source='test'):
         """
         Write test-results to the database
 
@@ -448,12 +448,15 @@ class ProjectManager:
 
         :param scoring: A dictionary with model scoring metrics
         :type scoring: dict
+
+        :param scoring_source: The source of scoring metrics
+        :type scoring_source: str
         """
         models = self.get_all_models()
         # Check if models exist
         if not models or session['username'] not in models or project_name not in models[session['username']]:
             return 0
 
-        models[session['username']][project_name]['test_score'] = scoring
+        models[session['username']][project_name][f'{scoring_source}_score'] = scoring
         self.__db_client.set('models', models)
         return 1

@@ -204,9 +204,13 @@ class ProjectRuntime:
         """
         Attempt training the model for the current running project
         """
-        self.model_manager.train_model(
-            x_train=self.__x_train,
-            y_train=self.__y_train
+        self.__project_manager.store_model_scoring(
+            project_name=self.__project_name,
+            scoring=self.model_manager.train_model(
+                x_train=self.__x_train,
+                y_train=self.__y_train
+            ),
+            scoring_source='train'
         )
 
     def test_model(self):
@@ -214,8 +218,8 @@ class ProjectRuntime:
         Attempt evaluating the model that has been trained for the current project
         """
         self.__project_manager.store_model_scoring(
-            self.__project_name,
-            self.model_manager.test_model(
+            project_name=self.__project_name,
+            scoring=self.model_manager.test_model(
                 x_test=self.__x_test,
                 y_test=self.__y_test
             )

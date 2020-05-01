@@ -111,6 +111,13 @@ class ModelManager:
                 else:
                     raise ValueError(f'Error building model: there is no layer type {_layer["layerType"]}')
 
+            # Compile the model
+            self.__model.compile(
+                optimizer='adam',
+                metrics=['accuracy'],
+                loss=keras.losses.MeanSquaredError()
+            )
+
     def train_model(self, x_train, y_train):
         """
         Train a model with given X_train and y_train data, epochs, batch_size and validation split
@@ -120,17 +127,14 @@ class ModelManager:
 
         :param y_train:
         :type y_train: Series
+
+        :rtype: dict
         """
         self.__build_model(input_shape=ModelManager.__get_input_shape(x_train))
-        self.__model.compile(
-            optimizer='adam',
-            metrics=['accuracy'],
-            loss=keras.losses.MeanSquaredError()
-        )
 
         hist = LossHistory()
         logging.info('Model compiled, training model now')
-        self.__model.fit(
+        model_history = self.__model.fit(
             x=x_train,
             y=y_train,
             epochs=self.__get_epochs(),
@@ -138,6 +142,11 @@ class ModelManager:
             validation_split=self.__get_validation_split(),
             callbacks=[hist, ]
         )
+
+        _metrics = model_history.history
+        return {
+            key: [float(_item) for _item in _metrics[key]] for key in _metrics.keys()
+        }
 
     def store_model(self):
         """

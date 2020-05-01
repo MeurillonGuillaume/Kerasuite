@@ -32,7 +32,12 @@ if DATABASE_NAME not in listdir('.'):
     logging.warning('The database does not exist, initialising now ...')
     database = pickledb.load('Kerasuite.db', True)
     database.set('users',
-                 {"admin": {"password": "$2b$12$9PlFNhsAFENiKcsOsqjzAOPwUJyAF6FXCUxxbBHYJAhHai9q8eeCa", "admin": True}})
+                 {
+                     "admin": {
+                         "password": "$2b$12$9PlFNhsAFENiKcsOsqjzAOPwUJyAF6FXCUxxbBHYJAhHai9q8eeCa",
+                         "admin": True
+                     }
+                 })
 
 # Load database
 logging.info('Loading database into memory ...')
