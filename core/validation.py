@@ -48,7 +48,7 @@ def get_has_keys(*args):
     Check if required keys are in a GET request and return data if so
 
     :param args:
-    :type: any
+    :type: str
 
     :rtype: dict
     """

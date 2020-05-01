@@ -1,5 +1,6 @@
 import logging
 import pandas as pd
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, RobustScaler, MinMaxScaler, MaxAbsScaler, Normalizer, \
     QuantileTransformer, PowerTransformer
 from core.modelmanager import ModelManager
@@ -23,9 +24,11 @@ class ProjectRuntime:
         self.dataset = None
         self.__project_name = project_name
         self.dataset_name = project_manager.get_project_dataset(self.__project_name)
+        self.__project_manager = project_manager
         self.__dataset_dir = dataset_dir
         self.__load_dataset()
-        self.__model = ModelManager(project_name)
+        self.model_manager = ModelManager(project_name, project_manager)
+        self.__x_train, self.__x_test, self.__y_train, self.__y_test = None, None, None, None
 
     def __load_dataset(self):
         """
@@ -172,3 +175,46 @@ class ProjectRuntime:
             for column in self.dataset.columns.to_list():
                 results[column] = self.dataset[column].value_counts().to_dict()
         return results
+
+    def train_test_split(self):
+        """
+        Split the dataset in train- and test-data
+        """
+        # Request parameters
+        _split_size = self.__project_manager.get_preprocessing(self.__project_name, 'train-test-split') / 100.0
+        _random_state = self.__project_manager.get_preprocessing(self.__project_name, 'random-state')
+        _output_cols = self.__project_manager.get_preprocessing(self.__project_name, 'output-columns')
+
+        # Check if parameters have been set
+        if _split_size is not None and _random_state is not None and _output_cols is not None:
+            # Load features
+            _x = self.dataset.drop(_output_cols, axis=1)
+            # Load targets
+            _y = self.dataset[_output_cols]
+            # Split features & according targets to train- and test-sets according to random-state and split-size
+            self.__x_train, self.__x_test, self.__y_train, self.__y_test = train_test_split(_x, _y,
+                                                                                            random_state=_random_state,
+                                                                                            train_size=_split_size)
+            return 1
+        return 0
+
+    def train_model(self):
+        """
+        Attempt training the model for the current running project
+        """
+        self.model_manager.train_model(
+            x_train=self.__x_train,
+            y_train=self.__y_train
+        )
+
+    def test_model(self):
+        """
+        Attempt evaluating the model that has been trained for the current project
+        """
+        self.__project_manager.store_model_scoring(
+            self.__project_name,
+            self.model_manager.test_model(
+                x_test=self.__x_test,
+                y_test=self.__y_test
+            )
+        )

@@ -4,17 +4,34 @@
         {% if ProjectModel is none or ProjectModel.layers|length < 1 %}
             <p>No model has been created yet, please create a model below first.</p>
         {% else %}
-            <ol>
-                {% for Layer in ProjectModel.layers | sort(attribute='order') %}
-                    <li>{{ Layer['layerType'] }} (<a
-                            href="/remove/layer?project={{ Projectname }}&layer={{ Layer['layerId'] }}"
-                            onclick="return confirm('Are you sure to remove this {{ Layer['layerType'] }} layer?')">Remove
-                        layer</a>)
-                    </li>
-                {% endfor %}
-            </ol>
+            {% for Layer in ProjectModel.layers | sort(attribute='order') %}
+                <div class="tile mb-1">
+                    <div class="tile-content">
+                        <div class="tile-title">{{ Layer['order'] + 1 }}. {{ Layer['layerType'] }} layer
+                            ({% for param in Layer['parameters'] %}
+                                <code>{{ param | lower }}</code>: {{ Layer['parameters'][param] }}
+                            {% endfor %})
+                        </div>
+                        {% if Layer['description']|length > 0 %}
+                            <small class="tile-subtitle"><b>Description:</b> {{ Layer['description'] }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="tile-action">
+                        <button class="btn btn-sm btn-primary tooltip tooltip-left"
+                                data-tooltip="Edit {{ Layer['layerType'] }} layer">
+                            <i class="icon icon-edit"></i>
+                        </button>
+                        <a class="btn btn-sm btn-error tooltip tooltip-left"
+                           data-tooltip="Remove {{ Layer['layerType'] }} layer"
+                           href="/remove/layer?project={{ Projectname }}&layer={{ Layer['layerId'] }}"
+                           onclick="return confirm('Are you sure to delete this {{ Layer["layerType"] }} layer?');">
+                            <i class="icon icon-delete"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
         {% endif %}
-        <h4>Add new layer</h4>
+        <h4>Create model layers</h4>
         <div class="form-group">
             <label class="form-label" for="model-layer">Layer type</label>
             <select class="form-select" name="new-layer" id="model-layer">
@@ -29,5 +46,6 @@
         </div>
         <input type="hidden" name="project" value="{{ Projectname }}">
         <button class="btn btn-success" id="btn-new-layer">Create layer</button>
+        <a class="btn btn-error" href="/train/model?project={{ Projectname }}">Train model</a>
     </div>
 </div>

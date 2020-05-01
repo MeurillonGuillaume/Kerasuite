@@ -9,12 +9,17 @@ from core.projectmanager import ProjectManager
 from core.runtimemanager import RuntimeManager
 from core.usermanager import UserManager
 from core.validation import is_user_logged_in, get_has_keys, post_has_keys, is_file_allowed, get_layer_params
+import absl.logging
 
 # Global variables
 DATABASE_NAME = 'Kerasuite.db'
 
 # Enable logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)  # Default logging level
+
+# Remove Tensorflow logging bug
+logging.root.removeHandler(absl.logging._absl_handler)
+absl.logging._warn_preinit_stderr = False
 
 # Create Flask app
 app = Flask(__name__)
@@ -35,6 +40,18 @@ database = pickledb.load(DATABASE_NAME, True)
 project_manager = ProjectManager(database)
 user_manager = UserManager(database)
 runtime_manager = RuntimeManager(project_manager, app.config['UPLOAD_FOLDER'])
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    """
+    Redirect home on non-existing URL
+
+    :param e: The error to handle, print in console
+    :type e: str
+    """
+    logging.error(e)
+    return redirect('/')
 
 
 @app.route('/')
@@ -155,29 +172,28 @@ def run():
         data = get_has_keys('project')
         if data is not None:
             project = data['project']
-            try:
-                if project_manager.does_project_exist(project):
-                    if project_manager.does_project_have_dataset(project):
-                        if not runtime_manager.is_project_running(project):
-                            runtime_manager.run_project(project)
-                    return render_template('project.html',
-                                           Projectname=project,
-                                           Projectdescription=project_manager.get_project(project)['description'],
-                                           LoggedIn=session['loggedin'],
-                                           HasDataset=project_manager.does_project_have_dataset(project),
-                                           Dataset=runtime_manager.get_data_head(project),
-                                           TrainTestSplit=project_manager.get_preprocessing(project,
-                                                                                            'train-test-split'),
-                                           RandomState=project_manager.get_preprocessing(project, 'random-state'),
-                                           ColumnNames=runtime_manager.get_column_names(project),
-                                           Normalizers=NORMALIZATION_METHODS,
-                                           DataBalance=runtime_manager.get_data_balance(project),
-                                           ModelLayers=LAYERS,
-                                           OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
-                                           ProjectModel=project_manager.load_model(project),
-                                           LayerOptions=LAYER_OPTIONS)
-            except Exception as e:
-                logging.error(f'Exception in /run?project{project}: {e}')
+            if project_manager.does_project_exist(project):
+                if project_manager.does_project_have_dataset(project):
+                    if not runtime_manager.is_project_running(project):
+                        runtime_manager.run_project(project)
+
+                return render_template('project.html',
+                                       Projectname=project,
+                                       Projectdescription=project_manager.get_project(project)['description'],
+                                       LoggedIn=session['loggedin'],
+                                       HasDataset=project_manager.does_project_have_dataset(project),
+                                       Dataset=runtime_manager.get_data_head(project),
+                                       TrainTestSplit=project_manager.get_preprocessing(project,
+                                                                                        'train-test-split'),
+                                       RandomState=project_manager.get_preprocessing(project, 'random-state'),
+                                       ColumnNames=runtime_manager.get_column_names(project),
+                                       Normalizers=NORMALIZATION_METHODS,
+                                       DataBalance=runtime_manager.get_data_balance(project),
+                                       ModelLayers=LAYERS,
+                                       OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
+                                       ProjectModel=project_manager.load_model(project),
+                                       LayerOptions=LAYER_OPTIONS)
+
     return redirect('/login')
 
 
@@ -349,10 +365,11 @@ def create_layer():
     Create a new layer in a model
     """
     if is_user_logged_in():
-        if post_has_keys('project', 'new-layer'):
+        if post_has_keys('project', 'new-layer', 'layer-description'):
             project_manager.add_model_layer(project_name=request.form['project'],
                                             layer_type=request.form['new-layer'],
-                                            layer_params=get_layer_params(request.form['new-layer']))
+                                            layer_params=get_layer_params(request.form['new-layer']),
+                                            description=request.form['layer-description'])
             return redirect(f'/run?project={request.form["project"]}')
     return redirect('/')
 
@@ -368,6 +385,17 @@ def remove_layer():
             project_manager.remove_model_layer(
                 project_name=data['project'],
                 layer_id=data['layer'])
+            return redirect(f'/run?project={data["project"]}')
+    return redirect('/')
+
+
+@app.route('/train/model')
+def train_model():
+    if is_user_logged_in():
+        data = get_has_keys('project')
+        if data is not None:
+            runtime_manager.split_project_dataset(data['project'])
+            runtime_manager.train_project_model(data['project'])
             return redirect(f'/run?project={data["project"]}')
     return redirect('/')
 

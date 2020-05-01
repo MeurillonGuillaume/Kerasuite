@@ -54,6 +54,7 @@ class ProjectManager:
                 }]
             self.__dbclient.set('projects', projects)
             self.__dbclient.dump()
+            self.create_model(project_name=name)
 
     def get_all_projects(self):
         """
@@ -174,7 +175,7 @@ class ProjectManager:
                     'datatype': data_type,
                     'preprocessing': {
                         'train-test-split': 70,
-                        'random_state': 0,
+                        'random-state': 0,
                         'output-columns': []
                     }
                 }
@@ -188,7 +189,7 @@ class ProjectManager:
             'dataset': name,
             'preprocessing': {
                 'train-test-split': 70,
-                'random_state': 0,
+                'random-state': 0,
                 'output-columns': []
             }
         })
@@ -279,7 +280,11 @@ class ProjectManager:
             for _project in data[session['username']]:
                 if _project['projectname'] == project:
                     logging.info(f'User {session["username"]} set {param} to {value} for {project}')
-                    _project['preprocessing'][param] = value
+                    # Attempt to store non-strings as their correct type
+                    try:
+                        _project['preprocessing'][param] = eval(value)
+                    except Exception:
+                        _project['preprocessing'][param] = value
                     self.__dbclient.set('datasets', data)
                     return 1
             return 0
@@ -344,12 +349,13 @@ class ProjectManager:
                 'batch-size': 10,
                 'layers': [],
                 'timestamp': time.time(),
-                'validation-split': 0.75
+                'validation-split': 0.15,
+                'test_score': {}
             }
             # TODO: handle creating a new model + store old model in database
         self.__dbclient.set('models', models)
 
-    def add_model_layer(self, project_name, layer_type, layer_params):
+    def add_model_layer(self, project_name, layer_type, layer_params, description):
         """
         Create a new layer in a model
 
@@ -361,6 +367,9 @@ class ProjectManager:
 
         :param layer_params: A dictionary of layer parameters
         :type layer_params: dict
+
+        :param description: Extra information about this layer
+        :type description: str
         """
         models = self.get_all_models()
 
@@ -377,7 +386,8 @@ class ProjectManager:
             'layerType': layer_type,
             'layerId': str(uuid4()),
             'order': layer_number,
-            'parameters': layer_params
+            'parameters': layer_params,
+            'description': description
         })
         self.__dbclient.set('models', models)
 
@@ -421,3 +431,22 @@ class ProjectManager:
             return None
         else:
             return models[session['username']][project_name]
+
+    def store_model_scoring(self, project_name, scoring):
+        """
+        Write test-results to the database
+
+        :param project_name: The project which model has been tested
+        :type project_name: str
+
+        :param scoring: A dictionary with model scoring metrics
+        :type scoring: dict
+        """
+        models = self.get_all_models()
+        # Check if models exist
+        if not models or session['username'] not in models or project_name not in models[session['username']]:
+            return 0
+
+        models[session['username']][project_name]['test_score'] = scoring
+        self.__dbclient.set('models', models)
+        return 1
