@@ -2,6 +2,15 @@ from tensorflow import keras
 from pandas import Series
 from tensorflow.keras.layers import Dense, Dropout
 from core.projectmanager import ProjectManager
+import logging
+
+
+class LossHistory(keras.callbacks.Callback):
+    def on_train_begin(self, logs={}):
+        self.losses = []
+
+    def on_batch_end(self, batch, logs={}):
+        self.losses.append(logs.get('loss'))
 
 
 class ModelManager:
@@ -11,7 +20,8 @@ class ModelManager:
         :param targets:
         :type targets: Series
         """
-        return targets.shape
+        logging.debug('Requesting input shape for input data')
+        return (targets.shape[1],)
 
     def __init__(self, project_name, project_manager):
         """
@@ -20,12 +30,14 @@ class ModelManager:
         self.__project_manager = project_manager
         self.__project_name = project_name
         self.__model = keras.models.Sequential()
+        self.__layer_count = 0
 
     def __get_model_params(self):
         """
         Load all stored params for a project
         :rtype: dict
         """
+        logging.debug('Requesting model parameters')
         return self.__project_manager.load_model(self.__project_name)
 
     def __get_layers(self):
@@ -40,49 +52,57 @@ class ModelManager:
         Load the amount of wanted training epochs
         :rtype: int
         """
-        return self.__get_model_params()['epochs']
+        return int(self.__get_model_params()['epochs'])
 
     def __get_batch_size(self):
         """
         Load the wanted batch-size for training
         :rtype: int
         """
-        return self.__get_model_params()['batch-size']
+        return int(self.__get_model_params()['batch-size'])
 
     def __get_validation_split(self):
         """
         Load the validation-split to use during training
         :rtype: float
         """
-        return self.__get_model_params()['validation-split']
+        _v = self.__get_model_params()['validation-split']
+        if _v >= 1:
+            _v /= 100.0
+        return float(_v)
 
     def __build_model(self, input_shape):
         """
         Generate a model based on data from the database
         """
-        _idx = 0
-        layers = self.__get_layers()
-        # Iterate over layers sorted by order
-        for _layer in sorted(layers, key=lambda x: x['order']):
-            if _layer['layerType'] == 'Dense':
-                if _idx == 0:
-                    self.__model.add(Dense(
-                        units=_layer['parameters']['Units'],
-                        activation=_layer['parameters']['Activation'].lower(),
-                        input_shape=input_shape
-                    ))
+        if self.__layer_count < 1:
+            layers = self.__get_layers()
+            # Iterate over layers sorted by order
+            for _layer in sorted(layers, key=lambda x: x['order']):
+                if _layer['layerType'] == 'Dense':
+                    if self.__layer_count == 0:
+                        logging.info('Creating initial Dense layer')
+                        self.__model.add(Dense(
+                            units=_layer['parameters']['Units'],
+                            activation=_layer['parameters']['Activation'].lower(),
+                            input_shape=input_shape
+                        ))
+                    else:
+                        logging.info('New Dense layer')
+                        self.__model.add(Dense(
+                            units=_layer['parameters']['Units'],
+                            activation=_layer['parameters']['Activation'].lower()
+                        ))
+                    self.__layer_count += 1
+                elif _layer['layerType'] == 'Dropout':
+                    _r = _layer['parameters']['Rate']
+                    if _r >= 1:
+                        _r /= 100.0
+                    logging.info('New Dropout layer')
+                    self.__model.add(Dropout(rate=_r))
+                    self.__layer_count += 1
                 else:
-                    self.__model.add(Dense(
-                        units=_layer['parameters']['Units'],
-                        activation=_layer['parameters']['Activation'].lower()
-                    ))
-            elif _layer['layerType'] == 'Dropout':
-                _r = _layer['parameters']['Rate']
-                if _r >= 1:
-                    _r /= 100.0
-                self.__model.add(Dropout(rate=_r))
-            else:
-                raise ValueError(f'Error building model: there is no layer type {_layer["layerType"]}')
+                    raise ValueError(f'Error building model: there is no layer type {_layer["layerType"]}')
 
     def train_model(self, x_train, y_train):
         """
@@ -94,7 +114,23 @@ class ModelManager:
         :param y_train:
         :type y_train: Series
         """
-        self.__build_model(input_shape=ModelManager.__get_input_shape(y_train))
+        self.__build_model(input_shape=ModelManager.__get_input_shape(x_train))
+        self.__model.compile(
+            optimizer='adam',
+            metrics=['accuracy'],
+            loss=keras.losses.MeanSquaredError()
+        )
+
+        hist = LossHistory()
+        logging.info('Model compiled, training model now')
+        self.__model.fit(
+            x=x_train,
+            y=y_train,
+            epochs=self.__get_epochs(),
+            batch_size=self.__get_batch_size(),
+            validation_split=self.__get_validation_split(),
+            callbacks=[hist, ]
+        )
 
     def store_model(self):
         """

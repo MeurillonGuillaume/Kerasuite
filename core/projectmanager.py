@@ -348,7 +348,7 @@ class ProjectManager:
                 'batch-size': 10,
                 'layers': [],
                 'timestamp': time.time(),
-                'validation-split': 0.75
+                'validation-split': 0.15
             }
             # TODO: handle creating a new model + store old model in database
         self.__dbclient.set('models', models)
