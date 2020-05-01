@@ -6,6 +6,7 @@ import logging
 
 
 class LossHistory(keras.callbacks.Callback):
+    # Todo: stream training progress data to the UI
     def on_train_begin(self, logs={}):
         self.losses = []
 
@@ -25,6 +26,12 @@ class ModelManager:
 
     def __init__(self, project_name, project_manager):
         """
+        Initialise the model manager session
+
+        :param project_name: The project that is parent of this model
+        :type project_name: str
+
+        :param project_manager: The manager which has database access
         :type project_manager: ProjectManager
         """
         self.__project_manager = project_manager
@@ -147,6 +154,14 @@ class ModelManager:
     def test_model(self, x_test, y_test):
         """
         Test how good the model scores using the X_test and y_test data, store metrics in database
+
+        :param x_test: The testing features
+        :type x_test: Series
+
+        :param y_test: The testing labels
+        :type y_test: Series
+
+        :rtype: dict
         """
         if self.__layer_count > 0:
             results = self.__model.evaluate(x_test, y_test, batch_size=self.__get_batch_size())

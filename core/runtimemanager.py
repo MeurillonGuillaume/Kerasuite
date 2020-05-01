@@ -2,10 +2,20 @@ import gc
 import logging
 from flask import session
 from core.projectruntime import ProjectRuntime
+from core.projectmanager import ProjectManager
 
 
 class RuntimeManager:
     def __init__(self, project_manager, dataset_dir):
+        """
+        Manager class to keep track of all projects in the runtime
+
+        :param project_manager: A pointer to the manager with database access
+        :type project_manager: ProjectManager
+
+        :param dataset_dir: The directory where datasets can be found
+        :type dataset_dir: str
+        """
         self.__runtime = {}
         self.__project_manager = project_manager
         self.__dataset_dir = dataset_dir
