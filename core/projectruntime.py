@@ -12,13 +12,13 @@ class ProjectRuntime:
         """
         Initialise project runtime
 
-        :param project_name:
+        :param project_name: The name of the current project which is running
         :type project_name: str
 
-        :param project_manager:
+        :param project_manager: A pointer to the manager with database access
         :type project_manager: ProjectManager
 
-        :param dataset_dir:
+        :param dataset_dir: The directory where datasets can be found
         :type dataset_dir: str
         """
         self.dataset = None
@@ -179,6 +179,8 @@ class ProjectRuntime:
     def train_test_split(self):
         """
         Split the dataset in train- and test-data
+
+        :rtype: bool
         """
         # Request parameters
         _split_size = self.__project_manager.get_preprocessing(self.__project_name, 'train-test-split') / 100.0

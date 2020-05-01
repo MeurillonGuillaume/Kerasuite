@@ -391,6 +391,9 @@ def remove_layer():
 
 @app.route('/train/model')
 def train_model():
+    """
+    Train a model for the current project
+    """
     if is_user_logged_in():
         data = get_has_keys('project')
         if data is not None:
