@@ -1,0 +1,53 @@
+<div class="columns">
+    <div class="column col-lg-12 col-6">
+        <h4>Training evaluation</h4>
+        <div>
+            <canvas id="chart-train-evaluation" style="display: block; width: 618px; height: 309px;" width="618"
+                    height="309"
+                    class="chartjs-render-monitor"></canvas>
+            <script>
+                {
+                    let chartContext = document.getElementById('chart-train-evaluation').getContext('2d');
+                    new Chart(chartContext, {
+                        "type": "bar",
+                        "data": {
+                            "labels": ["a", "b", 'c'],
+                            "datasets": [{
+                                "label": `Unique values`,
+                                "data": [1, 2, 3],
+                                "borderWidth": 1,
+                                "backgroundColor": GetRandomColors(3)
+                            }]
+                        },
+                        "options": {"scales": {"yAxes": [{"ticks": {"beginAtZero": true}}]}}
+                    });
+                }
+            </script>
+        </div>
+
+        <h4>Testing evaluation</h4>
+        <div>
+            <canvas id="chart-test-evaluation" style="display: block; width: 618px; height: 309px;" width="618"
+                    height="309"
+                    class="chartjs-render-monitor"></canvas>
+            <script>
+                {
+                    let chartContext = document.getElementById('chart-test-evaluation').getContext('2d');
+                    new Chart(chartContext, {
+                        "type": "bar",
+                        "data": {
+                            "labels": ["a", "b", 'c'],
+                            "datasets": [{
+                                "label": `Unique values`,
+                                "data": [1, 2, 3],
+                                "borderWidth": 1,
+                                "backgroundColor": GetRandomColors(3)
+                            }]
+                        },
+                        "options": {"scales": {"yAxes": [{"ticks": {"beginAtZero": true}}]}}
+                    });
+                }
+            </script>
+        </div>
+    </div>
+</div>
