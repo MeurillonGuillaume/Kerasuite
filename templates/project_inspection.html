@@ -11,7 +11,7 @@
                 <div class="form-group">
                     <label class="form-label" for="column_select">Select a column to visualize</label>
                     <select class="form-select" id="columns_select">
-                        {% for Column in DataBalance %}
+                        {% for Column in DataBalance|sort %}
                             <option value="{{ Column }}">{{ Column }}</option>
                         {% endfor %}
                     </select>

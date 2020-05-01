@@ -5,7 +5,7 @@ const Get8bitValue = () => {
     return Math.floor((Math.random() * 255) + 1)
 }
 
-const GetRandomColor = (opacity = 0.75) => {
+const GetRandomColor = (opacity = 0.50) => {
     /**
      * Request a random RGBA color-String
      * @param {number} opacity: The opacity of the color
