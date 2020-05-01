@@ -3,6 +3,7 @@ from pandas import Series
 from tensorflow.keras.layers import Dense, Dropout
 from core.projectmanager import ProjectManager
 import logging
+from sklearn.metrics import classification_report
 
 
 class LossHistory(keras.callbacks.Callback):
@@ -173,8 +174,10 @@ class ModelManager:
         :rtype: dict
         """
         if self.__layer_count > 0:
+            y_pred = self.__model.predict_classes(x_test)
             results = self.__model.evaluate(x_test, y_test, batch_size=self.__get_batch_size())
             return {
                 "test_loss": float(results[0]),
-                "test_accuracy": float(results[1])
+                "test_accuracy": float(results[1]),
+                "classification_report": classification_report(y_true=y_test, y_pred=y_pred, output_dict=True)
             }
