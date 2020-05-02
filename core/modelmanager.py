@@ -146,7 +146,7 @@ class ModelManager:
 
         _metrics = model_history.history
         return {
-            key: [float(_item) for _item in _metrics[key]] for key in _metrics.keys()
+            key: [round(float(_item) * 100.0, 2) for _item in _metrics[key]] for key in _metrics.keys()
         }
 
     def store_model(self):
@@ -178,8 +178,8 @@ class ModelManager:
             results = self.__model.evaluate(x_test, y_test, batch_size=self.__get_batch_size())
             print(type(y_test))
             return {
-                "test_loss": float(results[0]),
-                "test_accuracy": float(results[1]),
+                "test_loss": round(float(results[0]) * 100.0, 2),
+                "test_accuracy": round(float(results[1]) * 100.0, 2),
                 "classification_report": classification_report(
                     y_true=y_test,
                     y_pred=y_pred,

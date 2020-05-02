@@ -1,6 +1,6 @@
 <div class="columns">
     <div class="column col-lg-12">
-        <div class="accordion m-2">
+        <div class="accordion m-2 col-8 col-lg-12">
             <input id="evaluation-train" type="radio" name="accordion-preprocessing" hidden="">
             <label class="accordion-header c-hand" for="evaluation-train">
                 <h4>
@@ -41,7 +41,20 @@
                                         "labels": labels,
                                         "datasets": data
                                     },
-                                    "options": {"scales": {"yAxes": [{"ticks": {"beginAtZero": true}}]}}
+                                    "options": {
+                                        "title": {
+                                            "display": true,
+                                            "text": "Training evaluation metrics"
+                                        },
+                                        "scales": {
+                                            "yAxes": [{
+                                                "ticks": {
+                                                    "beginAtZero": true,
+                                                    "suggestedMax": 100
+                                                }
+                                            }]
+                                        }
+                                    }
                                 });
                             }
                         </script>
@@ -61,10 +74,12 @@
             </label>
             <div class="accordion-body">
                 {% if TestScoring %}
-                    <p>For more information on the meaning of scoring-metrics for individual classes, see <a
-                            target="_blank"
-                            href="https://www.scikit-yb.org/en/latest/api/classifier/classification_report.html#classification-report">Yellowbrick
-                        docs.</a>
+                    <p>Below are the results that were achieved using the model that has been built and trained. The
+                        model has been trained on {{ TrainTestSplit }}% of the submitted data,
+                        so {{ 100 - TrainTestSplit }}% of the data was used for this evaluation. For more information on
+                        the meaning of scoring-metrics for individual classes, see <a target="_blank"
+                                                                                      href="https://www.scikit-yb.org/en/latest/api/classifier/classification_report.html#classification-report">Yellowbrick
+                            docs.</a>
                     </p>
                     <div class="filter">
                         <input type="radio" id="tag-0" class="filter-tag" name="filter-radio" hidden checked>
@@ -74,11 +89,11 @@
                         <div class="filter-nav">
                             <label class="chip" for="tag-0">All evaluations</label>
                             <label class="chip" for="tag-1">General evaluation</label>
-                            <label class="chip" for="tag-2">Individual evaluation</label>
+                            <label class="chip" for="tag-2">Per-class evaluation</label>
                         </div>
 
                         <div class="filter-body columns">
-                            <div class="column col-md-12 col-4 mb-1 filter-item" data-tag="tag-1">
+                            <div class="column col-md-12 col-4 filter-item" data-tag="tag-1">
                                 <div class="card mb-1">
                                     <div class="card-header bg-secondary">
                                         <div class="card-title h5">General test-set scoring</div>
@@ -92,9 +107,9 @@
                                                 <b>Test-set accuracy</b> <i>(Higher &equals; better)</i>
                                             </label>
                                             <meter id="test-acc" class="meter tooltip"
-                                                   value="{{ (TestScoring['test_accuracy'] * 100) | round(2) }}"
+                                                   value="{{ TestScoring['test_accuracy'] | round(2) }}"
                                                    optimum="100" min="0" max="100" low="50" high="80"
-                                                   data-tooltip="Test-set accuracy: {{ (TestScoring['test_accuracy'] * 100) | round(3) }}%"></meter>
+                                                   data-tooltip="Test-set accuracy: {{ TestScoring['test_accuracy'] | round(2) }}%"></meter>
                                         </div>
 
                                         <div class="form-group">
@@ -102,16 +117,16 @@
                                                 &equals;
                                                 better)</i></label>
                                             <meter id="test-acc" class="meter tooltip"
-                                                   value="{{ (TestScoring['test_loss']* 100) | round(2) }}"
+                                                   value="{{ TestScoring['test_loss'] | round(2) }}"
                                                    optimum="0" min="0" max="100" low="35" high="60"
-                                                   data-tooltip="Test-set loss: {{ (TestScoring['test_loss']* 100) | round(3) }}%"></meter>
+                                                   data-tooltip="Test-set loss: {{ TestScoring['test_loss']| round(2) }}%"></meter>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             {% for cr in TestScoring['classification_report'] %}
                                 {% if cr not in ["accuracy", "macro avg", "weighted avg"] %}
-                                    <div class="column col-md-12 col-4 mb-1 filter-item" data-tag="tag-2">
+                                    <div class="column col-md-12 col-4 filter-item" data-tag="tag-2">
                                         <div class="card mb-1">
                                             <div class="card-header bg-secondary">
                                                 <div class="card-title h5">Scoring for class {{ cr }}</div>
