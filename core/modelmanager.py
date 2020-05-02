@@ -1,8 +1,9 @@
 from tensorflow import keras
-from pandas import Series
+from pandas import DataFrame
 from tensorflow.keras.layers import Dense, Dropout
 from core.projectmanager import ProjectManager
 import logging
+from sklearn.metrics import classification_report
 
 
 class LossHistory(keras.callbacks.Callback):
@@ -111,6 +112,13 @@ class ModelManager:
                 else:
                     raise ValueError(f'Error building model: there is no layer type {_layer["layerType"]}')
 
+            # Compile the model
+            self.__model.compile(
+                optimizer='adam',
+                metrics=['accuracy'],
+                loss=keras.losses.MeanSquaredError()
+            )
+
     def train_model(self, x_train, y_train):
         """
         Train a model with given X_train and y_train data, epochs, batch_size and validation split
@@ -120,17 +128,14 @@ class ModelManager:
 
         :param y_train:
         :type y_train: Series
+
+        :rtype: dict
         """
         self.__build_model(input_shape=ModelManager.__get_input_shape(x_train))
-        self.__model.compile(
-            optimizer='adam',
-            metrics=['accuracy'],
-            loss=keras.losses.MeanSquaredError()
-        )
 
         hist = LossHistory()
         logging.info('Model compiled, training model now')
-        self.__model.fit(
+        model_history = self.__model.fit(
             x=x_train,
             y=y_train,
             epochs=self.__get_epochs(),
@@ -138,6 +143,11 @@ class ModelManager:
             validation_split=self.__get_validation_split(),
             callbacks=[hist, ]
         )
+
+        _metrics = model_history.history
+        return {
+            key: [float(_item) for _item in _metrics[key]] for key in _metrics.keys()
+        }
 
     def store_model(self):
         """
@@ -156,16 +166,23 @@ class ModelManager:
         Test how good the model scores using the X_test and y_test data, store metrics in database
 
         :param x_test: The testing features
-        :type x_test: Series
+        :type x_test: DataFrame
 
         :param y_test: The testing labels
-        :type y_test: Series
+        :type y_test: DataFrame
 
         :rtype: dict
         """
         if self.__layer_count > 0:
+            y_pred = self.__model.predict_classes(x_test)
             results = self.__model.evaluate(x_test, y_test, batch_size=self.__get_batch_size())
+            print(type(y_test))
             return {
                 "test_loss": float(results[0]),
-                "test_accuracy": float(results[1])
+                "test_accuracy": float(results[1]),
+                "classification_report": classification_report(
+                    y_true=y_test,
+                    y_pred=y_pred,
+                    output_dict=True
+                )
             }

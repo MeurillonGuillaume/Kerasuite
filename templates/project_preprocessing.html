@@ -14,7 +14,7 @@
                     <label for="column">Column to drop</label>
                     <select class="form-select" name="column" id="column">
                         {% if ColumnNames %}
-                            {% for Column in ColumnNames %}
+                            {% for Column in ColumnNames|sort %}
                                 <option value="{{ Column }}">{{ Column }}</option>
                             {% endfor %}
                         {% else %}
@@ -45,7 +45,7 @@
                     <label for="column">Column to rename</label>
                     <select class="form-select" name="col_name_old" id="column">
                         {% if ColumnNames %}
-                            {% for Column in ColumnNames %}
+                            {% for Column in ColumnNames|sort %}
                                 <option value="{{ Column }}">{{ Column }}</option>
                             {% endfor %}
                         {% else %}
@@ -81,7 +81,7 @@
                     <label for="column">Replace values in column</label>
                     <select class="form-select" name="column" id="column">
                         {% if ColumnNames %}
-                            {% for Column in ColumnNames %}
+                            {% for Column in ColumnNames|sort %}
                                 <option value="{{ Column }}">{{ Column }}</option>
                             {% endfor %}
                         {% else %}
@@ -123,7 +123,7 @@
                     <label class="form-label" for="select-column">Columns to normalize</label>
                     <select class="form-select" name="columns[]" id="select-column" multiple required>
                         {% if ColumnNames %}
-                            {% for Column in ColumnNames %}
+                            {% for Column in ColumnNames|sort %}
                                 <option value="{{ Column }}">{{ Column }}</option>
                             {% endfor %}
                         {% else %}
@@ -135,9 +135,9 @@
                     <label class="form-label" for="normalisation-method">Normalise data with method</label>
                     <select class="form-select" name="normalisation-method" id="normalisation-method" required>
                         {% if Normalizers %}
-                            {% for NormType in Normalizers %}
+                            {% for NormType in Normalizers|sort %}
                                 <optgroup label="{{ NormType }}">
-                                    {% for Normalizer in Normalizers[NormType] %}
+                                    {% for Normalizer in Normalizers[NormType]|sort %}
                                         <option value="{{ Normalizer }}">{{ Normalizer }}</option>
                                     {% endfor %}
                                 </optgroup>
@@ -186,7 +186,7 @@
                     <label class="form-label" for="column-output">Select output column(s)</label>
                     <select class="form-select" name="column-output[]" id="column-output" multiple required>
                         {% if ColumnNames %}
-                            {% for Column in ColumnNames %}
+                            {% for Column in ColumnNames|sort %}
                                 {% if OutputColumns is not none %}
                                     <option value="{{ Column }}"
                                             {% if Column in OutputColumns %}selected{% endif %}>{{ Column }}</option>

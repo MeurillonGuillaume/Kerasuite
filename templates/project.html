@@ -104,6 +104,25 @@
             </ul>
         </div>
     </div>
+    <div class="accordion m-2">
+        <input id="accordion-evaluation" type="radio" name="accordion-radio" hidden="">
+        <label class="accordion-header c-hand" for="accordion-evaluation">
+            <h3>
+                <i class="icon icon-arrow-right mr-1"></i>4 Model evaluation
+            </h3>
+        </label>
+        <div class="accordion-body">
+            <ul class="menu menu-nav">
+                <li class="menu-item">
+                    {% if HasDataset %}
+                        {% include 'project_modelevaluation.html' %}
+                    {% else %}
+                        <p>Please upload a dataset before proceeding.</p>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
     {% include 'modal_editproject.html' %}
     {% include 'modal_project_layer_params.html' %}
 {% endblock %}
