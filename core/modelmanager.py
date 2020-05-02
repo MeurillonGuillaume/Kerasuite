@@ -1,5 +1,5 @@
 from tensorflow import keras
-from pandas import Series
+from pandas import DataFrame
 from tensorflow.keras.layers import Dense, Dropout
 from core.projectmanager import ProjectManager
 import logging
@@ -166,18 +166,23 @@ class ModelManager:
         Test how good the model scores using the X_test and y_test data, store metrics in database
 
         :param x_test: The testing features
-        :type x_test: Series
+        :type x_test: DataFrame
 
         :param y_test: The testing labels
-        :type y_test: Series
+        :type y_test: DataFrame
 
         :rtype: dict
         """
         if self.__layer_count > 0:
             y_pred = self.__model.predict_classes(x_test)
             results = self.__model.evaluate(x_test, y_test, batch_size=self.__get_batch_size())
+            print(type(y_test))
             return {
                 "test_loss": float(results[0]),
                 "test_accuracy": float(results[1]),
-                "classification_report": classification_report(y_true=y_test, y_pred=y_pred, output_dict=True)
+                "classification_report": classification_report(
+                    y_true=y_test,
+                    y_pred=y_pred,
+                    output_dict=True
+                )
             }
