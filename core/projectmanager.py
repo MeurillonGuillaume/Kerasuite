@@ -65,6 +65,7 @@ class ProjectManager:
             self.__db_client.set('projects', projects)
             self.__db_client.dump()
             self.create_model(project_name=name)
+            logging.info(f"Created project {name} for user {session['username']}")
 
     def get_all_projects(self):
         """
@@ -293,7 +294,9 @@ class ProjectManager:
                     # Attempt to store non-strings as their correct type
                     try:
                         _project['preprocessing'][param] = eval(value)
-                    except Exception:
+                    except Exception as e:
+                        logging.warning(
+                            f"Could not store preprocessing parameter as evaluated datatype, defaulting to String: {e}")
                         _project['preprocessing'][param] = value
                     self.__db_client.set('datasets', data)
                     return 1
