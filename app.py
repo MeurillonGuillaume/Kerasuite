@@ -65,6 +65,7 @@ def home():
     Serve the homepage or redirect to the login page
     """
     if is_user_logged_in():
+        logging.debug(f'Loading home for user {session["username"]}')
         return render_template('home.html',
                                LoggedIn=session['loggedin'],
                                Projects=project_manager.get_user_projects(),
@@ -83,8 +84,10 @@ def login():
                 session['loggedin'] = True
                 session['username'] = request.form['username']
                 if session['username'] == 'admin' and user_manager.admin_has_default_pass():
+                    logging.info(f'Admin manager still uses default password, prompting for change')
                     return redirect('/change/password?user=admin')
                 return redirect('/')
+        logging.warning(f'Could not authenticate user {request.form["username"]}, wrong log-in information')
         return render_template('login.html')
     return redirect('/')
 
@@ -97,6 +100,7 @@ def change_password():
     if is_user_logged_in():
         data = get_has_keys('user')
         if data is not None and data['user'] == session['username']:
+            logging.info(f"Prompting user {data['user']} to change password")
             return render_template('change_password.html', Username=data['user'])
         if post_has_keys('old_password', 'new_password', 'new_password_repeat'):
             old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
@@ -113,6 +117,7 @@ def logout():
     """
     if is_user_logged_in():
         session['loggedin'] = False
+        logging.debug(f'User {session["username"]} logging out')
     return redirect('/')
 
 
@@ -149,6 +154,7 @@ def drop_project():
     if is_user_logged_in():
         data = get_has_keys('project')
         if data is not None:
+            logging.info(f'User {session["username"]} dropped project {data["project"]}')
             project_manager.drop_project(data['project'])
             return redirect('/')
     return redirect('/login')
@@ -181,7 +187,7 @@ def run():
                 if project_manager.does_project_have_dataset(project):
                     if not runtime_manager.is_project_running(project):
                         runtime_manager.run_project(project)
-
+                logging.info(f'Loading project {data["project"]} for user {session["username"]}')
                 return render_template('project.html',
                                        Projectname=project,
                                        Projectdescription=project_manager.get_project(project)['description'],
@@ -211,11 +217,15 @@ def run():
 
 @app.route('/quit')
 def quit_project():
+    """
+    Remove a project from the runtime session
+    """
     if is_user_logged_in():
         data = get_has_keys('project')
         if data is not None:
             if project_manager.does_project_exist(data['project']):
                 runtime_manager.stop_project(data['project'])
+                logging.info(f"Shutdown project {data['project']} for user {session['username']}")
                 return redirect('/')
     return redirect('/login')
 
@@ -235,6 +245,7 @@ def set_dataset():
                     dataset.save(f'{app.config["UPLOAD_FOLDER"]}/{new_filename}.{file_ext}')
                     project_manager.assign_dataset(new_filename, file_ext,
                                                    request.form['projectname'])
+                    logging.info(f'Project {request.form["projectname"]} received a new dataset')
                     return redirect(f'/run?project={request.form["projectname"]}')
     return redirect('/login')
 
