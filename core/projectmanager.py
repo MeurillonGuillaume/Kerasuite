@@ -487,5 +487,8 @@ class ProjectManager:
             return None
 
         if scoring_source in [self.SCORING_TEST, self.SCORING_TRAIN]:
-            return models[session['username']][project_name][f'{scoring_source}_score']
-        return None
+            try:
+                return models[session['username']][project_name][f'{scoring_source}_score']
+            except Exception as e:
+                logging.error(f'Could not load model scoring: {e}')
+                return None

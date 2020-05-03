@@ -83,11 +83,12 @@ def login():
             if user_manager.attempt_login(request.form['username'], request.form['password']):
                 session['loggedin'] = True
                 session['username'] = request.form['username']
+
                 if session['username'] == 'admin' and user_manager.admin_has_default_pass():
                     logging.info(f'Admin manager still uses default password, prompting for change')
                     return redirect('/change/password?user=admin')
+
                 return redirect('/')
-        logging.warning(f'Could not authenticate user {request.form["username"]}, wrong log-in information')
         return render_template('login.html')
     return redirect('/')
 

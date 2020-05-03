@@ -225,5 +225,12 @@ class RuntimeManager:
         self.__runtime[session['username']][project_name].train_test_split()
 
     def train_project_model(self, project_name):
+        """
+        Train the model
+
+        :param project_name: The project to train a model for
+        :type project_name: str
+        """
+        self.split_project_dataset(project_name=project_name)
         self.__runtime[session['username']][project_name].train_model()
         self.__runtime[session['username']][project_name].test_model()
