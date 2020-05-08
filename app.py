@@ -83,11 +83,12 @@ def login():
             if user_manager.attempt_login(request.form['username'], request.form['password']):
                 session['loggedin'] = True
                 session['username'] = request.form['username']
+
                 if session['username'] == 'admin' and user_manager.admin_has_default_pass():
                     logging.info(f'Admin manager still uses default password, prompting for change')
                     return redirect('/change/password?user=admin')
+
                 return redirect('/')
-        logging.warning(f'Could not authenticate user {request.form["username"]}, wrong log-in information')
         return render_template('login.html')
     return redirect('/')
 
@@ -181,6 +182,7 @@ def run():
     """
     if is_user_logged_in():
         data = get_has_keys('project')
+        err = get_has_keys('error')
         if data is not None:
             project = data['project']
             if project_manager.does_project_exist(project):
@@ -188,6 +190,7 @@ def run():
                     if not runtime_manager.is_project_running(project):
                         runtime_manager.run_project(project)
                 logging.info(f'Loading project {data["project"]} for user {session["username"]}')
+
                 return render_template('project.html',
                                        Projectname=project,
                                        Projectdescription=project_manager.get_project(project)['description'],
@@ -209,8 +212,8 @@ def run():
                                            scoring_source=project_manager.SCORING_TRAIN),
                                        TestScoring=project_manager.load_model_scoring(
                                            project_name=project,
-                                           scoring_source=project_manager.SCORING_TEST)
-                                       )
+                                           scoring_source=project_manager.SCORING_TEST),
+                                       Error=err['error'])
 
     return redirect('/login')
 
@@ -420,9 +423,17 @@ def train_model():
     if is_user_logged_in():
         data = get_has_keys('project')
         if data is not None:
-            runtime_manager.split_project_dataset(data['project'])
-            runtime_manager.train_project_model(data['project'])
-            return redirect(f'/run?project={data["project"]}')
+            try:
+                runtime_manager.split_project_dataset(data['project'])
+                runtime_manager.train_project_model(data['project'])
+                return redirect(f'/run?project={data["project"]}')
+            except Exception as e:
+                logging.error(f'Failed to train project {data["project"]}: {e}')
+
+                # Check where the error happened
+                err = project_manager.validate_training_settings(data['project'])
+                if err is not None:
+                    return redirect(f'/run?project={data["project"]}&error={err}')
     return redirect('/')
 
 

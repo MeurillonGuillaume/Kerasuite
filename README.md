@@ -46,6 +46,12 @@ Properly preprocessed datasets can be used as training input for neural networks
     ```shell script
     python3 app.py
     ```
+4. By default, Kerasuite comes with an administrative user-account that can be used to create, modify and delete other users. To access this account, use:
+    ```text
+   Name: admin
+   Password: Kerasuite
+   ```
+   **Please change this password ASAP, you will be prompted to do so on each log-in with the default password**. After creating a second administrative user, you have the ability to remove this default `admin` account entirely. Doing so is best-practise.
 
 ## Future features
 

@@ -10,6 +10,17 @@ from flask import session
 class ProjectManager:
     SCORING_TEST = 'test'
     SCORING_TRAIN = 'train'
+    __PREPROCESSING_OPTIONS = {
+        'train-test-split': str,
+        'random-state': int,
+        'output-columns': list
+    }
+    __MODEL_OPTIONS = {
+        'epochs': int,
+        'batch-size': int,
+        'layers': list,
+        'validation-split': float
+    }
 
     def __init__(self, db_instance):
         """
@@ -486,6 +497,63 @@ class ProjectManager:
         if not models or session['username'] not in models or project_name not in models[session['username']]:
             return None
 
-        if scoring_source in [self.SCORING_TEST, self.SCORING_TRAIN]:
-            return models[session['username']][project_name][f'{scoring_source}_score']
-        return None
+        if scoring_source in [ProjectManager.SCORING_TEST, ProjectManager.SCORING_TRAIN]:
+            try:
+                return models[session['username']][project_name][f'{scoring_source}_score']
+            except Exception as e:
+                logging.error(f'Could not load model scoring: {e}')
+                return None
+
+    def validate_preprocessing(self, project_name):
+        """
+        Check if all preprocessing parameters are set in order to train a model
+
+        :param project_name: The project to check preprocessing parameters for
+        :type project_name: str
+
+        :returns: A list of wrong/missing parameters or None
+        :rtype: None or list
+        """
+        _result = None
+        for _param_name, _param_type in ProjectManager.__PREPROCESSING_OPTIONS.items():
+            if not isinstance(self.get_preprocessing(project_name=project_name, param_name=_param_name), _param_type):
+                if _result is None:
+                    _result = []
+                _result.append(_param_name)
+        return _result
+
+    def validate_model_params(self, project_name):
+        """
+        Check if all model parameters are set in order to train a model
+
+        :param project_name: The project to check model parameters for
+        :type project_name: str
+
+        :returns: A list of wrong/missing parameters or None
+        :rtype: None or list
+        """
+        model, _result = self.load_model(project_name), None
+        for _param_name, _param_type in ProjectManager.__MODEL_OPTIONS.items():
+            if _param_name not in model.keys() or not isinstance(model[_param_name], _param_type):
+                if _result is None:
+                    _result = []
+                _result.append(_param_name)
+        return _result
+
+    def validate_training_settings(self, project_name):
+        """
+        Validate parameters that have not been set
+
+        :param project_name: The project to check parameters for
+        :type project_name: str
+
+        :returns: A list of wrong/missing parameters or None
+        :rtype: None or list
+        """
+        _result = None
+        for _tmp in [self.validate_preprocessing(project_name), self.validate_model_params(project_name)]:
+            if _tmp is not None:
+                if _result is None:
+                    _result = []
+                _result += _tmp
+        return _result
