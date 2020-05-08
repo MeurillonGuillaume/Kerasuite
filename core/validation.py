@@ -61,7 +61,10 @@ def get_has_keys(*args):
                 _isvalid.append(1)
             else:
                 _isvalid.append(0)
-            _res[_item] = str(request.args.get(_item))
+            try:
+                _res[_item] = eval(request.args.get(_item))
+            except:
+                _res[_item] = str(request.args.get(_item))
         if all(_isvalid):
             return _res
     return

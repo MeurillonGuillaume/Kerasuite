@@ -182,6 +182,7 @@ def run():
     """
     if is_user_logged_in():
         data = get_has_keys('project')
+        err = get_has_keys('error')
         if data is not None:
             project = data['project']
             if project_manager.does_project_exist(project):
@@ -189,9 +190,6 @@ def run():
                     if not runtime_manager.is_project_running(project):
                         runtime_manager.run_project(project)
                 logging.info(f'Loading project {data["project"]} for user {session["username"]}')
-
-                # Check if any errors were passed through
-                err = None
 
                 return render_template('project.html',
                                        Projectname=project,
@@ -215,8 +213,7 @@ def run():
                                        TestScoring=project_manager.load_model_scoring(
                                            project_name=project,
                                            scoring_source=project_manager.SCORING_TEST),
-                                       Error=err
-                                       )
+                                       Error=err['error'])
 
     return redirect('/login')
 
