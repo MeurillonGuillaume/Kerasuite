@@ -1,9 +1,9 @@
 import logging
 from os import urandom, listdir, path
 from uuid import uuid4
-import pickledb
 from flask import Flask, render_template, redirect, request, session
 from werkzeug.utils import secure_filename
+from core.database import Database
 from core.modelcomponents import LAYERS, NORMALIZATION_METHODS, LAYER_OPTIONS
 from core.projectmanager import ProjectManager
 from core.runtimemanager import RuntimeManager
@@ -30,7 +30,7 @@ app.config['UPLOAD_FOLDER'] = path.join(path.dirname(path.realpath(__file__)), '
 if DATABASE_NAME not in listdir('.'):
     # Initialise the database with a default user & password (admin - Kerasuite)
     logging.warning('The database does not exist, initialising now ...')
-    database = pickledb.load('Kerasuite.db', True)
+    database = Database(DATABASE_NAME)
     database.set('users',
                  {
                      "admin": {
@@ -41,7 +41,7 @@ if DATABASE_NAME not in listdir('.'):
 
 # Load database
 logging.info('Loading database into memory ...')
-database = pickledb.load(DATABASE_NAME, True)
+database = Database(DATABASE_NAME)
 project_manager = ProjectManager(database)
 user_manager = UserManager(database)
 runtime_manager = RuntimeManager(project_manager, app.config['UPLOAD_FOLDER'])
