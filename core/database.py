@@ -1,3 +1,4 @@
+import pickledb
 from pickledb import PickleDB
 import logging
 
@@ -18,19 +19,15 @@ class Database(PickleDB):
         :param sig: Wether or not to enable the Sigterm handler
         :type sig: bool
         """
-        super(Database, self).__init__(
+        self.__main = pickledb.load(location=location, auto_dump=False, sig=sig)
+
+        self.__db_duplicate = super(Database, self).__init__(
             location=location,
             auto_dump=False,
             sig=sig
         )
 
-        self.__db_duplicate = super(Database, self).__init__(
-            location=location,
-            auto_dump=True,
-            sig=sig
-        )
-
-    def __set_duplicate(self, key, value):
+    def __dump_to_disk(self, key, value):
         """
         Persist values to the database duplicate
 
@@ -39,12 +36,7 @@ class Database(PickleDB):
 
         :param value: The value to set for the given key
         """
-        self.__db_duplicate.set(
-            key=key,
-            value=value
-        )
-        # Write to disk
-        self.__db_duplicate.dump()
+        self.__main.dump()
 
     def set(self, key, value):
         """
@@ -56,11 +48,8 @@ class Database(PickleDB):
         :param value: The value to set for the given key
         """
         try:
-            if super(Database, self).set(key=key, value=value):
-                self.__set_duplicate(
-                    key=key,
-                    value=value
-                )
+            if self.__main.set(key=key, value=value):
+                self.__main.dump()
                 return True
         except Exception as e:
             logging.error(f'There was an error setting ({key}:{value}) to the database: {e}')
