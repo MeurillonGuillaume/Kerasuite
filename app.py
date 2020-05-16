@@ -8,7 +8,7 @@ from core.modelcomponents import LAYERS, NORMALIZATION_METHODS, LAYER_OPTIONS
 from core.projectmanager import ProjectManager
 from core.runtimemanager import RuntimeManager
 from core.usermanager import UserManager
-from core.validation import is_user_logged_in, get_has_keys, post_has_keys, is_file_allowed, get_layer_params
+from core.validation import is_user_logged_in, get_has_keys, post_has_keys, is_file_allowed, get_layer_params, LoginForm
 import absl.logging
 
 # Global variables
@@ -79,12 +79,14 @@ def login():
     Serve the login page or redirect to home
     """
     if not is_user_logged_in():
-        if post_has_keys('password', 'username'):
-            if user_manager.attempt_login(request.form['username'], request.form['password']):
-                session['loggedin'] = True
-                session['username'] = request.form['username']
+        post_data = LoginForm(request.form)
+        if request.method == 'POST' and post_data.validate():
 
-                if session['username'] == 'admin' and user_manager.admin_has_default_pass():
+            if user_manager.attempt_login(post_data.username.data, post_data.password.data):
+                session['loggedin'] = True
+                session['username'] = post_data.username.data
+
+                if post_data.username.data == 'admin' and user_manager.admin_has_default_pass():
                     logging.info(f'Admin manager still uses default password, prompting for change')
                     return redirect('/change/password?user=admin')
 

@@ -160,7 +160,7 @@ class ProjectManager:
         :rtype: bool
         """
         p = self.get_project(project_name)
-        if p is not 0:
+        if p != 0:
             return 1
         return 0
 

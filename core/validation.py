@@ -1,6 +1,8 @@
 import logging
 from flask import session, request
 from core.modelcomponents import LAYER_OPTIONS
+from flask_wtf import FlaskForm
+from wtforms import Form, StringField, PasswordField, validators
 
 # Globals
 ALLOWED_FILETYPES = ['csv', 'json']
@@ -35,7 +37,7 @@ def is_file_allowed(filename):
 def post_has_keys(*args):
     """
     Check if a POST request contains all required keys
-    :type args: str
+    :type args: dict
     :rtype: bool
     """
     if request.method == 'POST':
@@ -87,3 +89,14 @@ def get_layer_params(layer_type):
         except Exception:
             _res[_o] = request.form[_o]
     return _res
+
+
+class LoginForm(Form):
+    username = StringField('username', [
+        validators.Length(min=3),
+        validators.DataRequired()
+    ])
+    password = PasswordField('password', [
+        validators.Length(min=8),
+        validators.DataRequired()
+    ])
