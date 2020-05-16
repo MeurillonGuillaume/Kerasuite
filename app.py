@@ -8,7 +8,7 @@ from core.modelcomponents import LAYERS, NORMALIZATION_METHODS, LAYER_OPTIONS
 from core.projectmanager import ProjectManager
 from core.runtimemanager import RuntimeManager
 from core.usermanager import UserManager
-from core.validation import is_user_logged_in, get_has_keys, post_has_keys, is_file_allowed, get_layer_params, LoginForm
+from core.validation import *
 import absl.logging
 
 # Global variables
@@ -91,6 +91,9 @@ def login():
                     return redirect('/change/password?user=admin')
 
                 return redirect('/')
+        else:
+            # TODO: proper error handling
+            print(post_data.errors)
         return render_template('login.html')
     return redirect('/')
 
@@ -101,16 +104,25 @@ def change_password():
     Change a users password
     """
     if is_user_logged_in():
+        if request.method == 'POST':
+            form = PasswordUpdateForm(request.form)
+            if form.validate():
+                user_manager.change_password(
+                    old=form.old_password.data,
+                    new=form.new_password.data,
+                    new_repeat=form.new_password_validate.data
+                )
+                return redirect('/logout')
+            else:
+                # TODO: proper error handling
+                print(form.errors)
+    else:
         data = get_has_keys('user')
         if data is not None and data['user'] == session['username']:
             logging.info(f"Prompting user {data['user']} to change password")
             return render_template('change_password.html', Username=data['user'])
-        if post_has_keys('old_password', 'new_password', 'new_password_repeat'):
-            old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
-                'new_password_repeat']
-            user_manager.change_password(old, new, new_repeat)
-            return redirect('/logout')
-    return redirect('/login')
+
+    return redirect('/change/password')
 
 
 @app.route('/logout')
