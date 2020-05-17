@@ -122,3 +122,39 @@ class PasswordUpdateForm(Form):
         validators.EqualTo('new_password', message='New password must match password repeat'),
         validators.DataRequired(message='Repeating the password is required')
     ])
+
+
+class EditProjectForm(Form):
+    ...
+
+
+class NewProjectForm(Form):
+    ...
+
+
+class NewLayerForm(Form):
+    ...
+
+
+class SetProjectDataset(Form):
+    ...
+
+
+class DropColumnForm(Form):
+    ...
+
+
+class SetColumnNameForm(Form):
+    ...
+
+
+class ReplaceValueForm(Form):
+    ...
+
+
+class PreprocessingForm(Form):
+    ...
+
+
+class DatasetSplitForm(Form):
+    ...
