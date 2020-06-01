@@ -2,7 +2,7 @@ import logging
 from flask import session, request
 from core.modelcomponents import LAYER_OPTIONS
 from flask_wtf import FlaskForm
-from wtforms import Form, StringField, PasswordField, validators
+from wtforms import Form, StringField, PasswordField, validators, HiddenField
 
 # Globals
 ALLOWED_FILETYPES = ['csv', 'json']
@@ -92,69 +92,44 @@ def get_layer_params(layer_type):
 
 
 class LoginForm(Form):
-    username = StringField('username', [
-        validators.Length(min=3, message='Username is not long enough'),
-        validators.DataRequired(message='A username is required')
-    ])
-    password = PasswordField('password', [
-        validators.Length(min=8, message='The password needs at least 8 characters'),
-        validators.DataRequired(message='A password is required'),
-        validators.Regexp(
-            r'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
-            message='Password does not match security checks: minimum 8 characters, uppercase + lowercase, a number and/or special character.'
-        )
-    ])
+    username = StringField(
+        label='username',
+        validators=[
+            validators.Length(min=3, message='Username is not long enough'),
+            validators.DataRequired(message='A username is required')
+        ])
+    password = PasswordField(
+        label='password',
+        validators=[
+            validators.Length(min=8, message='The password needs at least 8 characters'),
+            validators.DataRequired(message='A password is required'),
+            validators.Regexp(
+                r'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
+                message='Password does not match security checks: minimum 8 characters, uppercase + lowercase, a number and/or special character.'
+            )
+        ])
 
 
 class PasswordUpdateForm(Form):
-    old_password = PasswordField('password', [
-        validators.DataRequired(message='The old password is required.')
-    ])
-    new_password = PasswordField('new-password', [
-        validators.Length(min=8, message='The password needs at least 8 characters'),
-        validators.DataRequired(message='A password is required'),
-        validators.Regexp(
-            r'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
-            message='Password does not match security checks: minimum 8 characters, uppercase + lowercase, a number and/or special character.'
-        )
-    ])
-    new_password_validate = PasswordField('new-password-repeat', [
-        validators.EqualTo('new_password', message='New password must match password repeat'),
-        validators.DataRequired(message='Repeating the password is required')
-    ])
+    old_password = PasswordField(
+        label='password',
+        validators=[
+            validators.DataRequired(message='The old password is required.')
+        ])
+    new_password = PasswordField(
+        label='new-password',
+        validators=[
+            validators.Length(min=8, message='The password needs at least 8 characters'),
+            validators.DataRequired(message='A password is required'),
+            validators.Regexp(
+                r'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
+                message='Password does not match security checks: minimum 8 characters, uppercase + lowercase, a number and/or special character.'
+            )
+        ])
+    new_password_validate = PasswordField(
+        label='new-password-repeat',
+        validators=[
+            validators.EqualTo('new_password', message='New password must match password repeat'),
+            validators.DataRequired(message='Repeating the password is required')
+        ])
 
-
-class EditProjectForm(Form):
-    ...
-
-
-class NewProjectForm(Form):
-    ...
-
-
-class NewLayerForm(Form):
-    ...
-
-
-class SetProjectDataset(Form):
-    ...
-
-
-class DropColumnForm(Form):
-    ...
-
-
-class SetColumnNameForm(Form):
-    ...
-
-
-class ReplaceValueForm(Form):
-    ...
-
-
-class PreprocessingForm(Form):
-    ...
-
-
-class DatasetSplitForm(Form):
-    ...

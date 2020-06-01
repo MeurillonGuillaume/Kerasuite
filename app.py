@@ -104,18 +104,17 @@ def change_password():
     Change a users password
     """
     if is_user_logged_in():
-        if request.method == 'POST':
-            form = PasswordUpdateForm(request.form)
-            if form.validate():
-                user_manager.change_password(
-                    old=form.old_password.data,
-                    new=form.new_password.data,
-                    new_repeat=form.new_password_validate.data
-                )
-                return redirect('/logout')
-            else:
-                # TODO: proper error handling
-                print(form.errors)
+        form = PasswordUpdateForm(request.form)
+        if request.method == 'POST' and form.validate():
+            user_manager.change_password(
+                old=form.old_password.data,
+                new=form.new_password.data,
+                new_repeat=form.new_password_validate.data
+            )
+            return redirect('/logout')
+        else:
+            # TODO: proper error handling
+            print(form.errors)
     else:
         data = get_has_keys('user')
         if data is not None and data['user'] == session['username']:
