@@ -65,11 +65,13 @@ def home():
     Serve the homepage or redirect to the login page
     """
     if is_user_logged_in():
+        form = CreateProjectForm()
         logging.debug(f'Loading home for user {session["username"]}')
         return render_template('home.html',
                                LoggedIn=session['loggedin'],
                                Projects=project_manager.get_user_projects(),
-                               ActiveProjects=runtime_manager.get_running_projects())
+                               ActiveProjects=runtime_manager.get_running_projects(),
+                               NewProjectForm=form)
     return redirect('/login')
 
 

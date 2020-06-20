@@ -1,8 +1,15 @@
-{% macro add_form_group(field) %}
+{% macro add_form_group(field, icon_name=None) %}
     <div class="form-group">
         <label for="{{ field.name }}" class="form-label">
             {{ field.label }}</label>
-        {{ field(class_="form-input")|safe }}
+        {% if icon_name is not none %}
+            <div class="has-icon-left">
+                {{ field(class_="form-input")|safe }}
+                <i class="form-icon icon {{ icon_name }}"></i>
+            </div>
+        {% else %}
+            {{ field(class_="form-input")|safe }}
+        {% endif %}
     </div>
 {% endmacro %}
 

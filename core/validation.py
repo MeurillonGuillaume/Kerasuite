@@ -1,7 +1,7 @@
 import logging
 from flask import session, request
 from core.modelcomponents import LAYER_OPTIONS
-from wtforms import Form, StringField, PasswordField, validators, HiddenField, SubmitField
+from wtforms import Form, StringField, PasswordField, validators, HiddenField, TextAreaField
 
 # Globals
 ALLOWED_FILETYPES = ['csv', 'json']
@@ -124,12 +124,33 @@ class PasswordUpdateForm(Form):
             validators.Regexp('(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
                               message="Your password must be at least 8 characters, and have a mix of capitalised and lowercase letters, numbers and/or special characters")
         ],
-        render_kw={'placeholder': 'MyN3wGr34tP@$$w0rd', 'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'}
+        render_kw={'placeholder': 'MyN3wGr34tP@$$w0rd',
+                   'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'}
     )
     new_password_validate = PasswordField(
         label='Validate new password',
         validators=[
             validators.EqualTo('new_password', 'New passwords must match')
         ],
-        render_kw={'placeholder': 'MyN3wGr34tP@$$w0rd', 'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'}
+        render_kw={'placeholder': 'MyN3wGr34tP@$$w0rd',
+                   'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'}
+    )
+
+
+class CreateProjectForm(Form):
+    project_name = StringField(
+        label='Project name',
+        validators=[
+            validators.Length(min=3, max=64, message='Project name has to be between 3 - 64 characters'),
+            validators.DataRequired(message='A project name is required')
+        ],
+        render_kw={'placeholder': 'The amazing Hello, World!', 'autofocus': True}
+    )
+    project_description = TextAreaField(
+        label='Project description',
+        validators=[
+            validators.Length(max=250, message='The project description cannot be over 250 characters')
+        ],
+        render_kw={'placeholder': 'This project is the most advanced Hello, World! your eyes have ever seen.',
+                   'rows': 1}
     )
