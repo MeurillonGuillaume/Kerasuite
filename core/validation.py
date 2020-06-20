@@ -1,8 +1,7 @@
 import logging
 from flask import session, request
 from core.modelcomponents import LAYER_OPTIONS
-from flask_wtf import FlaskForm
-from wtforms import Form, StringField, PasswordField, validators, HiddenField
+from wtforms import Form, StringField, PasswordField, validators, HiddenField, SubmitField
 
 # Globals
 ALLOWED_FILETYPES = ['csv', 'json']
@@ -102,34 +101,31 @@ class LoginForm(Form):
         label='password',
         validators=[
             validators.Length(min=8, message='The password needs at least 8 characters'),
-            validators.DataRequired(message='A password is required'),
-            validators.Regexp(
-                r'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
-                message='Password does not match security checks: minimum 8 characters, uppercase + lowercase, a number and/or special character.'
-            )
+            validators.DataRequired(message='A password is required')
         ])
 
 
 class PasswordUpdateForm(Form):
     old_password = PasswordField(
-        label='password',
+        label='Old password',
         validators=[
-            validators.DataRequired(message='The old password is required.')
-        ])
+            validators.DataRequired()
+        ],
+        render_kw={'placeholder': 'P@$$w0rd', 'autofocus': True}
+    )
     new_password = PasswordField(
-        label='new-password',
+        label='New password',
         validators=[
-            validators.Length(min=8, message='The password needs at least 8 characters'),
-            validators.DataRequired(message='A password is required'),
-            validators.Regexp(
-                r'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
-                message='Password does not match security checks: minimum 8 characters, uppercase + lowercase, a number and/or special character.'
-            )
-        ])
+            validators.DataRequired('A new password is required'),
+            validators.Regexp('(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
+                              message="Your password must be at least 8 characters, and have a mix of capitalised and lowercase letters, numbers and/or special characters")
+        ],
+        render_kw={'placeholder': 'MyN3wGr34tP@$$w0rd', 'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'}
+    )
     new_password_validate = PasswordField(
-        label='new-password-repeat',
+        label='Validate new password',
         validators=[
-            validators.EqualTo('new_password', message='New password must match password repeat'),
-            validators.DataRequired(message='Repeating the password is required')
-        ])
-
+            validators.EqualTo('new_password', 'New passwords must match')
+        ],
+        render_kw={'placeholder': 'MyN3wGr34tP@$$w0rd', 'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'}
+    )

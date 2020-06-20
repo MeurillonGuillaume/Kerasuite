@@ -103,9 +103,12 @@ def change_password():
     """
     Change a users password
     """
-    if is_user_logged_in():
-        form = PasswordUpdateForm(request.form)
-        if request.method == 'POST' and form.validate():
+    form = PasswordUpdateForm(request.form)
+    if is_user_logged_in() and request.method == 'POST':
+        if form.validate():
+            print(form.old_password.data)
+            print(form.new_password.data)
+            print(form.new_password_validate.data)
             user_manager.change_password(
                 old=form.old_password.data,
                 new=form.new_password.data,
@@ -119,8 +122,7 @@ def change_password():
         data = get_has_keys('user')
         if data is not None and data['user'] == session['username']:
             logging.info(f"Prompting user {data['user']} to change password")
-            return render_template('change_password.html', Username=data['user'])
-
+            return render_template('change_password.html', Username=data['user'], Form=form)
     return redirect('/change/password')
 
 
