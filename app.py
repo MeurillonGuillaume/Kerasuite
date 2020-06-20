@@ -158,9 +158,13 @@ def create_project():
     Create a new project for a certain user
     """
     if is_user_logged_in():
-        if post_has_keys('projectdescription', 'projectname'):
-            project_manager.create_project(request.form['projectname'],
-                                           request.form['projectdescription'])
+        form = CreateProjectForm(request.form)
+        if request.method == 'POST' and form.validate():
+            project_manager.create_project(
+                form.project_name.data,
+                form.project_description.data
+            )
+        return redirect('/')
     return redirect('/login')
 
 
