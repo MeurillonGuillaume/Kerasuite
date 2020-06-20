@@ -92,17 +92,21 @@ def get_layer_params(layer_type):
 
 class LoginForm(Form):
     username = StringField(
-        label='username',
+        label='Username',
         validators=[
             validators.Length(min=3, message='Username is not long enough'),
             validators.DataRequired(message='A username is required')
-        ])
+        ],
+        render_kw={'placeholder': 'JohnDoe123', 'autofocus': True}
+    )
     password = PasswordField(
-        label='password',
+        label='Password',
         validators=[
             validators.Length(min=8, message='The password needs at least 8 characters'),
             validators.DataRequired(message='A password is required')
-        ])
+        ],
+        render_kw={'placeholder': 'P@$$w0rd'}
+    )
 
 
 class PasswordUpdateForm(Form):

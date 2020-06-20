@@ -78,23 +78,23 @@ def login():
     """
     Serve the login page or redirect to home
     """
+    form = LoginForm(request.form)
     if not is_user_logged_in():
-        post_data = LoginForm(request.form)
-        if request.method == 'POST' and post_data.validate():
+        if request.method == 'POST' and form.validate():
 
-            if user_manager.attempt_login(post_data.username.data, post_data.password.data):
+            if user_manager.attempt_login(form.username.data, form.password.data):
                 session['loggedin'] = True
-                session['username'] = post_data.username.data
+                session['username'] = form.username.data
 
-                if post_data.username.data == 'admin' and user_manager.admin_has_default_pass():
+                if form.username.data == 'admin' and user_manager.admin_has_default_pass():
                     logging.info(f'Admin manager still uses default password, prompting for change')
                     return redirect('/change/password?user=admin')
 
                 return redirect('/')
         else:
             # TODO: proper error handling
-            print(post_data.errors)
-        return render_template('login.html')
+            print(form.errors)
+        return render_template('login.html', Form=form)
     return redirect('/')
 
 
