@@ -168,3 +168,35 @@ class CreateProjectForm(Form):
             'rows': 1
         }
     )
+
+
+class EditProjectForm(Form):
+    project_oldname = HiddenField(
+        validators=[
+            validators.Regexp('^[a-zA-Z0-9_ ]{3,64}$',
+                              message='Project name has to be between 3 - 64 characters and cannot contain special characters'),
+            validators.DataRequired(message='Stop messing with the HTML, I need that.')
+        ]
+    )
+    project_newname = StringField(
+        label='Project name',
+        validators=[
+            validators.DataRequired(message='A project name is required'),
+            validators.Regexp('^[a-zA-Z0-9_ ]{3,64}$',
+                              message='Project name has to be between 3 - 64 characters and cannot contain special characters')
+        ],
+        render_kw={
+            'placeholder': 'The amazing Hello, World!',
+            'pattern': '^[a-zA-Z0-9_ ]{3,64}$'
+        }
+    )
+    project_description = TextAreaField(
+        label='Project description (optional)',
+        validators=[
+            validators.Length(max=250, message='The project description cannot be over 250 characters')
+        ],
+        render_kw={
+            'placeholder': 'This project is the most advanced Hello, World! your eyes have ever seen.',
+            'rows': 3
+        }
+    )

@@ -187,12 +187,12 @@ def edit_project():
     """
     Edit the fields of a project
     """
-    if is_user_logged_in():
-        if post_has_keys('projectdescription', 'projectname', 'old_projectname'):
-            newname = project_manager.update_project(request.form['old_projectname'],
-                                                     request.form['projectname'],
-                                                     request.form['projectdescription'])
-            return redirect(f'/run?project={newname}')
+    form = EditProjectForm(request.form)
+    if is_user_logged_in() and form.validate() and request.method == 'POST':
+        newname = project_manager.update_project(form.project_oldname.data,
+                                                 form.project_newname.data,
+                                                 form.project_description.data)
+        return redirect(f'/run?project={newname}')
     return redirect('/login')
 
 
@@ -201,6 +201,7 @@ def run():
     """
     Launch a project or redirect to login
     """
+    form = EditProjectForm()
     if is_user_logged_in():
         data = get_has_keys('project')
         err = get_has_keys('error')
@@ -234,7 +235,8 @@ def run():
                                        TestScoring=project_manager.load_model_scoring(
                                            project_name=project,
                                            scoring_source=project_manager.SCORING_TEST),
-                                       Error=err['error'])
+                                       Error=err['error'],
+                                       ModifyProjectForm=form)
 
     return redirect('/login')
 
