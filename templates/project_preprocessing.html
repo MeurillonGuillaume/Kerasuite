@@ -161,44 +161,10 @@
         <div class="accordion-body">
             <form action="/set/project/dataset/split" method="post"
                   enctype="multipart/form-data">
-                <div class="form-group">
-                    <label class="form-label" for="train-test-range">How much data should be in
-                        the trainingset?</label>
-                    <input id="train-test-range" class="slider tooltip p-2" type="range"
-                           min="50"
-                           max="90"
-                            {% if TrainTestSplit %}
-                           value="{{ TrainTestSplit }}"
-                            {% else %}
-                           value="70"
-                            {% endif %}
-                           step="1"
-                           oninput="this.setAttribute('value', `${this.value}%`);"
-                           name="train-test-split" required>
-                    <input type="hidden" value="{{ Projectname }}" name="project" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="random-state">Custom random state <i>(optional)</i></label>
-                    <input type="number" class="form-input" id="random-state" name="random-state"
-                           value="{% if RandomState %}{{ RandomState }}{% else %}0{% endif %}" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="column-output">Select output column(s)</label>
-                    <select class="form-select" name="column-output[]" id="column-output" multiple required>
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                {% if OutputColumns is not none %}
-                                    <option value="{{ Column }}"
-                                            {% if Column in OutputColumns %}selected{% endif %}>{{ Column }}</option>
-                                {% else %}
-                                    <option value="{{ Column }}">{{ Column }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <option value="" disabled>There are no columns</option>
-                        {% endif %}
-                    </select>
-                </div>
+                {{ add_form_group(PreprocessingForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(PreprocessingForm.train_test_split, value=TrainTestSplit) }}
+                {{ add_form_group(PreprocessingForm.random_state, value=RandomState) }}
+                {{ add_form_group(PreprocessingForm.column_output) }}
                 <input type="submit" class="btn btn-success" value="Set split size">
             </form>
         </div>

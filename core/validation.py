@@ -1,7 +1,8 @@
 import logging
 from flask import session, request
 from core.modelcomponents import LAYER_OPTIONS
-from wtforms import Form, StringField, PasswordField, validators, HiddenField, TextAreaField
+from wtforms import Form, StringField, PasswordField, validators, HiddenField, TextAreaField, SelectMultipleField
+from wtforms.fields.html5 import IntegerRangeField, IntegerField
 
 # Globals
 ALLOWED_FILETYPES = ['csv', 'json']
@@ -200,3 +201,51 @@ class EditProjectForm(Form):
             'rows': 3
         }
     )
+
+
+class PreprocessingForm(Form):
+    project = HiddenField(
+        validators=[
+            validators.DataRequired(message='Stop messing with the HTML, I need that.')
+        ]
+    )
+    train_test_split = IntegerRangeField(
+        label='Which percentage of data should be in the training set?',
+        validators=[
+            validators.NumberRange(min=50, max=95),
+            validators.DataRequired(message='A train-test-split is required.')
+        ],
+        default=75,
+        render_kw={
+            'class': 'slider tooltip p-2',
+            'oninput': 'this.setAttribute("value", `${this.value}`);',
+            'min': 50,
+            'max': 95
+        }
+    )
+    random_state = IntegerField(
+        label="Custom random state (optional)",
+        default=0
+    )
+    column_output = SelectMultipleField(
+        label="Select output column(s)",
+        validators=[
+            validators.DataRequired(message='At least 1 output column is required!')
+        ],
+        render_kw={
+            'class': 'form-select'
+        })
+
+    def set_column_names(self, names):
+        """
+        Set the values required for the choices input
+        """
+        names.sort()
+        self.column_output.choices = [(name, name) for name in names]
+
+    def set_selected_columns(self, selected):
+        default = []
+        for c in self.column_output.choices:
+            if c[0] in selected:
+                default.append(c[0])
+        self.column_output.data = default

@@ -201,7 +201,9 @@ def run():
     """
     Launch a project or redirect to login
     """
-    form = EditProjectForm()
+    edit_form = EditProjectForm()
+    preprocessing_form = PreprocessingForm()
+
     if is_user_logged_in():
         data = get_has_keys('project')
         err = get_has_keys('error')
@@ -212,6 +214,9 @@ def run():
                     if not runtime_manager.is_project_running(project):
                         runtime_manager.run_project(project)
                 logging.info(f'Loading project {data["project"]} for user {session["username"]}')
+
+                preprocessing_form.set_column_names(runtime_manager.get_column_names(project))
+                preprocessing_form.set_selected_columns(project_manager.get_preprocessing(project, 'output-columns'))
 
                 return render_template('project.html',
                                        Projectname=project,
@@ -226,7 +231,6 @@ def run():
                                        Normalizers=NORMALIZATION_METHODS,
                                        DataBalance=runtime_manager.get_data_balance(project),
                                        ModelLayers=LAYERS,
-                                       OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
                                        ProjectModel=project_manager.load_model(project),
                                        LayerOptions=LAYER_OPTIONS,
                                        TrainScoring=project_manager.load_model_scoring(
@@ -236,7 +240,8 @@ def run():
                                            project_name=project,
                                            scoring_source=project_manager.SCORING_TEST),
                                        Error=err['error'],
-                                       ModifyProjectForm=form)
+                                       ModifyProjectForm=edit_form,
+                                       PreprocessingForm=preprocessing_form)
 
     return redirect('/login')
 
@@ -281,18 +286,20 @@ def set_dataset_split():
     """
     Assign a certain percentage to split the training & test data with
     """
-    if is_user_logged_in():
-        if post_has_keys('project', 'train-test-split', 'random-state', 'column-output[]'):
-            project_manager.set_preprocessing(request.form['project'],
+    if is_user_logged_in() and request.method == 'POST':
+        form = PreprocessingForm(request.form)
+        form.set_column_names(runtime_manager.get_column_names(request.form['project']))
+        if form.validate():
+            project_manager.set_preprocessing(form.project.data,
                                               'train-test-split',
-                                              int(request.form['train-test-split']))
-            project_manager.set_preprocessing(request.form['project'],
+                                              int(form.train_test_split.data))
+            project_manager.set_preprocessing(form.project.data,
                                               'random-state',
-                                              request.form['random-state'])
-            project_manager.set_preprocessing(request.form['project'],
+                                              int(form.random_state.data))
+            project_manager.set_preprocessing(form.project.data,
                                               'output-columns',
-                                              request.form.getlist('column-output[]'))
-            return redirect(f'/run?project={request.form["project"]}')
+                                              form.column_output.data)
+            return redirect(f'/run?project={form.project.data}')
     return redirect('/')
 
 
@@ -461,4 +468,4 @@ def train_model():
 
 
 if __name__ == '__main__':
-    app.run(port=4444, host='0.0.0.0')
+    app.run(port=4444, host='0.0.0.0', debug=True)
