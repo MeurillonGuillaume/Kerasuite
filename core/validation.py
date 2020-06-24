@@ -97,7 +97,10 @@ class LoginForm(Form):
             validators.Length(min=3, message='Username is not long enough'),
             validators.DataRequired(message='A username is required')
         ],
-        render_kw={'placeholder': 'JohnDoe123', 'autofocus': True}
+        render_kw={
+            'placeholder': 'JohnDoe123',
+            'autofocus': True
+        }
     )
     password = PasswordField(
         label='Password',
@@ -115,7 +118,10 @@ class PasswordUpdateForm(Form):
         validators=[
             validators.DataRequired()
         ],
-        render_kw={'placeholder': 'P@$$w0rd', 'autofocus': True}
+        render_kw={
+            'placeholder': 'P@$$w0rd',
+            'autofocus': True
+        }
     )
     new_password = PasswordField(
         label='New password',
@@ -132,8 +138,10 @@ class PasswordUpdateForm(Form):
         validators=[
             validators.EqualTo('new_password', 'New passwords must match')
         ],
-        render_kw={'placeholder': 'MyN3wGr34tP@$$w0rd',
-                   'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'}
+        render_kw={
+            'placeholder': 'MyN3wGr34tP@$$w0rd',
+            'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'
+        }
     )
 
 
@@ -141,16 +149,22 @@ class CreateProjectForm(Form):
     project_name = StringField(
         label='Project name',
         validators=[
-            validators.Length(min=3, max=64, message='Project name has to be between 3 - 64 characters'),
-            validators.DataRequired(message='A project name is required')
+            validators.DataRequired(message='A project name is required'),
+            validators.Regexp('^[a-zA-Z0-9_ ]{3,64}$',
+                              message='Project name has to be between 3 - 64 characters and cannot contain special characters')
         ],
-        render_kw={'placeholder': 'The amazing Hello, World!', 'autofocus': True}
+        render_kw={
+            'placeholder': 'The amazing Hello, World!',
+            'pattern': '^[a-zA-Z0-9_ ]{3,64}$'
+        }
     )
     project_description = TextAreaField(
         label='Project description',
         validators=[
             validators.Length(max=250, message='The project description cannot be over 250 characters')
         ],
-        render_kw={'placeholder': 'This project is the most advanced Hello, World! your eyes have ever seen.',
-                   'rows': 1}
+        render_kw={
+            'placeholder': 'This project is the most advanced Hello, World! your eyes have ever seen.',
+            'rows': 1
+        }
     )

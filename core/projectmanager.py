@@ -53,7 +53,6 @@ class ProjectManager:
 
         :param description: A description about the project
         :type description: str
-
         """
         projects = self.get_all_projects()
         if not projects:
