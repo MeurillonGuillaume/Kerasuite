@@ -9,7 +9,7 @@
             <div class="modal-body">
                 <div class="content">
                     {{ add_form_group(ModifyProjectForm.project_oldname, hidden=True, value=Projectname) }}
-                    {{ add_form_group(ModifyProjectForm.project_newname) }}
+                    {{ add_form_group(ModifyProjectForm.project_newname, value=Projectname) }}
                     {{ add_form_group(ModifyProjectForm.project_description) }}
                 </div>
             </div>
