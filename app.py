@@ -203,6 +203,7 @@ def run():
     """
     edit_form = EditProjectForm()
     preprocessing_form = PreprocessingForm()
+    rename_form = RenameColumnForm()
 
     if is_user_logged_in():
         data = get_has_keys('project')
@@ -217,6 +218,7 @@ def run():
 
                 preprocessing_form.set_column_names(runtime_manager.get_column_names(project))
                 preprocessing_form.set_selected_columns(project_manager.get_preprocessing(project, 'output-columns'))
+                rename_form.set_old_columns(runtime_manager.get_column_names(project))
 
                 return render_template('project.html',
                                        Projectname=project,
@@ -241,7 +243,8 @@ def run():
                                            scoring_source=project_manager.SCORING_TEST),
                                        Error=err['error'],
                                        ModifyProjectForm=edit_form,
-                                       PreprocessingForm=preprocessing_form)
+                                       PreprocessingForm=preprocessing_form,
+                                       RenameForm=rename_form)
 
     return redirect('/login')
 
@@ -308,12 +311,17 @@ def set_column_name():
     """
     Change a column name
     """
-    if is_user_logged_in():
-        if post_has_keys('project', 'col_name_old', 'col_name_new'):
-            runtime_manager.rename_column(request.form['project'],
-                                          request.form['col_name_old'],
-                                          request.form['col_name_new'])
-            return redirect(f'/run?project={request.form["project"]}')
+    if is_user_logged_in() and request.method == 'POST':
+        form = RenameColumnForm(request.form)
+        form.set_old_columns(runtime_manager.get_column_names(request.form['project']))
+
+        if form.validate():
+            runtime_manager.rename_column(form.project.data,
+                                          form.old_col_name.data,
+                                          form.new_col_name.data)
+            return redirect(f'/run?project={form.project.data}')
+        else:
+            print(form.errors)
     return redirect('/')
 
 

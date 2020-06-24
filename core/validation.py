@@ -1,7 +1,8 @@
 import logging
 from flask import session, request
 from core.modelcomponents import LAYER_OPTIONS
-from wtforms import Form, StringField, PasswordField, validators, HiddenField, TextAreaField, SelectMultipleField
+from wtforms import Form, StringField, PasswordField, validators, HiddenField, TextAreaField, SelectMultipleField, \
+    SelectField
 from wtforms.fields.html5 import IntegerRangeField, IntegerField
 
 # Globals
@@ -244,8 +245,40 @@ class PreprocessingForm(Form):
         self.column_output.choices = [(name, name) for name in names]
 
     def set_selected_columns(self, selected):
+        """
+        Set selected columns
+        """
         default = []
         for c in self.column_output.choices:
             if c[0] in selected:
                 default.append(c[0])
         self.column_output.data = default
+
+
+class RenameColumnForm(Form):
+    project = HiddenField(
+        validators=[
+            validators.DataRequired(message='Stop messing with the HTML, I need that.')
+        ]
+    )
+    old_col_name = SelectField(
+        label='Column to rename',
+        validators=[
+            validators.DataRequired(message='An old column name is required')
+        ],
+        render_kw={'class': 'form-select'}
+    )
+    new_col_name = StringField(
+        label='New column name',
+        validators=[
+            validators.DataRequired(message="A new column name is required")
+        ],
+        render_kw={
+            'placeholder': 'new-column-name',
+            'pattern': '^[a-zA-Z0-9_ ]{2,250}$'
+        }
+    )
+
+    def set_old_columns(self, names):
+        names.sort()
+        self.old_col_name.choices = [(name, name) for name in names]

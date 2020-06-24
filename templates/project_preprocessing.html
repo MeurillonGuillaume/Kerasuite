@@ -41,26 +41,9 @@
         </label>
         <div class="accordion-body">
             <form action="/set/column/name" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="column">Column to rename</label>
-                    <select class="form-select" name="col_name_old" id="column">
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                <option value="{{ Column }}">{{ Column }}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="" selected="true" disabled="disabled">No columns
-                                found...
-                            </option>
-                        {% endif %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="old-val">New column name</label>
-                    <input class="form-input" type="text" name="col_name_new" id="old-val"
-                           placeholder="NewName36" required>
-                </div>
-                <input type="hidden" name="project" value="{{ Projectname }}">
+                {{ add_form_group(RenameForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(RenameForm.old_col_name) }}
+                {{ add_form_group(RenameForm.new_col_name) }}
                 <button class="btn btn-success btn-lg">
                     <i class="icon icon-edit"></i> Rename column
                 </button>
