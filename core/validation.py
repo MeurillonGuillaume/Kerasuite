@@ -97,11 +97,15 @@ class LoginForm(Form):
         label='Username',
         validators=[
             validators.Length(min=3, message='Username is not long enough'),
-            validators.DataRequired(message='A username is required')
+            validators.DataRequired(message='A username is required'),
+            validators.Regexp(
+                '^[a-zA-Z0-9_-]{3,64}$',
+                message='A username should have between 3 and 64 alphanumeric characters, no special except _ and -.')
         ],
         render_kw={
             'placeholder': 'JohnDoe123',
-            'autofocus': True
+            'autofocus': True,
+            'pattern': '^[a-zA-Z0-9_-]{3,64}$'
         }
     )
     password = PasswordField(
@@ -129,8 +133,9 @@ class PasswordUpdateForm(Form):
         label='New password',
         validators=[
             validators.DataRequired('A new password is required'),
-            validators.Regexp('(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
-                              message="Your password must be at least 8 characters, and have a mix of capitalised and lowercase letters, numbers and/or special characters")
+            validators.Regexp(
+                '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
+                message="Your password must be at least 8 characters, and have a mix of capitalised and lowercase letters, numbers and/or special characters")
         ],
         render_kw={'placeholder': 'MyN3wGr34tP@$$w0rd',
                    'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$'}
@@ -152,8 +157,9 @@ class CreateProjectForm(Form):
         label='Project name',
         validators=[
             validators.DataRequired(message='A project name is required'),
-            validators.Regexp('^[a-zA-Z0-9_ ]{3,64}$',
-                              message='Project name has to be between 3 - 64 characters and cannot contain special characters')
+            validators.Regexp(
+                '^[a-zA-Z0-9_ ]{3,64}$',
+                message='Project name has to be between 3 - 64 characters and cannot contain special characters')
         ],
         render_kw={
             'placeholder': 'The amazing Hello, World!',
@@ -175,8 +181,9 @@ class CreateProjectForm(Form):
 class EditProjectForm(Form):
     project_oldname = HiddenField(
         validators=[
-            validators.Regexp('^[a-zA-Z0-9_ ]{3,64}$',
-                              message='Project name has to be between 3 - 64 characters and cannot contain special characters'),
+            validators.Regexp(
+                '^[a-zA-Z0-9_ ]{3,64}$',
+                message='Project name has to be between 3 - 64 characters and cannot contain special characters'),
             validators.DataRequired(message='Stop messing with the HTML, I need that.')
         ]
     )
@@ -184,8 +191,9 @@ class EditProjectForm(Form):
         label='Project name',
         validators=[
             validators.DataRequired(message='A project name is required'),
-            validators.Regexp('^[a-zA-Z0-9_ ]{3,64}$',
-                              message='Project name has to be between 3 - 64 characters and cannot contain special characters')
+            validators.Regexp(
+                '^[a-zA-Z0-9_ ]{3,64}$',
+                message='Project name has to be between 3 - 64 characters and cannot contain special characters')
         ],
         render_kw={
             'placeholder': 'The amazing Hello, World!',
@@ -380,3 +388,42 @@ class ReplaceDataForm(Form):
         """
         names.sort()
         self.column.choices = [(name, name) for name in names]
+
+
+class CreateUserForm(Form):
+    username = StringField(
+        label='New username',
+        validators=[
+            validators.DataRequired('A username is required'),
+            validators.Regexp(
+                '^[a-zA-Z0-9_-]{3,64}$',
+                message='A username should have between 3 and 64 alphanumeric characters, no special except _ and -.')
+        ],
+        render_kw={
+            'placeholder': 'TheLegend27',
+            'pattern': '^[a-zA-Z0-9_-]{3,64}$'
+        }
+    )
+    password = PasswordField(
+        label='Password',
+        validators=[
+            validators.DataRequired('A password is required'),
+            validators.Regexp(
+                '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
+                message="Your password must be at least 8 characters, and have a mix of capitalised and lowercase letters, numbers and/or special characters")
+        ],
+        render_kw={
+            'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
+            'placeholder': 'Sup3erS3cr3tP@ssw0rd'
+        }
+    )
+    password_repeat = PasswordField(
+        label='Repeat password',
+        validators=[
+            validators.EqualTo('password', message='Passwords must match!')
+        ],
+        render_kw={
+            'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
+            'placeholder': 'Sup3erS3cr3tP@ssw0rd'
+        }
+    )

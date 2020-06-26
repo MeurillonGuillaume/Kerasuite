@@ -6,20 +6,6 @@ from passlib.hash import bcrypt
 
 
 class UserManager:
-    @staticmethod
-    def is_password_strong(password):
-        """
-        Check if a password matches the front-end validation
-
-        :param password: A password String to check
-        :type password: str
-
-        :rtype: bool
-        :returns: True or False
-        """
-        if match(r'(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$', password):
-            return 1
-        return 0
 
     def __init__(self, db):
         """

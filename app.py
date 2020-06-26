@@ -145,10 +145,12 @@ def settings():
     Return a settings page or redirect to login.
     """
     if is_user_logged_in():
+        new_user_form = CreateUserForm()
         return render_template('settings.html', LoggedIn=session['loggedin'],
                                IsAdmin=user_manager.has_elevated_rights(),
                                UserList=user_manager.get_users(),
-                               Username=session['username'])
+                               Username=session['username'],
+                               NewUserForm=new_user_form)
     return redirect('/login')
 
 
@@ -416,15 +418,12 @@ def create_user():
     """
     Create a new user
     """
-    if is_user_logged_in():
+    if is_user_logged_in() and request.method == 'POST':
         if user_manager.has_elevated_rights():
-            if post_has_keys('username', 'password', 'password_repeat'):
-                username, password, pass_repeat = request.form['username'], request.form['password'], request.form[
-                    'password_repeat']
-                if len('username') > 1 and password == pass_repeat:
-                    if not user_manager.does_user_exist(username):
-                        if user_manager.is_password_strong(password):
-                            user_manager.register_user(username, password, False)
+            form = CreateUserForm(request.form)
+            if form.validate():
+                if not user_manager.does_user_exist(form.username.data):
+                    user_manager.register_user(form.username.data, form.password.data, False)
         return redirect('/settings')
     return redirect('/login')
 
