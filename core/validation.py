@@ -282,3 +282,26 @@ class RenameColumnForm(Form):
     def set_old_columns(self, names):
         names.sort()
         self.old_col_name.choices = [(name, name) for name in names]
+
+
+class NormalizeForm(Form):
+    columns = SelectMultipleField(
+        label="Select column(s) to normalize",
+        render_kw={
+            'class': 'form-select'
+        })
+    method = SelectField(
+        label="Data normalization method",
+    )
+    project = HiddenField(
+    )
+
+    def set_column_names(self, names):
+        """
+        Set the values required for the choices input
+        """
+        names.sort()
+        self.columns.choices = [(name, name) for name in names]
+
+    def set_method_choises(self, choises):
+        self.method.choices = [(item, item) for values in choises.values() for item in values]

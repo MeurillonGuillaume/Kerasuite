@@ -100,23 +100,13 @@
             </h4>
         </label>
         <div class="accordion-body">
-            <form action="/preprocess/columns" method="post"
+            <form action="/normalize/columns" method="post"
                   enctype="multipart/form-data">
+                {{ add_form_group(NormalizationForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(NormalizationForm.columns) }}
                 <div class="form-group">
-                    <label class="form-label" for="select-column">Columns to normalize</label>
-                    <select class="form-select" name="columns[]" id="select-column" multiple required>
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                <option value="{{ Column }}">{{ Column }}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="" disabled>There are no columns</option>
-                        {% endif %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="normalisation-method">Normalise data with method</label>
-                    <select class="form-select" name="normalisation-method" id="normalisation-method" required>
+                    <label class="form-label" for="method">Normalise data with method</label>
+                    <select class="form-select" name="method" id="method" required>
                         {% if Normalizers %}
                             {% for NormType in Normalizers|sort %}
                                 <optgroup label="{{ NormType }}">
@@ -128,7 +118,6 @@
                         {% endif %}
                     </select>
                 </div>
-                <input type="hidden" value="{{ Projectname }}" name="project" required>
                 <input type="submit" class="btn btn-success" value="Normalise data">
             </form>
         </div>
