@@ -47,31 +47,10 @@
         </label>
         <div class="accordion-body">
             <form action="/replace/dataset/values" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="column">Replace values in column</label>
-                    <select class="form-select" name="column" id="column">
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                <option value="{{ Column }}">{{ Column }}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="" selected="true" disabled="disabled">No columns
-                                found...
-                            </option>
-                        {% endif %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="old-val">The value to replace</label>
-                    <input class="form-input" type="text" name="value_old" id="old-val"
-                           placeholder="Value123" required>
-                </div>
-                <div class="form-group">
-                    <label for="new-val">Replace value with</label>
-                    <input class="form-input" type="text" name="value_new" id="new-val"
-                           placeholder="Newvalue-123" required>
-                </div>
-                <input type="hidden" name="project" value="{{ Projectname }}" required>
+                {{ add_form_group(ReplaceForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(ReplaceForm.column) }}
+                {{ add_form_group(ReplaceForm.value_old) }}
+                {{ add_form_group(ReplaceForm.value_new) }}
                 <button class="btn btn-success btn-lg">
                     <i class="icon icon-edit"></i> Replace values
                 </button>

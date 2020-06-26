@@ -206,6 +206,7 @@ def run():
     rename_form = RenameColumnForm()
     normalization_form = NormalizeForm()
     drop_form = DropColumnForm()
+    replace_form = ReplaceDataForm()
 
     if is_user_logged_in():
         data = get_has_keys('project')
@@ -224,6 +225,7 @@ def run():
                 rename_form.set_old_columns(columns)
                 normalization_form.set_column_names(columns)
                 drop_form.set_column_names(columns)
+                replace_form.set_column_names(columns)
 
                 return render_template('project.html',
                                        Projectname=project,
@@ -251,7 +253,8 @@ def run():
                                        RenameForm=rename_form,
                                        NormalizationForm=normalization_form,
                                        Normalizers=NORMALIZATION_METHODS,
-                                       DropForm=drop_form)
+                                       DropForm=drop_form,
+                                       ReplaceForm=replace_form)
 
     return redirect('/login')
 
@@ -364,13 +367,16 @@ def drop_column():
 
 @app.route('/replace/dataset/values', methods=['GET', 'POST'])
 def replace_dataset_values():
-    if is_user_logged_in():
-        if post_has_keys('column', 'project', 'value_old', 'value_new'):
-            runtime_manager.replace_values(request.form['project'],
-                                           request.form['column'],
-                                           request.form['value_old'],
-                                           request.form['value_new'])
-            return redirect(f'/run?project={request.form["project"]}')
+    if is_user_logged_in() and request.method == 'POST':
+        form = ReplaceDataForm(request.form)
+        form.set_column_names(runtime_manager.get_column_names(request.form['project']))
+
+        if form.validate():
+            runtime_manager.replace_values(form.project.data,
+                                           form.column.data,
+                                           form.value_old.data,
+                                           form.value_new.data)
+            return redirect(f'/run?project={form.project.data}')
     return redirect('/')
     pass
 

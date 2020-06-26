@@ -337,3 +337,46 @@ class DropColumnForm(Form):
         """
         names.sort()
         self.column.choices = [(name, name) for name in names]
+
+
+class ReplaceDataForm(Form):
+    project = HiddenField(
+        validators=[
+            validators.DataRequired(message='Stop messing with the HTML, I need that.')
+        ]
+    )
+    column = SelectField(
+        label="Replace values in column",
+        validators=[
+            validators.DataRequired('You need to select which column to drop')
+        ],
+        render_kw={
+            'class': 'form-select'
+        })
+    value_old = StringField(
+        label='Exact value to replace',
+        render_kw={
+            'placeholder': 'OldValue123'
+        },
+        validators=[
+            validators.DataRequired('A value to replaced is required'),
+            validators.Length(min=1, message='The value to replace should be at least 1 character')
+        ]
+    )
+    value_new = StringField(
+        label='Replace all with',
+        render_kw={
+            'placeholder': 'new-value'
+        },
+        validators=[
+            validators.DataRequired('A new value is required'),
+            validators.Length(min=1, message='The new value should be at least 1 character')
+        ]
+    )
+
+    def set_column_names(self, names):
+        """
+        Set the values required for the choices input
+        """
+        names.sort()
+        self.column.choices = [(name, name) for name in names]
