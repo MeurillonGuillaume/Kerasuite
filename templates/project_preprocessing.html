@@ -10,21 +10,8 @@
         </label>
         <div class="accordion-body">
             <form action="/drop/column" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="column">Column to drop</label>
-                    <select class="form-select" name="column" id="column">
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                <option value="{{ Column }}">{{ Column }}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="" selected="true" disabled="disabled">No columns
-                                found...
-                            </option>
-                        {% endif %}
-                    </select>
-                    <input type="hidden" name="project" value="{{ Projectname }}">
-                </div>
+                {{ add_form_group(DropForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(DropForm.column) }}
                 <button class="btn btn-success btn-lg">
                     <i class="icon icon-delete icon-resize-small"></i> Drop column
                 </button>

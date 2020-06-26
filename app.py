@@ -205,6 +205,7 @@ def run():
     preprocessing_form = PreprocessingForm()
     rename_form = RenameColumnForm()
     normalization_form = NormalizeForm()
+    drop_form = DropColumnForm()
 
     if is_user_logged_in():
         data = get_has_keys('project')
@@ -217,10 +218,12 @@ def run():
                         runtime_manager.run_project(project)
                 logging.info(f'Loading project {data["project"]} for user {session["username"]}')
 
-                preprocessing_form.set_column_names(runtime_manager.get_column_names(project))
+                columns = runtime_manager.get_column_names(project)
+                preprocessing_form.set_column_names(columns)
                 preprocessing_form.set_selected_columns(project_manager.get_preprocessing(project, 'output-columns'))
-                rename_form.set_old_columns(runtime_manager.get_column_names(project))
-                normalization_form.set_column_names(runtime_manager.get_column_names(project))
+                rename_form.set_old_columns(columns)
+                normalization_form.set_column_names(columns)
+                drop_form.set_column_names(columns)
 
                 return render_template('project.html',
                                        Projectname=project,
@@ -231,7 +234,7 @@ def run():
                                        TrainTestSplit=project_manager.get_preprocessing(project,
                                                                                         'train-test-split'),
                                        RandomState=project_manager.get_preprocessing(project, 'random-state'),
-                                       ColumnNames=runtime_manager.get_column_names(project),
+                                       ColumnNames=columns,
                                        DataBalance=runtime_manager.get_data_balance(project),
                                        ModelLayers=LAYERS,
                                        ProjectModel=project_manager.load_model(project),
@@ -247,7 +250,8 @@ def run():
                                        PreprocessingForm=preprocessing_form,
                                        RenameForm=rename_form,
                                        NormalizationForm=normalization_form,
-                                       Normalizers=NORMALIZATION_METHODS)
+                                       Normalizers=NORMALIZATION_METHODS,
+                                       DropForm=drop_form)
 
     return redirect('/login')
 
@@ -348,10 +352,13 @@ def drop_column():
     """
     Delete a column
     """
-    if is_user_logged_in():
-        if post_has_keys('project', 'column'):
-            runtime_manager.drop_column(request.form['project'], request.form['column'])
-            return redirect(f'/run?project={request.form["project"]}')
+    if is_user_logged_in() and request.method == 'POST':
+        form = DropColumnForm(request.form)
+        form.set_column_names(runtime_manager.get_column_names(request.form['project']))
+
+        if form.validate():
+            runtime_manager.drop_column(form.project.data, form.column.data)
+            return redirect(f'/run?project={form.project.data}')
     return redirect('/')
 
 

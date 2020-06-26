@@ -287,13 +287,22 @@ class RenameColumnForm(Form):
 class NormalizeForm(Form):
     columns = SelectMultipleField(
         label="Select column(s) to normalize",
+        validators=[
+            validators.DataRequired('At least one column is required')
+        ],
         render_kw={
             'class': 'form-select'
         })
     method = SelectField(
         label="Data normalization method",
+        validators=[
+            validators.DataRequired('A normalization method is required')
+        ]
     )
     project = HiddenField(
+        validators=[
+            validators.DataRequired(message='Stop messing with the HTML, I need that.')
+        ]
     )
 
     def set_column_names(self, names):
@@ -305,3 +314,26 @@ class NormalizeForm(Form):
 
     def set_method_choises(self, choises):
         self.method.choices = [(item, item) for values in choises.values() for item in values]
+
+
+class DropColumnForm(Form):
+    project = HiddenField(
+        validators=[
+            validators.DataRequired(message='Stop messing with the HTML, I need that.')
+        ]
+    )
+    column = SelectField(
+        label="Select a column to drop",
+        validators=[
+            validators.DataRequired('You need to select which column to drop')
+        ],
+        render_kw={
+            'class': 'form-select'
+        })
+
+    def set_column_names(self, names):
+        """
+        Set the values required for the choices input
+        """
+        names.sort()
+        self.column.choices = [(name, name) for name in names]
