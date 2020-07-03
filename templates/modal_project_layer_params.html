@@ -47,7 +47,7 @@
                  * @param   {String}    param_name   The name of the parameter to create an input for
                  * @return
                  */
-                paramHolder.innerHTML += `<label for="param-${param_name}" class="form-label"><b>${param_name}</b>: ${layerOptions[layerType][param_name].description}</label>`;
+                paramHolder.innerHTML += `<label for="param-${param_name}" class="form-label"><b>${param_name.charAt(0).toUpperCase()}${param_name.slice(1)}</b>: ${layerOptions[layerType][param_name].description}</label>`;
                 switch (layerOptions[layerType][param_name].inputInfo.type) {
                     case "select":
                         paramHolder.innerHTML += `<select class="form-select" name="${param_name}" id="param-${param_name}"></select>`;

@@ -248,18 +248,20 @@ class PreprocessingForm(Form):
         """
         Set the values required for the choices input
         """
-        names.sort()
-        self.column_output.choices = [(name, name) for name in names]
+        if names is not None:
+            names.sort()
+            self.column_output.choices = [(name, name) for name in names]
 
     def set_selected_columns(self, selected):
         """
         Set selected columns
         """
-        default = []
-        for c in self.column_output.choices:
-            if c[0] in selected:
-                default.append(c[0])
-        self.column_output.data = default
+        if selected is not None:
+            default = []
+            for c in self.column_output.choices:
+                if c[0] in selected:
+                    default.append(c[0])
+            self.column_output.data = default
 
 
 class RenameColumnForm(Form):
@@ -287,8 +289,9 @@ class RenameColumnForm(Form):
     )
 
     def set_old_columns(self, names):
-        names.sort()
-        self.old_col_name.choices = [(name, name) for name in names]
+        if names is not None:
+            names.sort()
+            self.old_col_name.choices = [(name, name) for name in names]
 
 
 class NormalizeForm(Form):
@@ -316,11 +319,13 @@ class NormalizeForm(Form):
         """
         Set the values required for the choices input
         """
-        names.sort()
-        self.columns.choices = [(name, name) for name in names]
+        if names is not None:
+            names.sort()
+            self.columns.choices = [(name, name) for name in names]
 
     def set_method_choises(self, choises):
-        self.method.choices = [(item, item) for values in choises.values() for item in values]
+        if choises is not None:
+            self.method.choices = [(item, item) for values in choises.values() for item in values]
 
 
 class DropColumnForm(Form):
@@ -342,8 +347,9 @@ class DropColumnForm(Form):
         """
         Set the values required for the choices input
         """
-        names.sort()
-        self.column.choices = [(name, name) for name in names]
+        if names is not None:
+            names.sort()
+            self.column.choices = [(name, name) for name in names]
 
 
 class ReplaceDataForm(Form):
@@ -385,8 +391,9 @@ class ReplaceDataForm(Form):
         """
         Set the values required for the choices input
         """
-        names.sort()
-        self.column.choices = [(name, name) for name in names]
+        if names is not None:
+            names.sort()
+            self.column.choices = [(name, name) for name in names]
 
 
 class CreateUserForm(Form):
