@@ -18,8 +18,8 @@
                                   rows="2"
                                   placeholder="Extra information about this layer"></textarea>
                     </div>
-                    <input type="hidden" name="project" value="{{ Projectname }}">
-                    <input type="hidden" name="new-layer" id="hidden-layertype">
+                    {{ add_form_group(CreateLayerForm.project, hidden=True, value=Projectname) }}
+                    {{ add_form_group(CreateLayerForm.new_layer_name, hidden=True) }}
                 </div>
             </div>
             <div class="modal-footer">

@@ -51,15 +51,15 @@ ACTIVATION_FUNCTIONS = {
 #           - values: (required for type=select) a dict of values & description of these values
 LAYER_OPTIONS = {
     'Dense': {
-        'Units': {
+        'units': {
             'description': 'The amount of neurons generated for this layer, equals the dimensionality of the output',
             'inputInfo': {
                 'type': 'number',
-                'min': 0,
+                'min': 1,
                 'max': None
             }
         },
-        'Activation': {
+        'activation': {
             'description': 'The type of mathematical function to use as activation function',
             'inputInfo': {
                 'type': 'select',
@@ -68,7 +68,7 @@ LAYER_OPTIONS = {
         }
     },
     'Dropout': {
-        'Rate': {
+        'rate': {
             'description': 'The percentage of neurons that randomly disabled at once',
             'inputInfo': {
                 'type': 'range',

@@ -209,6 +209,7 @@ def run():
     normalization_form = NormalizeForm()
     drop_form = DropColumnForm()
     replace_form = ReplaceDataForm()
+    create_layer_form = CreateLayerForm()
 
     if is_user_logged_in():
         data = get_has_keys('project')
@@ -256,7 +257,8 @@ def run():
                                        NormalizationForm=normalization_form,
                                        Normalizers=NORMALIZATION_METHODS,
                                        DropForm=drop_form,
-                                       ReplaceForm=replace_form)
+                                       ReplaceForm=replace_form,
+                                       CreateLayerForm=create_layer_form)
 
     return redirect('/login')
 
@@ -447,13 +449,26 @@ def create_layer():
     """
     Create a new layer in a model
     """
-    if is_user_logged_in():
-        if post_has_keys('project', 'new-layer', 'layer-description'):
-            project_manager.add_model_layer(project_name=request.form['project'],
-                                            layer_type=request.form['new-layer'],
-                                            layer_params=get_layer_params(request.form['new-layer']),
-                                            description=request.form['layer-description'])
-            return redirect(f'/run?project={request.form["project"]}')
+    layer_forms = {'Dense': AddDenseLayerForm, 'Dropout': AddDropoutLayerForm}
+
+    if is_user_logged_in() and request.method == 'POST':
+        # Validate a baseform first, which contains the project name, layer type & description
+        baseform = CreateLayerForm(request.form)
+        baseform.new_layer.data = baseform.new_layer_name.data
+        if baseform.validate():
+            # Load the datafrom which fits the specific layer type
+            dataform = layer_forms[baseform.new_layer.data](request.form)
+            if dataform.validate():
+                layer_data = get_layer_params(form_data=dataform, layer_type=baseform.new_layer.data)
+                project_manager.add_model_layer(project_name=baseform.project.data,
+                                                layer_type=baseform.new_layer.data,
+                                                layer_params=layer_data,
+                                                description=baseform.layer_description.data)
+                return redirect(f'/run?project={baseform.project.data}')
+            else:
+                print(dataform.errors)
+        else:
+            print(baseform.errors)
     return redirect('/')
 
 

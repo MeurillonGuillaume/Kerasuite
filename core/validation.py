@@ -1,6 +1,6 @@
 import logging
 from flask import session, request
-from core.modelcomponents import LAYER_OPTIONS
+from core.modelcomponents import LAYER_OPTIONS, ACTIVATION_FUNCTIONS
 from wtforms import Form, StringField, PasswordField, validators, HiddenField, TextAreaField, SelectMultipleField, \
     SelectField
 from wtforms.fields.html5 import IntegerRangeField, IntegerField
@@ -73,7 +73,7 @@ def get_has_keys(*args):
     return
 
 
-def get_layer_params(layer_type):
+def get_layer_params(form_data, layer_type):
     """
     Request data for all params defined for a certain layer
 
@@ -82,14 +82,13 @@ def get_layer_params(layer_type):
 
     :rtype: dict
     """
-    _res = {}
-    for _o in LAYER_OPTIONS[layer_type]:
-        # Attempt to convert to most fitting datatype, else use String
-        try:
-            _res[_o] = eval(request.form[_o])
-        except Exception:
-            _res[_o] = request.form[_o]
-    return _res
+    _result = {}
+    if layer_type == 'Dense':
+        _result['units'] = form_data.units.data
+        _result['activation'] = form_data.activation.data
+    elif layer_type == 'Dropout':
+        _result['rate'] = form_data.rate.data
+    return _result
 
 
 class LoginForm(Form):
@@ -425,5 +424,66 @@ class CreateUserForm(Form):
         render_kw={
             'pattern': '(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$',
             'placeholder': 'Sup3erS3cr3tP@ssw0rd'
+        }
+    )
+
+
+class CreateLayerForm(Form):
+    project = HiddenField(
+        validators=[
+            validators.DataRequired(message='Stop messing with the HTML, I need that.')
+        ]
+    )
+    new_layer_name = HiddenField(
+        validators=[
+            validators.DataRequired(message='A layer type is required')
+        ],
+        render_kw={'id': 'hidden-layertype'}
+    )
+    new_layer = SelectField(
+        label='Layer type',
+        choices=[(item, item) for item in LAYER_OPTIONS.keys()],
+        render_kw={
+            'id': 'model-layer',
+            'class': 'form-select'
+        }
+    )
+    layer_description = TextAreaField(
+        label='Layer Description (optional)',
+        validators=[
+            validators.Length(max=250, message='The layer description cannot be over 250 characters')
+        ]
+    )
+
+
+class AddDenseLayerForm(Form):
+    # Add layer type in subform to double check in app.py
+    units = IntegerField(
+        label='Units: how many neurons will be created for this layer. This defines the dimensionality of the output',
+        validators=[
+            validators.NumberRange(min=1, message='A layer must have at least 1 activation unit'),
+            validators.DataRequired(message='Units is a required parameters')
+        ]
+    )
+    activation = SelectField(
+        label='Activation: the mathematical function used as activation function',
+        validators=[
+            validators.DataRequired(message='An activation function is required')
+        ],
+        choices=[(f"{key}", f"{key}: {value}") for key, value in ACTIVATION_FUNCTIONS.items()]
+    )
+
+
+class AddDropoutLayerForm(Form):
+    rate = IntegerRangeField(
+        label='Rate: a percentage of neurons that are disabled randomly',
+        validators=[
+            validators.DataRequired('A dropout rate is required'),
+            validators.NumberRange(min=0, max=75,
+                                   message="The input range for dropout must be between 0 and 75")
+        ],
+        render_kw={
+            'min': 0,
+            'max': 100
         }
     )
