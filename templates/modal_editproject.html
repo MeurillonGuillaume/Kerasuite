@@ -8,17 +8,9 @@
             </div>
             <div class="modal-body">
                 <div class="content">
-                    <div class="form-group">
-                        <label class="form-label" for="projectname">Name</label>
-                        <input type="hidden" name="old_projectname" value="{{ Projectname }}">
-                        <input type="text" name="projectname" class="form-input" id="projectname"
-                               placeholder="The amazing Hello, World!" value="{{ Projectname }}" autofocus required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="projectdescription">Description <i>(optional)</i></label>
-                        <textarea class="form-input" name="projectdescription" id="projectdescription"
-                                  rows="3">{{ Projectdescription }}</textarea>
-                    </div>
+                    {{ add_form_group(ModifyProjectForm.project_oldname, hidden=True, value=Projectname) }}
+                    {{ add_form_group(ModifyProjectForm.project_newname, value=Projectname) }}
+                    {{ add_form_group(ModifyProjectForm.project_description) }}
                 </div>
             </div>
             <div class="modal-footer">

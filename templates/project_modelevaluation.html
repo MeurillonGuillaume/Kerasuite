@@ -1,0 +1,170 @@
+<div class="columns">
+    <div class="column col-lg-12">
+        <div class="accordion m-2 col-8 col-lg-12">
+            <input id="evaluation-train" type="radio" name="accordion-preprocessing" hidden="">
+            <label class="accordion-header c-hand" for="evaluation-train">
+                <h4>
+                    <i class="icon icon-arrow-right mr-1"></i>Training evaluation
+                </h4>
+            </label>
+            <div class="accordion-body">
+                {% if TrainScoring is not none %}
+                    <div>
+                        <canvas id="chart-train-evaluation" style="display: block; width: 618px; height: 309px;"
+                                width="618"
+                                height="309"
+                                class="chartjs-render-monitor"></canvas>
+                        <script>
+                            {
+                                let chartContext = document.getElementById('chart-train-evaluation').getContext('2d');
+                                let chartData = {{ TrainScoring|tojson }};
+                                let labels = [], data = [];
+
+                                for (let metric in chartData) {
+                                    if (labels.length === 0) {
+                                        for (let i = 0; i < chartData[metric].length; i++) {
+                                            labels.push(`Epoch ${i + 1}`)
+                                        }
+                                    }
+
+                                    data.push({
+                                        "label": metric,
+                                        "data": chartData[metric],
+                                        "borderColor": GetRandomColor(0.35),
+                                        "fill": false
+                                    })
+                                }
+
+                                new Chart(chartContext, {
+                                    "type": "line",
+                                    "data": {
+                                        "labels": labels,
+                                        "datasets": data
+                                    },
+                                    "options": {
+                                        "title": {
+                                            "display": true,
+                                            "text": "Training evaluation metrics"
+                                        },
+                                        "scales": {
+                                            "yAxes": [{
+                                                "ticks": {
+                                                    "beginAtZero": true,
+                                                    "suggestedMax": 100
+                                                }
+                                            }]
+                                        }
+                                    }
+                                });
+                            }
+                        </script>
+                    </div>
+                {% else %}
+                    <p>No model has been trained yet, can't show any statistics.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="accordion m-2">
+            <input id="evaluation-test" type="radio" name="accordion-preprocessing" hidden="">
+            <label class="accordion-header c-hand" for="evaluation-test">
+                <h4>
+                    <i class="icon icon-arrow-right mr-1"></i>Testing evaluation
+                </h4>
+            </label>
+            <div class="accordion-body">
+                {% if TestScoring %}
+                    <p>Below are the results that were achieved using the model that has been built and trained. The
+                        model has been trained on {{ TrainTestSplit }}% of the submitted data,
+                        so {{ 100 - TrainTestSplit }}% of the data was used for this evaluation. For more information on
+                        the meaning of scoring-metrics for individual classes, see <a target="_blank"
+                                                                                      href="https://www.scikit-yb.org/en/latest/api/classifier/classification_report.html#classification-report">Yellowbrick
+                            docs.</a>
+                    </p>
+                    <div class="filter">
+                        <input type="radio" id="tag-0" class="filter-tag" name="filter-radio" hidden checked>
+                        <input type="radio" id="tag-1" class="filter-tag" name="filter-radio" hidden>
+                        <input type="radio" id="tag-2" class="filter-tag" name="filter-radio" hidden>
+
+                        <div class="filter-nav">
+                            <label class="chip" for="tag-0">All evaluations</label>
+                            <label class="chip" for="tag-1">General evaluation</label>
+                            <label class="chip" for="tag-2">Per-class evaluation</label>
+                        </div>
+
+                        <div class="filter-body columns">
+                            <div class="column col-md-12 col-4 filter-item" data-tag="tag-1">
+                                <div class="card mb-1">
+                                    <div class="card-header bg-secondary">
+                                        <div class="card-title h5">General test-set scoring</div>
+                                        <div class="card-subtitle">
+                                            <p><i>How well did the model score in general?</i></p>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="test-acc">
+                                                <b>Test-set accuracy</b> <i>(Higher &equals; better)</i>
+                                            </label>
+                                            <meter id="test-acc" class="meter tooltip"
+                                                   value="{{ TestScoring['test_accuracy'] | round(2) }}"
+                                                   optimum="100" min="0" max="100" low="50" high="80"
+                                                   data-tooltip="Test-set accuracy: {{ TestScoring['test_accuracy'] | round(2) }}%"></meter>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="test-loss"><b>Test-set loss</b> <i>(Lower
+                                                &equals;
+                                                better)</i></label>
+                                            <meter id="test-acc" class="meter tooltip"
+                                                   value="{{ TestScoring['test_loss'] | round(2) }}"
+                                                   optimum="0" min="0" max="100" low="35" high="60"
+                                                   data-tooltip="Test-set loss: {{ TestScoring['test_loss']| round(2) }}%"></meter>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% for cr in TestScoring['classification_report'] %}
+                                {% if cr not in ["accuracy", "macro avg", "weighted avg"] %}
+                                    <div class="column col-md-12 col-4 filter-item" data-tag="tag-2">
+                                        <div class="card mb-1">
+                                            <div class="card-header bg-secondary">
+                                                <div class="card-title h5">Scoring for class {{ cr }}</div>
+                                                <div class="card-subtitle">
+                                                    <p>
+                                                        <i>How good is the model on class {{ cr }}?</i>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="card-body">
+                                                {% for key in TestScoring['classification_report'][cr] %}
+                                                    <div class="form-group">
+                                                        {% if key != "support" %}
+                                                            <label for="test-acc">
+                                                                <b>{{ key|capitalize }}</b> <i>(Higher &equals;
+                                                                better)</i>
+                                                            </label>
+                                                            <meter id="test-acc" class="meter tooltip"
+                                                                   value="{{ (TestScoring['classification_report'][cr][key] * 100) | round(2) }}"
+                                                                   optimum="100" min="0" max="100" low="50" high="80"
+                                                                   data-tooltip="{{ key|capitalize }}: {{ (TestScoring['classification_report'][cr][key] * 100) | round(2) }}%">
+                                                            </meter>
+                                                        {% else %}
+                                                            Based on {{ TestScoring['classification_report'][cr][key] }}
+                                                            test-samples.
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

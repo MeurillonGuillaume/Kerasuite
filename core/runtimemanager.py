@@ -2,10 +2,20 @@ import gc
 import logging
 from flask import session
 from core.projectruntime import ProjectRuntime
+from core.projectmanager import ProjectManager
 
 
 class RuntimeManager:
     def __init__(self, project_manager, dataset_dir):
+        """
+        Manager class to keep track of all projects in the runtime
+
+        :param project_manager: A pointer to the manager with database access
+        :type project_manager: ProjectManager
+
+        :param dataset_dir: The directory where datasets can be found
+        :type dataset_dir: str
+        """
         self.__runtime = {}
         self.__project_manager = project_manager
         self.__dataset_dir = dataset_dir
@@ -204,3 +214,23 @@ class RuntimeManager:
         except Exception as e:
             logging.error(f'Error loading active projects for {session["username"]}: {e}')
             return []
+
+    def split_project_dataset(self, project_name):
+        """
+        Split the dataset in a train- and testset for a certain project
+
+        :param project_name: The project to split the dataset for
+        :type project_name: str
+        """
+        self.__runtime[session['username']][project_name].train_test_split()
+
+    def train_project_model(self, project_name):
+        """
+        Train the model
+
+        :param project_name: The project to train a model for
+        :type project_name: str
+        """
+        self.split_project_dataset(project_name=project_name)
+        self.__runtime[session['username']][project_name].train_model()
+        self.__runtime[session['username']][project_name].test_model()
