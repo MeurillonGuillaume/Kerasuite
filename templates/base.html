@@ -1,3 +1,24 @@
+{% macro add_form_group(field, icon_name=None, hidden=False, value=None) %}
+    <div class="form-group">
+        {% if not hidden %}
+            <label for="{{ field.name }}" class="form-label">
+                {{ field.label }}</label>
+        {% endif %}
+        {% if icon_name is not none %}
+            <div class="has-icon-left">
+                {{ field(class_="form-input")|safe }}
+                <i class="form-icon icon {{ icon_name }}"></i>
+            </div>
+        {% else %}
+            {% if value is not none %}
+                {{ field(class_="form-input", value=value)|safe }}
+            {% else %}
+                {{ field(class_="form-input")|safe }}
+            {% endif %}
+        {% endif %}
+    </div>
+{% endmacro %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

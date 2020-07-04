@@ -8,7 +8,7 @@ from core.modelcomponents import LAYERS, NORMALIZATION_METHODS, LAYER_OPTIONS
 from core.projectmanager import ProjectManager
 from core.runtimemanager import RuntimeManager
 from core.usermanager import UserManager
-from core.validation import is_user_logged_in, get_has_keys, post_has_keys, is_file_allowed, get_layer_params
+from core.validation import *
 import absl.logging
 
 # Global variables
@@ -65,11 +65,13 @@ def home():
     Serve the homepage or redirect to the login page
     """
     if is_user_logged_in():
+        form = CreateProjectForm()
         logging.debug(f'Loading home for user {session["username"]}')
         return render_template('home.html',
                                LoggedIn=session['loggedin'],
                                Projects=project_manager.get_user_projects(),
-                               ActiveProjects=runtime_manager.get_running_projects())
+                               ActiveProjects=runtime_manager.get_running_projects(),
+                               NewProjectForm=form)
     return redirect('/login')
 
 
@@ -78,18 +80,23 @@ def login():
     """
     Serve the login page or redirect to home
     """
+    form = LoginForm(request.form)
     if not is_user_logged_in():
-        if post_has_keys('password', 'username'):
-            if user_manager.attempt_login(request.form['username'], request.form['password']):
-                session['loggedin'] = True
-                session['username'] = request.form['username']
+        if request.method == 'POST' and form.validate():
 
-                if session['username'] == 'admin' and user_manager.admin_has_default_pass():
+            if user_manager.attempt_login(form.username.data, form.password.data):
+                session['loggedin'] = True
+                session['username'] = form.username.data
+
+                if form.username.data == 'admin' and user_manager.admin_has_default_pass():
                     logging.info(f'Admin manager still uses default password, prompting for change')
                     return redirect('/change/password?user=admin')
 
                 return redirect('/')
-        return render_template('login.html')
+        else:
+            # TODO: proper error handling
+            print(form.errors)
+        return render_template('login.html', Form=form)
     return redirect('/')
 
 
@@ -98,17 +105,27 @@ def change_password():
     """
     Change a users password
     """
-    if is_user_logged_in():
+    form = PasswordUpdateForm(request.form)
+    if is_user_logged_in() and request.method == 'POST':
+        if form.validate():
+            print(form.old_password.data)
+            print(form.new_password.data)
+            print(form.new_password_validate.data)
+            user_manager.change_password(
+                old=form.old_password.data,
+                new=form.new_password.data,
+                new_repeat=form.new_password_validate.data
+            )
+            return redirect('/logout')
+        else:
+            # TODO: proper error handling
+            print(form.errors)
+    else:
         data = get_has_keys('user')
         if data is not None and data['user'] == session['username']:
             logging.info(f"Prompting user {data['user']} to change password")
-            return render_template('change_password.html', Username=data['user'])
-        if post_has_keys('old_password', 'new_password', 'new_password_repeat'):
-            old, new, new_repeat = request.form['old_password'], request.form['new_password'], request.form[
-                'new_password_repeat']
-            user_manager.change_password(old, new, new_repeat)
-            return redirect('/logout')
-    return redirect('/login')
+            return render_template('change_password.html', Username=data['user'], Form=form)
+    return redirect('/change/password')
 
 
 @app.route('/logout')
@@ -128,10 +145,12 @@ def settings():
     Return a settings page or redirect to login.
     """
     if is_user_logged_in():
+        new_user_form = CreateUserForm()
         return render_template('settings.html', LoggedIn=session['loggedin'],
                                IsAdmin=user_manager.has_elevated_rights(),
                                UserList=user_manager.get_users(),
-                               Username=session['username'])
+                               Username=session['username'],
+                               NewUserForm=new_user_form)
     return redirect('/login')
 
 
@@ -141,9 +160,13 @@ def create_project():
     Create a new project for a certain user
     """
     if is_user_logged_in():
-        if post_has_keys('projectdescription', 'projectname'):
-            project_manager.create_project(request.form['projectname'],
-                                           request.form['projectdescription'])
+        form = CreateProjectForm(request.form)
+        if request.method == 'POST' and form.validate():
+            project_manager.create_project(
+                form.project_name.data,
+                form.project_description.data
+            )
+        return redirect('/')
     return redirect('/login')
 
 
@@ -166,12 +189,12 @@ def edit_project():
     """
     Edit the fields of a project
     """
-    if is_user_logged_in():
-        if post_has_keys('projectdescription', 'projectname', 'old_projectname'):
-            newname = project_manager.update_project(request.form['old_projectname'],
-                                                     request.form['projectname'],
-                                                     request.form['projectdescription'])
-            return redirect(f'/run?project={newname}')
+    form = EditProjectForm(request.form)
+    if is_user_logged_in() and form.validate() and request.method == 'POST':
+        newname = project_manager.update_project(form.project_oldname.data,
+                                                 form.project_newname.data,
+                                                 form.project_description.data)
+        return redirect(f'/run?project={newname}')
     return redirect('/login')
 
 
@@ -180,6 +203,14 @@ def run():
     """
     Launch a project or redirect to login
     """
+    edit_form = EditProjectForm()
+    preprocessing_form = PreprocessingForm()
+    rename_form = RenameColumnForm()
+    normalization_form = NormalizeForm()
+    drop_form = DropColumnForm()
+    replace_form = ReplaceDataForm()
+    create_layer_form = CreateLayerForm()
+
     if is_user_logged_in():
         data = get_has_keys('project')
         err = get_has_keys('error')
@@ -191,6 +222,14 @@ def run():
                         runtime_manager.run_project(project)
                 logging.info(f'Loading project {data["project"]} for user {session["username"]}')
 
+                columns = runtime_manager.get_column_names(project)
+                preprocessing_form.set_column_names(columns)
+                preprocessing_form.set_selected_columns(project_manager.get_preprocessing(project, 'output-columns'))
+                rename_form.set_old_columns(columns)
+                normalization_form.set_column_names(columns)
+                drop_form.set_column_names(columns)
+                replace_form.set_column_names(columns)
+
                 return render_template('project.html',
                                        Projectname=project,
                                        Projectdescription=project_manager.get_project(project)['description'],
@@ -200,11 +239,9 @@ def run():
                                        TrainTestSplit=project_manager.get_preprocessing(project,
                                                                                         'train-test-split'),
                                        RandomState=project_manager.get_preprocessing(project, 'random-state'),
-                                       ColumnNames=runtime_manager.get_column_names(project),
-                                       Normalizers=NORMALIZATION_METHODS,
+                                       ColumnNames=columns,
                                        DataBalance=runtime_manager.get_data_balance(project),
                                        ModelLayers=LAYERS,
-                                       OutputColumns=project_manager.get_preprocessing(project, 'output-columns'),
                                        ProjectModel=project_manager.load_model(project),
                                        LayerOptions=LAYER_OPTIONS,
                                        TrainScoring=project_manager.load_model_scoring(
@@ -213,7 +250,15 @@ def run():
                                        TestScoring=project_manager.load_model_scoring(
                                            project_name=project,
                                            scoring_source=project_manager.SCORING_TEST),
-                                       Error=err['error'])
+                                       Error=err['error'],
+                                       ModifyProjectForm=edit_form,
+                                       PreprocessingForm=preprocessing_form,
+                                       RenameForm=rename_form,
+                                       NormalizationForm=normalization_form,
+                                       Normalizers=NORMALIZATION_METHODS,
+                                       DropForm=drop_form,
+                                       ReplaceForm=replace_form,
+                                       CreateLayerForm=create_layer_form)
 
     return redirect('/login')
 
@@ -258,18 +303,20 @@ def set_dataset_split():
     """
     Assign a certain percentage to split the training & test data with
     """
-    if is_user_logged_in():
-        if post_has_keys('project', 'train-test-split', 'random-state', 'column-output[]'):
-            project_manager.set_preprocessing(request.form['project'],
+    if is_user_logged_in() and request.method == 'POST':
+        form = PreprocessingForm(request.form)
+        form.set_column_names(runtime_manager.get_column_names(request.form['project']))
+        if form.validate():
+            project_manager.set_preprocessing(form.project.data,
                                               'train-test-split',
-                                              int(request.form['train-test-split']))
-            project_manager.set_preprocessing(request.form['project'],
+                                              int(form.train_test_split.data))
+            project_manager.set_preprocessing(form.project.data,
                                               'random-state',
-                                              request.form['random-state'])
-            project_manager.set_preprocessing(request.form['project'],
+                                              int(form.random_state.data))
+            project_manager.set_preprocessing(form.project.data,
                                               'output-columns',
-                                              request.form.getlist('column-output[]'))
-            return redirect(f'/run?project={request.form["project"]}')
+                                              form.column_output.data)
+            return redirect(f'/run?project={form.project.data}')
     return redirect('/')
 
 
@@ -278,23 +325,32 @@ def set_column_name():
     """
     Change a column name
     """
-    if is_user_logged_in():
-        if post_has_keys('project', 'col_name_old', 'col_name_new'):
-            runtime_manager.rename_column(request.form['project'],
-                                          request.form['col_name_old'],
-                                          request.form['col_name_new'])
-            return redirect(f'/run?project={request.form["project"]}')
+    if is_user_logged_in() and request.method == 'POST':
+        form = RenameColumnForm(request.form)
+        form.set_old_columns(runtime_manager.get_column_names(request.form['project']))
+        if form.validate():
+            runtime_manager.rename_column(form.project.data,
+                                          form.old_col_name.data,
+                                          form.new_col_name.data)
+            return redirect(f'/run?project={form.project.data}')
+        else:
+            print(form.errors)
     return redirect('/')
 
 
-@app.route('/preprocess/columns', methods=['GET', 'POST'])
-def preprocess_columns():
-    if is_user_logged_in():
-        if post_has_keys('project', 'columns[]', 'normalisation-method'):
-            runtime_manager.preprocess_project(project_name=request.form['project'],
-                                               method=request.form['normalisation-method'],
-                                               columns=request.form.getlist('columns[]'))
-            return redirect(f'/run?project={request.form["project"]}')
+@app.route('/normalize/columns', methods=['GET', 'POST'])
+def normalize_columns():
+    if is_user_logged_in() and request.method == 'POST':
+        form = NormalizeForm(request.form)
+        form.set_column_names(runtime_manager.get_column_names(request.form['project']))
+        form.set_method_choises(NORMALIZATION_METHODS)
+        if form.validate():
+            runtime_manager.preprocess_project(project_name=form.project.data,
+                                               method=form.method.data,
+                                               columns=form.columns.data)
+            return redirect(f'/run?project={form.project.data}')
+        else:
+            print(form.errors)
     return redirect('/')
 
 
@@ -303,22 +359,28 @@ def drop_column():
     """
     Delete a column
     """
-    if is_user_logged_in():
-        if post_has_keys('project', 'column'):
-            runtime_manager.drop_column(request.form['project'], request.form['column'])
-            return redirect(f'/run?project={request.form["project"]}')
+    if is_user_logged_in() and request.method == 'POST':
+        form = DropColumnForm(request.form)
+        form.set_column_names(runtime_manager.get_column_names(request.form['project']))
+
+        if form.validate():
+            runtime_manager.drop_column(form.project.data, form.column.data)
+            return redirect(f'/run?project={form.project.data}')
     return redirect('/')
 
 
 @app.route('/replace/dataset/values', methods=['GET', 'POST'])
 def replace_dataset_values():
-    if is_user_logged_in():
-        if post_has_keys('column', 'project', 'value_old', 'value_new'):
-            runtime_manager.replace_values(request.form['project'],
-                                           request.form['column'],
-                                           request.form['value_old'],
-                                           request.form['value_new'])
-            return redirect(f'/run?project={request.form["project"]}')
+    if is_user_logged_in() and request.method == 'POST':
+        form = ReplaceDataForm(request.form)
+        form.set_column_names(runtime_manager.get_column_names(request.form['project']))
+
+        if form.validate():
+            runtime_manager.replace_values(form.project.data,
+                                           form.column.data,
+                                           form.value_old.data,
+                                           form.value_new.data)
+            return redirect(f'/run?project={form.project.data}')
     return redirect('/')
     pass
 
@@ -358,15 +420,12 @@ def create_user():
     """
     Create a new user
     """
-    if is_user_logged_in():
+    if is_user_logged_in() and request.method == 'POST':
         if user_manager.has_elevated_rights():
-            if post_has_keys('username', 'password', 'password_repeat'):
-                username, password, pass_repeat = request.form['username'], request.form['password'], request.form[
-                    'password_repeat']
-                if len('username') > 1 and password == pass_repeat:
-                    if not user_manager.does_user_exist(username):
-                        if user_manager.is_password_strong(password):
-                            user_manager.register_user(username, password, False)
+            form = CreateUserForm(request.form)
+            if form.validate():
+                if not user_manager.does_user_exist(form.username.data):
+                    user_manager.register_user(form.username.data, form.password.data, False)
         return redirect('/settings')
     return redirect('/login')
 
@@ -390,13 +449,26 @@ def create_layer():
     """
     Create a new layer in a model
     """
-    if is_user_logged_in():
-        if post_has_keys('project', 'new-layer', 'layer-description'):
-            project_manager.add_model_layer(project_name=request.form['project'],
-                                            layer_type=request.form['new-layer'],
-                                            layer_params=get_layer_params(request.form['new-layer']),
-                                            description=request.form['layer-description'])
-            return redirect(f'/run?project={request.form["project"]}')
+    layer_forms = {'Dense': AddDenseLayerForm, 'Dropout': AddDropoutLayerForm}
+
+    if is_user_logged_in() and request.method == 'POST':
+        # Validate a baseform first, which contains the project name, layer type & description
+        baseform = CreateLayerForm(request.form)
+        baseform.new_layer.data = baseform.new_layer_name.data
+        if baseform.validate():
+            # Load the datafrom which fits the specific layer type
+            dataform = layer_forms[baseform.new_layer.data](request.form)
+            if dataform.validate():
+                layer_data = get_layer_params(form_data=dataform, layer_type=baseform.new_layer.data)
+                project_manager.add_model_layer(project_name=baseform.project.data,
+                                                layer_type=baseform.new_layer.data,
+                                                layer_params=layer_data,
+                                                description=baseform.layer_description.data)
+                return redirect(f'/run?project={baseform.project.data}')
+            else:
+                print(dataform.errors)
+        else:
+            print(baseform.errors)
     return redirect('/')
 
 
@@ -438,4 +510,4 @@ def train_model():
 
 
 if __name__ == '__main__':
-    app.run(port=4444, host='0.0.0.0')
+    app.run(port=4444, host='0.0.0.0', debug=True)

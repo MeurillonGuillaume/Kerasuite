@@ -91,19 +91,19 @@ class ModelManager:
                     if self.__layer_count == 0:
                         logging.info('Creating initial Dense layer')
                         self.__model.add(Dense(
-                            units=_layer['parameters']['Units'],
-                            activation=_layer['parameters']['Activation'].lower(),
+                            units=_layer['parameters']['units'],
+                            activation=_layer['parameters']['activation'].lower(),
                             input_shape=input_shape
                         ))
                     else:
                         logging.info('New Dense layer')
                         self.__model.add(Dense(
-                            units=_layer['parameters']['Units'],
-                            activation=_layer['parameters']['Activation'].lower()
+                            units=_layer['parameters']['units'],
+                            activation=_layer['parameters']['activation'].lower()
                         ))
                     self.__layer_count += 1
                 elif _layer['layerType'] == 'Dropout':
-                    _r = _layer['parameters']['Rate']
+                    _r = _layer['parameters']['rate']
                     if _r >= 1:
                         _r /= 100.0
                     logging.info('New Dropout layer')

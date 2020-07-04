@@ -32,19 +32,8 @@
             {% endfor %}
         {% endif %}
         <h4>Create model layers</h4>
-        <div class="form-group">
-            <label class="form-label" for="model-layer">Layer type</label>
-            <select class="form-select" name="new-layer" id="model-layer">
-                {% for LayerType in ModelLayers | sort %}
-                    <optgroup label="{{ LayerType }}">
-                        {% for Layer in ModelLayers[LayerType] | sort %}
-                            <option value="{{ Layer }}">{{ Layer }}</option>
-                        {% endfor %}
-                    </optgroup>
-                {% endfor %}
-            </select>
-        </div>
-        <input type="hidden" name="project" value="{{ Projectname }}">
+        {{ add_form_group(CreateLayerForm.project, hidden=True, value=Projectname) }}
+        {{ add_form_group(CreateLayerForm.new_layer) }}
         <button class="btn btn-success" id="btn-new-layer">Create layer</button>
         <a class="btn btn-error" href="/train/model?project={{ Projectname }}">Train model</a>
     </div>

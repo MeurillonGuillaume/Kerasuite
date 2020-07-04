@@ -10,21 +10,8 @@
         </label>
         <div class="accordion-body">
             <form action="/drop/column" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="column">Column to drop</label>
-                    <select class="form-select" name="column" id="column">
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                <option value="{{ Column }}">{{ Column }}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="" selected="true" disabled="disabled">No columns
-                                found...
-                            </option>
-                        {% endif %}
-                    </select>
-                    <input type="hidden" name="project" value="{{ Projectname }}">
-                </div>
+                {{ add_form_group(DropForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(DropForm.column) }}
                 <button class="btn btn-success btn-lg">
                     <i class="icon icon-delete icon-resize-small"></i> Drop column
                 </button>
@@ -41,26 +28,9 @@
         </label>
         <div class="accordion-body">
             <form action="/set/column/name" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="column">Column to rename</label>
-                    <select class="form-select" name="col_name_old" id="column">
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                <option value="{{ Column }}">{{ Column }}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="" selected="true" disabled="disabled">No columns
-                                found...
-                            </option>
-                        {% endif %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="old-val">New column name</label>
-                    <input class="form-input" type="text" name="col_name_new" id="old-val"
-                           placeholder="NewName36" required>
-                </div>
-                <input type="hidden" name="project" value="{{ Projectname }}">
+                {{ add_form_group(RenameForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(RenameForm.old_col_name) }}
+                {{ add_form_group(RenameForm.new_col_name) }}
                 <button class="btn btn-success btn-lg">
                     <i class="icon icon-edit"></i> Rename column
                 </button>
@@ -77,31 +47,10 @@
         </label>
         <div class="accordion-body">
             <form action="/replace/dataset/values" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="column">Replace values in column</label>
-                    <select class="form-select" name="column" id="column">
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                <option value="{{ Column }}">{{ Column }}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="" selected="true" disabled="disabled">No columns
-                                found...
-                            </option>
-                        {% endif %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="old-val">The value to replace</label>
-                    <input class="form-input" type="text" name="value_old" id="old-val"
-                           placeholder="Value123" required>
-                </div>
-                <div class="form-group">
-                    <label for="new-val">Replace value with</label>
-                    <input class="form-input" type="text" name="value_new" id="new-val"
-                           placeholder="Newvalue-123" required>
-                </div>
-                <input type="hidden" name="project" value="{{ Projectname }}" required>
+                {{ add_form_group(ReplaceForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(ReplaceForm.column) }}
+                {{ add_form_group(ReplaceForm.value_old) }}
+                {{ add_form_group(ReplaceForm.value_new) }}
                 <button class="btn btn-success btn-lg">
                     <i class="icon icon-edit"></i> Replace values
                 </button>
@@ -117,23 +66,13 @@
             </h4>
         </label>
         <div class="accordion-body">
-            <form action="/preprocess/columns" method="post"
+            <form action="/normalize/columns" method="post"
                   enctype="multipart/form-data">
+                {{ add_form_group(NormalizationForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(NormalizationForm.columns) }}
                 <div class="form-group">
-                    <label class="form-label" for="select-column">Columns to normalize</label>
-                    <select class="form-select" name="columns[]" id="select-column" multiple required>
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                <option value="{{ Column }}">{{ Column }}</option>
-                            {% endfor %}
-                        {% else %}
-                            <option value="" disabled>There are no columns</option>
-                        {% endif %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="normalisation-method">Normalise data with method</label>
-                    <select class="form-select" name="normalisation-method" id="normalisation-method" required>
+                    <label class="form-label" for="method">Normalise data with method</label>
+                    <select class="form-select" name="method" id="method" required>
                         {% if Normalizers %}
                             {% for NormType in Normalizers|sort %}
                                 <optgroup label="{{ NormType }}">
@@ -145,7 +84,6 @@
                         {% endif %}
                     </select>
                 </div>
-                <input type="hidden" value="{{ Projectname }}" name="project" required>
                 <input type="submit" class="btn btn-success" value="Normalise data">
             </form>
         </div>
@@ -161,44 +99,10 @@
         <div class="accordion-body">
             <form action="/set/project/dataset/split" method="post"
                   enctype="multipart/form-data">
-                <div class="form-group">
-                    <label class="form-label" for="train-test-range">How much data should be in
-                        the trainingset?</label>
-                    <input id="train-test-range" class="slider tooltip p-2" type="range"
-                           min="50"
-                           max="90"
-                            {% if TrainTestSplit %}
-                           value="{{ TrainTestSplit }}"
-                            {% else %}
-                           value="70"
-                            {% endif %}
-                           step="1"
-                           oninput="this.setAttribute('value', `${this.value}%`);"
-                           name="train-test-split" required>
-                    <input type="hidden" value="{{ Projectname }}" name="project" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="random-state">Custom random state <i>(optional)</i></label>
-                    <input type="number" class="form-input" id="random-state" name="random-state"
-                           value="{% if RandomState %}{{ RandomState }}{% else %}0{% endif %}" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="column-output">Select output column(s)</label>
-                    <select class="form-select" name="column-output[]" id="column-output" multiple required>
-                        {% if ColumnNames %}
-                            {% for Column in ColumnNames|sort %}
-                                {% if OutputColumns is not none %}
-                                    <option value="{{ Column }}"
-                                            {% if Column in OutputColumns %}selected{% endif %}>{{ Column }}</option>
-                                {% else %}
-                                    <option value="{{ Column }}">{{ Column }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <option value="" disabled>There are no columns</option>
-                        {% endif %}
-                    </select>
-                </div>
+                {{ add_form_group(PreprocessingForm.project, hidden=True, value=Projectname) }}
+                {{ add_form_group(PreprocessingForm.train_test_split, value=TrainTestSplit) }}
+                {{ add_form_group(PreprocessingForm.random_state, value=RandomState) }}
+                {{ add_form_group(PreprocessingForm.column_output) }}
                 <input type="submit" class="btn btn-success" value="Set split size">
             </form>
         </div>
