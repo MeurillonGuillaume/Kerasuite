@@ -1,8 +1,8 @@
 import logging
-from re import match
-from pickledb import PickleDB
+
 from flask import session
 from passlib.hash import bcrypt
+from pickledb import PickleDB
 
 
 class UserManager:
