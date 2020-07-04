@@ -1,9 +1,11 @@
 import logging
+
 from flask import session, request
-from core.modelcomponents import LAYER_OPTIONS, ACTIVATION_FUNCTIONS
 from wtforms import Form, StringField, PasswordField, validators, HiddenField, TextAreaField, SelectMultipleField, \
     SelectField
 from wtforms.fields.html5 import IntegerRangeField, IntegerField
+
+from core.modelcomponents import LAYER_OPTIONS, ACTIVATION_FUNCTIONS
 
 # Globals
 ALLOWED_FILETYPES = ['csv', 'json']

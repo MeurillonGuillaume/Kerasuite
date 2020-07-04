@@ -1,8 +1,10 @@
 import gc
 import logging
+
 from flask import session
-from core.projectruntime import ProjectRuntime
+
 from core.projectmanager import ProjectManager
+from core.projectruntime import ProjectRuntime
 
 
 class RuntimeManager:
