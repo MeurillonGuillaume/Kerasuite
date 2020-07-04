@@ -1,8 +1,9 @@
 {% macro add_form_group(field, icon_name=None, hidden=False, value=None) %}
     <div class="form-group">
         {% if not hidden %}
-            <label for="{{ field.name }}" class="form-label">
-                {{ field.label|safe }}</label>
+            <label for="{{ field.name }}"
+                   class="form-label">
+                {{ field.label }}</label>
         {% endif %}
         {% if icon_name is not none %}
             <div class="has-icon-left">

@@ -499,6 +499,11 @@ class AddDropoutLayerForm(Form):
 
 
 class ModelOptionsForm(Form):
+    project = HiddenField(
+        validators=[
+            validators.DataRequired(message='Stop messing with the HTML, I need that.')
+        ]
+    )
     epochs = IntegerRangeField(
         label='Epochs: how many times will the model see the entire training-set',
         validators=[

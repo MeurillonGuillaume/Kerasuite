@@ -51,7 +51,6 @@
                 {{ add_form_group(CreateLayerForm.project, hidden=True, value=Projectname) }}
                 {{ add_form_group(CreateLayerForm.new_layer) }}
                 <button class="btn btn-success" id="btn-new-layer">Create layer</button>
-                <a class="btn btn-error" href="/train/model?project={{ Projectname }}">Train model</a>
             </div>
         </div>
         <div class="accordion m-2">
@@ -62,8 +61,24 @@
                 </h4>
             </label>
             <div class="accordion-body">
-                {{ add_form_group(ModelOptionsForm.epochs) }}
-                {{ add_form_group(ModelOptionsForm.batch_size) }}
+                <form action="/set/model/options" method="post" enctype="multipart/form-data">
+                    {{ add_form_group(ModelOptionsForm.epochs) }}
+                    {{ add_form_group(ModelOptionsForm.batch_size) }}
+                    {{ add_form_group(ModelOptionsForm.project, hidden=True, value=Projectname) }}
+                    <button class="btn btn-success" id="btn-new-layer">Set options</button>
+                </form>
+            </div>
+        </div>
+        <div class="accordion m-2">
+            <input id="building-build" type="radio" name="building-accordion" hidden="">
+            <label class="accordion-header c-hand" for="building-build">
+                <h4>
+                    <i class="icon icon-arrow-right mr-1"></i>Build model
+                </h4>
+            </label>
+            <div class="accordion-body">
+
+                <a class="btn btn-error" href="/train/model?project={{ Projectname }}">Train model</a>
             </div>
         </div>
     </div>

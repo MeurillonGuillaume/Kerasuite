@@ -515,5 +515,18 @@ def train_model():
     return redirect('/')
 
 
+@app.route('/set/model/options', methods=['GET', 'POST'])
+def set_model_options():
+    if is_user_logged_in() and request.method == 'POST':
+        form = ModelOptionsForm(request.form)
+        if form.validate():
+            project_manager.set_model_param(form.project.data, 'epochs', form.epochs.data)
+            project_manager.set_model_param(form.project.data, 'batch-size', form.batch_size.data)
+            return redirect(f'/run?project={form.project.data}')
+        else:
+            print(form.errors)
+    return redirect('/')
+
+
 if __name__ == '__main__':
     app.run(port=4444, host='0.0.0.0', debug=True)

@@ -250,10 +250,25 @@ class RuntimeManager:
         """
         Get a specific model parameter
 
-        :param project_name: The project to get the dataset length for
+        :param project_name: The project to request a key for
         :type project_name: str
 
         :param key: the name of the parameter to request
         :type key: str
         """
         return self.__runtime[session['username']][project_name].get_model_param(key)
+
+    def set_model_param(self, project_name, key, value):
+        """
+        Set a specific model parameter
+
+        :param project_name: The project to set a key for
+        :type project_name: str
+
+        :param key: the name of the parameter to set
+        :type key: str
+
+        :param value: The value to set for the key
+        :type value: any
+        """
+        self.__project_manager.set_model_param(project_name, key, value)

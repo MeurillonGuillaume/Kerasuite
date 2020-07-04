@@ -557,3 +557,19 @@ class ProjectManager:
                     _result = []
                 _result += _tmp
         return _result
+
+    def set_model_param(self, project_name, key, value):
+        """
+        Set a model parameter
+
+        :param project_name: The project to set parameters for
+        :type project_name: str
+
+        :param key: The parameter to set
+        :type key: str
+
+        :param value: The value to set for the key
+        """
+        models = self.get_all_models()
+        models[session['username']][project_name][key] = value
+        self.__db_client.set('models', models)
