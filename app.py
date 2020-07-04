@@ -210,6 +210,7 @@ def run():
     drop_form = DropColumnForm()
     replace_form = ReplaceDataForm()
     create_layer_form = CreateLayerForm()
+    model_options_form = ModelOptionsForm()
 
     if is_user_logged_in():
         data = get_has_keys('project')
@@ -229,6 +230,10 @@ def run():
                 normalization_form.set_column_names(columns)
                 drop_form.set_column_names(columns)
                 replace_form.set_column_names(columns)
+                model_options_form.set_values(
+                    max_count=runtime_manager.get_dataset_length(project),
+                    current_epochs=runtime_manager.get_model_param(project, 'epochs'),
+                    current_batchsize=runtime_manager.get_model_param(project, 'batch-size'))
 
                 return render_template('project.html',
                                        Projectname=project,
@@ -258,7 +263,8 @@ def run():
                                        Normalizers=NORMALIZATION_METHODS,
                                        DropForm=drop_form,
                                        ReplaceForm=replace_form,
-                                       CreateLayerForm=create_layer_form)
+                                       CreateLayerForm=create_layer_form,
+                                       ModelOptionsForm=model_options_form)
 
     return redirect('/login')
 

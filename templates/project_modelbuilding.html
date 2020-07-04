@@ -54,5 +54,17 @@
                 <a class="btn btn-error" href="/train/model?project={{ Projectname }}">Train model</a>
             </div>
         </div>
+        <div class="accordion m-2">
+            <input id="building-model-set-options" type="radio" name="building-accordion" hidden="">
+            <label class="accordion-header c-hand" for="building-model-set-options">
+                <h4>
+                    <i class="icon icon-arrow-right mr-1"></i>Set model options
+                </h4>
+            </label>
+            <div class="accordion-body">
+                {{ add_form_group(ModelOptionsForm.epochs) }}
+                {{ add_form_group(ModelOptionsForm.batch_size) }}
+            </div>
+        </div>
     </div>
 </div>

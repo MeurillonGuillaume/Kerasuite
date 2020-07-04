@@ -496,3 +496,46 @@ class AddDropoutLayerForm(Form):
             'max': 100
         }
     )
+
+
+class ModelOptionsForm(Form):
+    epochs = IntegerRangeField(
+        label='Epochs: how many times will the model see the entire training-set',
+        validators=[
+            validators.DataRequired(message='The amount of epochs is required'),
+            validators.NumberRange(min=1, max=1000000, message='The amount of epochs should be between 1 and 1000000')
+        ],
+        render_kw={
+            'min': 1,
+            'max': 1000,
+            'step': 2,
+            'class': 'slider tooltip p-2',
+            'oninput': 'this.setAttribute("value", `${this.value}`);',
+        }
+    )
+    batch_size = IntegerRangeField(
+        label='Batch size: after how many records will the model update weights (Works most efficient as powers of 2)',
+        validators=[
+            validators.DataRequired(message='The batch-size is required'),
+        ],
+        render_kw={
+            'min': 2,
+            'step': 2,
+            'class': 'slider tooltip p-2',
+            'oninput': 'this.setAttribute("value", `${this.value}`);',
+        }
+    )
+
+    def set_values(self, max_count, current_batchsize=5, current_epochs=25):
+        self.batch_size.validators.append(
+            validators.NumberRange(
+                min=1,
+                max=max_count,
+                message=f'The batch size must be between 1 and {max_count} (the amount of samples in the dataset)'
+            )
+        )
+        self.batch_size.render_kw['max'] = max_count
+        self.batch_size.render_kw['value'] = current_batchsize
+        self.batch_size.default = current_batchsize
+        self.epochs.default = current_epochs
+        self.epochs.render_kw['value'] = current_epochs

@@ -15,7 +15,7 @@ class RuntimeManager:
         :param project_manager: A pointer to the manager with database access
         :type project_manager: ProjectManager
 
-        :param dataset_dir: The directory where datasets can be found
+        :param dataset_dir: The directory where data sets can be found
         :type dataset_dir: str
         """
         self.__runtime = {}
@@ -236,3 +236,24 @@ class RuntimeManager:
         self.split_project_dataset(project_name=project_name)
         self.__runtime[session['username']][project_name].train_model()
         self.__runtime[session['username']][project_name].test_model()
+
+    def get_dataset_length(self, project_name):
+        """
+        Get the length of the dataset
+
+        :param project_name: The project to get the dataset length for
+        :type project_name: str
+        """
+        return self.__runtime[session['username']][project_name].get_dataset_length()
+
+    def get_model_param(self, project_name, key):
+        """
+        Get a specific model parameter
+
+        :param project_name: The project to get the dataset length for
+        :type project_name: str
+
+        :param key: the name of the parameter to request
+        :type key: str
+        """
+        return self.__runtime[session['username']][project_name].get_model_param(key)

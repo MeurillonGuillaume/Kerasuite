@@ -227,3 +227,24 @@ class ProjectRuntime:
             ),
             scoring_source=self.__project_manager.SCORING_TEST
         )
+
+    def get_dataset_length(self):
+        """
+        Get the length of the dataset
+        """
+        if self.dataset is not None:
+            return int(self.dataset.size / len(self.dataset.columns))
+        return 0
+
+    def get_model_param(self, key):
+        """
+        Get a specific model parameter
+
+        :param key: the name of the parameter to request
+        :type key: str
+        """
+        try:
+            return self.model_manager.get_model_params()[key]
+        except Exception as e:
+            logging.error(e)
+            return None

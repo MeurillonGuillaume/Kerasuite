@@ -42,7 +42,7 @@ class ModelManager:
         self.__model = keras.models.Sequential()
         self.__layer_count = 0
 
-    def __get_model_params(self):
+    def get_model_params(self):
         """
         Load all stored params for a project
         :rtype: dict
@@ -55,28 +55,28 @@ class ModelManager:
         Load a list from model layers
         :rtype: list
         """
-        return self.__get_model_params()['layers']
+        return self.get_model_params()['layers']
 
     def __get_epochs(self):
         """
         Load the amount of wanted training epochs
         :rtype: int
         """
-        return int(self.__get_model_params()['epochs'])
+        return int(self.get_model_params()['epochs'])
 
     def __get_batch_size(self):
         """
         Load the wanted batch-size for training
         :rtype: int
         """
-        return int(self.__get_model_params()['batch-size'])
+        return int(self.get_model_params()['batch-size'])
 
     def __get_validation_split(self):
         """
         Load the validation-split to use during training
         :rtype: float
         """
-        _v = self.__get_model_params()['validation-split']
+        _v = self.get_model_params()['validation-split']
         if _v >= 1:
             _v /= 100.0
         return float(_v)

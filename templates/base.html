@@ -2,7 +2,7 @@
     <div class="form-group">
         {% if not hidden %}
             <label for="{{ field.name }}" class="form-label">
-                {{ field.label }}</label>
+                {{ field.label|safe }}</label>
         {% endif %}
         {% if icon_name is not none %}
             <div class="has-icon-left">
