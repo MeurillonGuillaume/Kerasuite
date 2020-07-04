@@ -1,9 +1,11 @@
-from tensorflow import keras
-from pandas import DataFrame
-from tensorflow.keras.layers import Dense, Dropout
-from core.projectmanager import ProjectManager
 import logging
+
+from pandas import DataFrame
 from sklearn.metrics import classification_report
+from tensorflow import keras
+from tensorflow.keras.layers import Dense, Dropout
+
+from core.projectmanager import ProjectManager
 
 
 class LossHistory(keras.callbacks.Callback):

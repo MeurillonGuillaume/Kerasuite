@@ -1,5 +1,7 @@
 import logging
+
 from flask import session, request
+
 from core.modelcomponents import LAYER_OPTIONS
 
 # Globals
