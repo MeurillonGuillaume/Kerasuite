@@ -101,7 +101,7 @@ class ProjectManager:
             for project in projects:
                 if project['name'] == name:
                     return project
-        return 0
+        return None
 
     def drop_project(self, name):
         """
@@ -159,10 +159,7 @@ class ProjectManager:
 
         :rtype: bool
         """
-        p = self.get_project(project_name)
-        if p is not 0:
-            return 1
-        return 0
+        return self.get_project(project_name) is not None
 
     def get_all_datasets(self):
         """
