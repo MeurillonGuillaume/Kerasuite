@@ -517,6 +517,9 @@ def train_model():
 
 @app.route('/set/model/options', methods=['GET', 'POST'])
 def set_model_options():
+    """
+    Set options for training a model
+    """
     if is_user_logged_in() and request.method == 'POST':
         form = ModelOptionsForm(request.form)
         if form.validate():
