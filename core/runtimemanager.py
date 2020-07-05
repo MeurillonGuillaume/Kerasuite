@@ -247,6 +247,7 @@ class RuntimeManager:
         try:
             return self.__runtime[session['username']][project_name].get_dataset_length()
         except Exception as e:
+            logging.error(f'Could not get dataset length for {project_name} from {session["username"]}: {e}')
             return 0
 
     def get_model_param(self, project_name, key, on_except=None):

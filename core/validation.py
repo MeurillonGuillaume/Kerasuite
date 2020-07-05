@@ -532,15 +532,11 @@ class ModelOptionsForm(Form):
     )
     early_stopping = BooleanField(
         label='Use early stopping',
-        validators=[
-            validators.DataRequired('It\'s required to submit whether or not to use early stopping')
-        ]
+        render_kw={'checked': ''}
     )
     model_checkpoints = BooleanField(
         label='Use model checkpoints',
-        validators=[
-            validators.DataRequired('It\'s required to submit whether or not to use model checkpoints')
-        ]
+        render_kw={'checked': ''}
     )
 
     def set_values(self, max_count, current_batchsize=5, current_epochs=25, current_es=False, current_mcp=False):
@@ -556,5 +552,18 @@ class ModelOptionsForm(Form):
         self.batch_size.default = current_batchsize
         self.epochs.default = current_epochs
         self.epochs.render_kw['value'] = current_epochs
+
         self.model_checkpoints.default = current_mcp
         self.early_stopping.default = current_es
+
+        if not current_mcp:
+            if 'checked' in self.model_checkpoints.render_kw:
+                self.model_checkpoints.render_kw.pop('checked')
+        else:
+            self.model_checkpoints.render_kw = {'checked': ''}
+
+        if not current_es:
+            if 'checked' in self.early_stopping.render_kw:
+                self.early_stopping.render_kw.pop('checked')
+        else:
+            self.early_stopping.render_kw = {'checked': ''}

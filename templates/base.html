@@ -8,7 +8,7 @@
 
         {% if is_checkbox %}
             <label class="form-checkbox">
-                <input type="checkbox" class="form-input" name="{{ field.name }}" id="{{ field.name }}">
+                {{ field(_class="form-input")|safe }}
                 <i class="form-icon"></i> {{ field.label }}
             </label>
         {% endif %}

@@ -528,6 +528,8 @@ def set_model_options():
         if form.validate():
             project_manager.set_model_param(form.project.data, 'epochs', form.epochs.data)
             project_manager.set_model_param(form.project.data, 'batch-size', form.batch_size.data)
+            project_manager.set_model_param(form.project.data, 'early_stopping', form.early_stopping.data)
+            project_manager.set_model_param(form.project.data, 'model_checkpoints', form.model_checkpoints.data)
             return redirect(f'/run?project={form.project.data}')
         else:
             print(form.errors)
