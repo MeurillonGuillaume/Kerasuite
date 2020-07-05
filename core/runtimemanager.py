@@ -244,9 +244,12 @@ class RuntimeManager:
         :param project_name: The project to get the dataset length for
         :type project_name: str
         """
-        return self.__runtime[session['username']][project_name].get_dataset_length()
+        try:
+            return self.__runtime[session['username']][project_name].get_dataset_length()
+        except Exception as e:
+            return 0
 
-    def get_model_param(self, project_name, key):
+    def get_model_param(self, project_name, key, on_except=None):
         """
         Get a specific model parameter
 
@@ -255,8 +258,14 @@ class RuntimeManager:
 
         :param key: the name of the parameter to request
         :type key: str
+
+        :param on_except:
         """
-        return self.__runtime[session['username']][project_name].get_model_param(key)
+        try:
+            return self.__runtime[session['username']][project_name].get_model_param(key)
+        except Exception as e:
+            logging.error(f'Could not get model parameter {key}: {e}')
+            return on_except
 
     def set_model_param(self, project_name, key, value):
         """

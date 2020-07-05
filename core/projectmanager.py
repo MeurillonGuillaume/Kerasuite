@@ -371,6 +371,8 @@ class ProjectManager:
             models[session['username']][project_name] = {
                 'epochs': 5,
                 'batch-size': 10,
+                'early_stopping': False,
+                'model_checkpoints': False,
                 'layers': [],
                 'timestamp': time.time(),
                 'validation-split': 0.15,

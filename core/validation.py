@@ -2,7 +2,7 @@ import logging
 
 from flask import session, request
 from wtforms import Form, StringField, PasswordField, validators, HiddenField, TextAreaField, SelectMultipleField, \
-    SelectField
+    SelectField, BooleanField
 from wtforms.fields.html5 import IntegerRangeField, IntegerField
 
 from core.modelcomponents import LAYER_OPTIONS, ACTIVATION_FUNCTIONS
@@ -530,8 +530,20 @@ class ModelOptionsForm(Form):
             'oninput': 'this.setAttribute("value", `${this.value}`);',
         }
     )
+    early_stopping = BooleanField(
+        label='Use early stopping',
+        validators=[
+            validators.DataRequired('It\'s required to submit whether or not to use early stopping')
+        ]
+    )
+    model_checkpoints = BooleanField(
+        label='Use model checkpoints',
+        validators=[
+            validators.DataRequired('It\'s required to submit whether or not to use model checkpoints')
+        ]
+    )
 
-    def set_values(self, max_count, current_batchsize=5, current_epochs=25):
+    def set_values(self, max_count, current_batchsize=5, current_epochs=25, current_es=False, current_mcp=False):
         self.batch_size.validators.append(
             validators.NumberRange(
                 min=1,
@@ -544,3 +556,5 @@ class ModelOptionsForm(Form):
         self.batch_size.default = current_batchsize
         self.epochs.default = current_epochs
         self.epochs.render_kw['value'] = current_epochs
+        self.model_checkpoints.default = current_mcp
+        self.early_stopping.default = current_es

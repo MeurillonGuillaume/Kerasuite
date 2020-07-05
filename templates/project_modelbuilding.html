@@ -64,6 +64,8 @@
                 <form action="/set/model/options" method="post" enctype="multipart/form-data">
                     {{ add_form_group(ModelOptionsForm.epochs) }}
                     {{ add_form_group(ModelOptionsForm.batch_size) }}
+                    {{ add_form_group(ModelOptionsForm.early_stopping, is_checkbox=True) }}
+                    {{ add_form_group(ModelOptionsForm.model_checkpoints, is_checkbox=True) }}
                     {{ add_form_group(ModelOptionsForm.project, hidden=True, value=Projectname) }}
                     <button class="btn btn-success" id="btn-new-layer">Set options</button>
                 </form>

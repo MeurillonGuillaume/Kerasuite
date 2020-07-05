@@ -232,8 +232,11 @@ def run():
                 replace_form.set_column_names(columns)
                 model_options_form.set_values(
                     max_count=runtime_manager.get_dataset_length(project),
-                    current_epochs=runtime_manager.get_model_param(project, 'epochs'),
-                    current_batchsize=runtime_manager.get_model_param(project, 'batch-size'))
+                    current_epochs=runtime_manager.get_model_param(project, 'epochs', 5),
+                    current_batchsize=runtime_manager.get_model_param(project, 'batch-size', 25),
+                    current_es=runtime_manager.get_model_param(project, 'early_stopping', False),
+                    current_mcp=runtime_manager.get_model_param(project, 'model_checkpoints', False)
+                )
 
                 return render_template('project.html',
                                        Projectname=project,

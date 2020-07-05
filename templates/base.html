@@ -1,16 +1,24 @@
-{% macro add_form_group(field, icon_name=None, hidden=False, value=None) %}
+{% macro add_form_group(field, icon_name=None, hidden=False, value=None, is_checkbox=False) %}
     <div class="form-group">
-        {% if not hidden %}
+        {% if not hidden and not is_checkbox %}
             <label for="{{ field.name }}"
                    class="form-label">
                 {{ field.label }}</label>
         {% endif %}
-        {% if icon_name is not none %}
+
+        {% if is_checkbox %}
+            <label class="form-checkbox">
+                <input type="checkbox" class="form-input" name="{{ field.name }}" id="{{ field.name }}">
+                <i class="form-icon"></i> {{ field.label }}
+            </label>
+        {% endif %}
+
+        {% if icon_name is not none and not is_checkbox %}
             <div class="has-icon-left">
                 {{ field(class_="form-input")|safe }}
                 <i class="form-icon icon {{ icon_name }}"></i>
             </div>
-        {% else %}
+        {% elif not is_checkbox %}
             {% if value is not none %}
                 {{ field(class_="form-input", value=value)|safe }}
             {% else %}
