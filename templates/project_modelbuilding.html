@@ -1,5 +1,5 @@
 <div class="columns">
-    <div class="column col-lg-12 col-6">
+    <div class="column col-md-12 col-6">
         <div class="accordion m-2">
             <input id="building-model-overview" type="radio" name="building-accordion" hidden="">
             <label class="accordion-header c-hand" for="building-model-overview">
@@ -53,6 +53,7 @@
                 <button class="btn btn-success" id="btn-new-layer">Create layer</button>
             </div>
         </div>
+
         <div class="accordion m-2">
             <input id="building-model-set-options" type="radio" name="building-accordion" hidden="">
             <label class="accordion-header c-hand" for="building-model-set-options">
@@ -71,6 +72,35 @@
                 </form>
             </div>
         </div>
+        {% if ModelOptionsForm.early_stopping.default %}
+            <div class="accordion m-2">
+                <input id="building-earlystop" type="radio" name="building-accordion" hidden="">
+                <label class="accordion-header c-hand" for="building-earlystop">
+                    <h4>
+                        <i class="icon icon-arrow-right mr-1"></i>Set early stopping options
+                    </h4>
+                </label>
+                <div class="accordion-body">
+                    {{ add_form_group(EarlyStoppingForm.patience) }}
+                    {{ add_form_group(EarlyStoppingForm.monitor) }}
+                    {{ add_form_group(EarlyStoppingForm.mode) }}
+                </div>
+            </div>
+        {% endif %}
+        {% if ModelOptionsForm.model_checkpoints.default %}
+            <div class="accordion m-2">
+                <input id="building-modelcheckpoint" type="radio" name="building-accordion" hidden="">
+                <label class="accordion-header c-hand" for="building-modelcheckpoint">
+                    <h4>
+                        <i class="icon icon-arrow-right mr-1"></i>Set model checkpoint options
+                    </h4>
+                </label>
+                <div class="accordion-body">
+                    ...
+                </div>
+            </div>
+        {% endif %}
+
         <div class="accordion m-2">
             <input id="building-build" type="radio" name="building-accordion" hidden="">
             <label class="accordion-header c-hand" for="building-build">

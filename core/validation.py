@@ -567,3 +567,52 @@ class ModelOptionsForm(Form):
                 self.early_stopping.render_kw.pop('checked')
         else:
             self.early_stopping.render_kw = {'checked': ''}
+
+
+class EarlyStoppingOptionsForm(Form):
+    monitor = SelectField(
+        label='Base early stopping on training metric',
+        choices=[
+            ('loss', 'Loss'),
+            ('accuracy', 'Accuracy'),
+            ('val_loss', 'Validation loss'),
+            ('val_acc', 'Validation accuracy')
+        ],
+        validators=[
+            validators.DataRequired('The metric to monitor is required for early stopping')
+        ],
+        render_kw={
+            'class': 'form-select'
+        }
+    )
+    patience = IntegerRangeField(
+        label='Patience: how many epochs of decreased scoring before early stopping kicks in',
+        validators=[
+            validators.DataRequired('Patience is required for early stopping')
+        ],
+        default=10,
+        render_kw={
+            'min': 1,
+            'max': 100,
+            'step': 2,
+            'class': 'slider tooltip p-2',
+            'oninput': 'this.setAttribute("value", `${this.value}`);',
+        }
+    )
+    mode = SelectField(
+        label='Early stopping mode',
+        validators=[
+            validators.DataRequired('The early stopping mode is required')
+        ],
+        choices=[('auto', 'Auto'), ('min', 'Min'), ('max', 'Max')],
+        render_kw={
+            'class': 'form-select'
+        }
+    )
+
+    def set_values(self, max_epochs):
+        self.patience.validators.append(
+            validators.NumberRange(min=1, max=max_epochs,
+                                   message=f'The patience value should be between 1 and {max_epochs}')
+        )
+        self.patience.render_kw['max'] = max_epochs

@@ -211,6 +211,7 @@ def run():
     replace_form = ReplaceDataForm()
     create_layer_form = CreateLayerForm()
     model_options_form = ModelOptionsForm()
+    early_stopping_form = EarlyStoppingOptionsForm()
 
     if is_user_logged_in():
         data = get_has_keys('project')
@@ -237,6 +238,7 @@ def run():
                     current_es=runtime_manager.get_model_param(project, 'early_stopping', False),
                     current_mcp=runtime_manager.get_model_param(project, 'model_checkpoints', False)
                 )
+                early_stopping_form.set_values(runtime_manager.get_model_param(project, 'epochs', 5))
 
                 return render_template('project.html',
                                        Projectname=project,
@@ -267,7 +269,8 @@ def run():
                                        DropForm=drop_form,
                                        ReplaceForm=replace_form,
                                        CreateLayerForm=create_layer_form,
-                                       ModelOptionsForm=model_options_form)
+                                       ModelOptionsForm=model_options_form,
+                                       EarlyStoppingForm=early_stopping_form)
 
     return redirect('/login')
 
